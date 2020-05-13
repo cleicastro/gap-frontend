@@ -3,3 +3,4 @@ export { default as StepComponent } from './StepComponent';
 export { default as FormContribuinte } from './FormContribuinte';
 export { default as FormDocumento } from './FormDocumento';
 export { default as Review } from './Review';
+export { default as CardDocumentSkeletron } from './CardDocumentSkeletron';

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import {
   Card,
@@ -16,16 +16,11 @@ import {
   useStylesVencido
 } from './styles';
 
-import ReviewDialog from './ReviewDialog';
-
-function CardDam({ className, listDam, ...rest }) {
+function CardDam({ className, listDam, handleDamDetail, ...rest }) {
   const classes = useStyles();
   const classesPago = useStylesPago();
   const classesCancelado = useStylesCancelado();
   const classesVencido = useStylesVencido();
-
-  const [showReview, setReviewShow] = useState(false);
-  const [damView, setDamView] = useState({});
 
   const classValueTotal = (status) => {
     switch (status) {
@@ -62,24 +57,17 @@ function CardDam({ className, listDam, ...rest }) {
       case 'Cancelado':
         return `Cancelado`;
       case 'Inadimplente':
-        return `${days} dia(s) de atraso ${Intl.DateTimeFormat('pt-BR').format(
-          new Date(vencimento)
-        )}`;
+        return `${days} dia(s) de atraso ${Intl.DateTimeFormat('pt-BR', {
+          timeZone: 'UTC'
+        }).format(new Date(vencimento))}`;
       default:
         return days > 0
-          ? `${days} dia(s) para vencer ${Intl.DateTimeFormat('pt-BR').format(
-            new Date(vencimento)
-          )}`
-          : `Vence hoje ${Intl.DateTimeFormat('pt-BR').format(
-            new Date(vencimento)
-          )}`;
-    }
-  };
-
-  const openReview = (data) => {
-    if (data) {
-      setDamView(data);
-      setReviewShow((show) => !show);
+          ? `${days} dia(s) para vencer ${Intl.DateTimeFormat('pt-BR', {
+            timeZone: 'UTC'
+          }).format(new Date(vencimento))}`
+          : `Vence hoje ${Intl.DateTimeFormat('pt-BR', {
+            timeZone: 'UTC'
+          }).format(new Date(vencimento))}`;
     }
   };
 
@@ -94,7 +82,7 @@ function CardDam({ className, listDam, ...rest }) {
                 ? classesCancelado.root
                 : clsx(classes.root, className)
             }>
-            <CardActionArea onClick={() => openReview(dam)}>
+            <CardActionArea onClick={() => handleDamDetail(dam)}>
               <CardHeader
                 avatar={
                   <Avatar
@@ -149,11 +137,6 @@ function CardDam({ className, listDam, ...rest }) {
           </Card>
         </Grid>
       ))}
-      <ReviewDialog
-        handleReviewShow={() => setReviewShow((show) => !show)}
-        showReview={showReview}
-        handleDamView={damView}
-      />
     </Grid>
   );
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import {
   FormControlLabel,
@@ -6,81 +6,179 @@ import {
   Typography,
   Slider,
   TextField,
-  Checkbox
+  Radio
 } from '@material-ui/core';
 
 import useStyles from './styles';
 
-function FormFilter() {
+function FormFilter({ handleOnSubmit }) {
   const classes = useStyles();
+  const [params, setParams] = useState({
+    dataInicialFilter: '',
+    dataFinalFilter: '',
+    docContribuinte: '',
+    id: '',
+    nameContribuinteFilter: '',
+    docContribuinteFilter: ''
+  });
+
+  const [selectedSituacao, setSelectedSituacao] = useState('all');
+
+  const [value, setValue] = useState([0, 1000]);
+
+  const handleChangeSlide = (event, newValue) => {
+    setValue(newValue);
+  };
+  const handleChangeTexField = (event) => {
+    setParams({ ...params, [event.target.id]: event.target.value });
+  };
+  const handleChangeRadioSituacao = (event) => {
+    setSelectedSituacao(event.target.value);
+  };
+
+  useEffect(() => {
+    const {
+      dataInicialFilter,
+      dataFinalFilter,
+      docContribuinteFilter,
+      id,
+      nameContribuinteFilter
+    } = params;
+
+    handleOnSubmit({
+      dataInicialFilter,
+      dataFinalFilter,
+      docContribuinteFilter,
+      id,
+      nameContribuinteFilter,
+      situacaoFilter: selectedSituacao,
+      valorTotalFilter: value.join(',')
+    });
+  }, [handleOnSubmit, params, selectedSituacao, value]);
 
   return (
-    <form className={classes.root} noValidate autoComplete="off">
+    <form
+      className={classes.root}
+      noValidate
+      autoComplete="off"
+      id="formFiltro">
       <div>
         <FormGroup row>
           <TextField
-            id="date-inicial"
+            id="dataInicialFilter"
             label="Data inicial:"
             type="date"
-            defaultValue="2017-05-24"
             className={classes.textField}
             InputLabelProps={{
               shrink: true
             }}
+            onChange={handleChangeTexField}
           />
           <TextField
-            id="date-final"
+            id="dataFinalFilter"
             label="Data final:"
             type="date"
-            defaultValue="2017-05-24"
             className={classes.textField}
             InputLabelProps={{
               shrink: true
             }}
+            onChange={handleChangeTexField}
           />
         </FormGroup>
         <FormGroup row>
           <TextField
-            id="cnpj-cpf"
+            id="docContribuinteFilter"
             label="CNPJ/CPF:"
             className={classes.textField}
+            onChange={handleChangeTexField}
           />
-          <TextField id="dam" label="N° DAM" className={classes.textField} />
+          <TextField
+            id="id"
+            label="N° DAM"
+            className={classes.textField}
+            onChange={handleChangeTexField}
+          />
         </FormGroup>
-        <TextField id="contribuinte" label="Contribuinte:" fullWidth />
+        <TextField
+          id="nameContribuinteFilter"
+          label="Contribuinte:"
+          fullWidth
+          onChange={handleChangeTexField}
+        />
         <FormGroup row>
           <FormControlLabel
-            control={<Checkbox checked={false} name="pago" color="primary" />}
+            control={
+              <Radio
+                checked={selectedSituacao === 'pago'}
+                onChange={handleChangeRadioSituacao}
+                value="pago"
+                name="radio-button-demo"
+                inputProps={{ 'aria-label': 'Pago' }}
+              />
+            }
             label="Pago"
           />
           <FormControlLabel
             control={
-              <Checkbox checked={false} name="checkedB" color="primary" />
+              <Radio
+                checked={selectedSituacao === 'vencer'}
+                onChange={handleChangeRadioSituacao}
+                value="vencer"
+                name="radio-button-demo"
+                inputProps={{ 'aria-label': 'Vencer' }}
+              />
+            }
+            label="À Vencer"
+          />
+          <FormControlLabel
+            control={
+              <Radio
+                checked={selectedSituacao === 'inadimplente'}
+                onChange={handleChangeRadioSituacao}
+                value="inadimplente"
+                name="radio-button-demo"
+                inputProps={{ 'aria-label': 'Inadimplente' }}
+              />
             }
             label="Inadimplente"
           />
           <FormControlLabel
             control={
-              <Checkbox checked={false} name="checkedC" color="primary" />
+              <Radio
+                checked={selectedSituacao === 'cancelado'}
+                onChange={handleChangeRadioSituacao}
+                value="cancelado"
+                name="radio-button-demo"
+                inputProps={{ 'aria-label': 'Cancelado' }}
+              />
             }
-            label="À Vencer"
+            label="Cancelado"
           />
           <FormControlLabel
-            control={<Checkbox checked name="checkedD" color="primary" />}
-            label="Cancelado"
+            control={
+              <Radio
+                checked={selectedSituacao === 'all'}
+                onChange={handleChangeRadioSituacao}
+                value="all"
+                name="radio-button-demo"
+                inputProps={{ 'aria-label': 'Todos' }}
+              />
+            }
+            label="Todos"
           />
         </FormGroup>
         <Typography id="range-slider" gutterBottom>
           Valor do DAM
         </Typography>
         <Slider
-          value={0}
+          value={value}
+          onChange={handleChangeSlide}
+          id="valorTotal"
+          name="valorTotal"
           valueLabelDisplay="auto"
           aria-labelledby="range-slider"
-          step={10}
-          marks
           min={0}
-          max={5000}
+          max={1000}
         />
       </div>
     </form>

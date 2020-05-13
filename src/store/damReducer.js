@@ -1,41 +1,68 @@
 import { Dam } from '../services';
 
 const ACTIONS = {
-  PRELOAD: 'DAM_PRELOAD',
+  ISLOAD: 'DAM_ISLOAD',
   LIST: 'DAM_LIST',
-  ADD: 'DAM_ADD'
+  LIST_INITIAL: 'LIST_INITIAL',
+  ADD: 'DAM_ADD',
+  ERROR: 'DAM_ERROR'
 };
 
 const INITIAL_STATE = {
+  error: [],
   listDam: [],
   pagination: {},
-  preload: true
+  isload: true
 };
 
 export const damReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
+    case ACTIONS.ISLOAD:
+      return {
+        isload: true
+      };
+    case ACTIONS.LIST_INITIAL:
+      return {
+        ...state,
+        listDam: action.listDam.data,
+        pagination: action.listDam.meta,
+        isload: action.isload
+      };
     case ACTIONS.LIST:
       return {
         ...state,
         listDam: [...state.listDam, ...action.listDam.data],
-        pagination: action.listDam.meta
+        pagination: action.listDam.meta,
+        isload: action.isload
+      };
+    case ACTIONS.ERROR:
+      return {
+        error: action.error,
+        isload: action.isload,
+        listDam: [],
+        pagination: {}
       };
     default:
       return state;
   }
 };
 
-export function requestDam(params) {
-  const token = 'aqui_tem_que_ficar_o_token_para_auth';
+export function requestDam(params, token) {
   return async (dispatch) => {
+    dispatch({ type: 'ISLOAD' });
     try {
-      const response = await Dam.getDam(token, params);
+      const response = await Dam.getDam({ ...params }, token);
       dispatch({
-        type: ACTIONS.LIST,
-        listDam: response.data
+        type: params.page > 1 ? ACTIONS.LIST : ACTIONS.LIST_INITIAL,
+        listDam: response.data,
+        isload: false
       });
     } catch (error) {
-      console.log(error);
+      dispatch({
+        type: ACTIONS.ERROR,
+        error,
+        isload: false
+      });
     }
   };
 }

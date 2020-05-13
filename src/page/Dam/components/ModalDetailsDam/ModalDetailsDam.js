@@ -16,9 +16,9 @@ import {
   Fade
 } from '@material-ui/core';
 import useStyles from './styles';
-import { Review } from '../../../../../components';
+import { Review } from '../../../../components';
 
-function Filtros({
+function ModalDetailsDam({
   className,
   handleReviewShow,
   showReview,
@@ -150,4 +150,4 @@ function Filtros({
   );
 }
 
-export default Filtros;
+export default ModalDetailsDam;

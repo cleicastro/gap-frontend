@@ -1,14 +1,12 @@
 import { Receita } from '../services';
 
 const ACTIONS = {
-  PRELOAD: 'Receita_PRELOAD',
   LIST: 'Receita_LIST',
   ADD: 'Receita_ADD'
 };
 
 const INITIAL_STATE = {
-  listReceita: [],
-  preload: true
+  listReceita: []
 };
 
 export const receitaReducer = (state = INITIAL_STATE, action) => {
@@ -23,8 +21,7 @@ export const receitaReducer = (state = INITIAL_STATE, action) => {
   }
 };
 
-export function requestReceita() {
-  const token = 'aqui_tem_que_ficar_o_token_para_auth';
+export function requestReceita(token) {
   return async (dispatch) => {
     try {
       const response = await Receita.getReceita(token);

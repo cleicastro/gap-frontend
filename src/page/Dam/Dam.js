@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+/* eslint-disable no-shadow */
+import React, { useState, useEffect, useRef } from 'react';
+import Axios from 'axios';
 
 import {
   Grid,
@@ -23,46 +25,127 @@ import InfiniteScroll from 'react-infinite-scroller';
 
 import { requestDam } from '../../store/damReducer';
 import { requestReceita } from '../../store/receitaReducer';
+import { setParams } from '../../store/paramsReducer';
+import {
+  CardDam,
+  Filtros,
+  NewDam,
+  TableDam,
+  ModalDetailsDam
+} from './components';
+import { CardDocumentSkeletron } from '../../components';
 import useStyles from './styles';
-import CardDam from './components/CardDam/CardDam';
-import Filtros from './components/Filtros/Filtros';
-import NewDam from './components/NewDam/NewDam';
 
 function Dam({
   listDam,
   pagination,
   ValueTotal,
+  isload,
   requestDam: handleListDam,
   listReceita,
+  setParams: handleParams,
+  paramsFilter,
   requestReceita: handleListReceita
 }) {
   const [showFiltro, setShowFiltro] = useState(false);
   const [showNewDam, setShowNewDam] = useState(false);
   const [listReceitaFiltro, setListReceitaFiltro] = useState([]);
+  const [viewTable, setViewTable] = useState(false);
+  const [showReview, setReviewShow] = useState(false);
+  const [damView, setDamView] = useState({});
+  const [order, setOrder] = useState('id');
+  const [sort, setSort] = useState(false);
+  const [params, setParams] = useState();
+  const timerToClearSomewhere = useRef(false);
+
   const classes = useStyles();
 
-  useEffect(() => {
-    handleListDam({
-      order: 'id',
-      sort: 'DESC',
-      page: 0
-    });
-
-    handleListReceita();
-  }, [handleListDam, handleListReceita]);
+  const itensSkeletron = [];
+  const quantSkeletron = 10;
+  for (let i = 0; i < quantSkeletron; i++) {
+    itensSkeletron.push(i);
+  }
 
   useEffect(() => {
     const listReceitaMap = [];
+    const tokenReceita = Axios.CancelToken.source();
     listReceita.map((d) => listReceitaMap.push(d.descricao));
-    setListReceitaFiltro(listReceitaMap);
+    setListReceitaFiltro(listReceitaMap, tokenReceita.token);
+
+    return () => {
+      tokenReceita.cancel('Request cancell');
+      clearTimeout(timerToClearSomewhere.current);
+    };
   }, [listReceita]);
 
-  const setPage = () => {
-    handleListDam({
-      order: 'id',
-      sort: 'DESC',
-      page: Number(pagination.current_page) + 1
-    });
+  useEffect(() => {
+    handleListReceita();
+  }, [handleListReceita]);
+
+  useEffect(() => {
+    handleParams(params);
+  }, [handleParams, params]);
+
+  useEffect(() => {
+    const tokenDam = Axios.CancelToken.source();
+    handleListDam(
+      {
+        order,
+        sort,
+        page: 1
+      },
+      tokenDam.token
+    );
+  }, [handleListDam, order, sort]);
+
+  useEffect(() => {
+    const tokenDam = Axios.CancelToken.source();
+    function requestDam() {
+      if (Object.keys(paramsFilter).length !== 0) {
+        timerToClearSomewhere.current = setTimeout(() => {
+          handleListDam(
+            { ...paramsFilter, order, sort, page: 1 },
+            tokenDam.token
+          );
+        }, 500);
+      }
+    }
+    requestDam();
+    return () => {
+      tokenDam.cancel('Request cancell');
+      clearTimeout(timerToClearSomewhere.current);
+    };
+  }, [handleListDam, paramsFilter, order, sort]);
+
+  const setPagination = () => {
+    const tokenDam = Axios.CancelToken.source();
+    if (pagination.current_page < pagination.last_page) {
+      handleListDam(
+        {
+          ...paramsFilter,
+          order,
+          sort,
+          page: Number(pagination.current_page) + 1
+        },
+        tokenDam.token
+      );
+    }
+  };
+
+  const handleModalDetails = (dam) => {
+    if (dam) {
+      setDamView(dam);
+      setReviewShow((show) => !show);
+    }
+  };
+
+  const handleOrderSort = (campo, isDefaultOrder) => {
+    if (campo === order) {
+      setSort((isSort) => !isSort);
+    } else {
+      setSort((isSort) => (isDefaultOrder ? true : !isSort));
+      setOrder(campo);
+    }
   };
 
   return (
@@ -83,6 +166,11 @@ function Dam({
                     <SearchIcon />
                   </div>
                   <InputBase
+                    id="fastSearch"
+                    name="fastSearch"
+                    onChange={(e) =>
+                      setParams({ contribuinte: e.target.value })
+                    }
                     placeholder="Buscar Contribuinte"
                     classes={{
                       root: classes.inputRoot,
@@ -101,6 +189,7 @@ function Dam({
                   <FilterListIcon />
                 </IconButton>
                 <IconButton
+                  onClick={() => setViewTable((show) => !show)}
                   size="small"
                   aria-label="Tabela"
                   className={classes.iconMenu}>
@@ -117,25 +206,47 @@ function Dam({
           </Paper>
         </Grid>
         <Grid item xs={12}>
+          {isload && <CardDocumentSkeletron quantSkeletron={itensSkeletron} />}
           <InfiniteScroll
-            threshold={550}
             pageStart={0}
-            loadMore={setPage}
-            hasMore={pagination.current_page < pagination.last_page}
+            hasMore={
+              pagination && pagination.current_page < pagination.last_page
+            }
+            loadMore={setPagination}
             loader={
               <div className={classes.loader} key={0}>
                 <CircularProgress color="primary" />
               </div>
             }>
-            <CardDam listDam={listDam} />
+            {viewTable ? (
+              <TableDam
+                listDam={listDam}
+                handleDamDetail={handleModalDetails}
+                handleOrderSort={handleOrderSort}
+                handleParams={setParams}
+              />
+            ) : (
+                <CardDam listDam={listDam} handleDamDetail={handleModalDetails} />
+              )}
           </InfiniteScroll>
         </Grid>
       </Grid>
+      <ModalDetailsDam
+        handleReviewShow={() => setReviewShow((show) => !show)}
+        showReview={showReview}
+        handleDamView={damView}
+      />
       <Filtros
         showFiltro={showFiltro}
         listReceita={listReceitaFiltro}
-        handleParams={(handleParm) => console.log(handleParm)}
-        handleFiltroShow={() => setShowFiltro((show) => !show)}
+        handleParams={(data) => {
+          setParams(data);
+          setShowFiltro((show) => !show);
+        }}
+        handleFiltroShow={() => {
+          setShowFiltro((show) => !show);
+          setParams({});
+        }}
       />
       <NewDam
         handleClose={() => setShowNewDam((show) => !show)}
@@ -156,15 +267,19 @@ function Dam({
 const mapStateToProps = (state) => ({
   listDam: state.dam.listDam,
   pagination: state.dam.pagination,
-  ValueTotal: state.dam.listDam.reduce(
-    (accumator, currentValue) =>
-      Number(accumator) + Number(currentValue.valor_total),
-    0
-  ),
-  listReceita: state.receita.listReceita
+  isload: state.dam.isload,
+  ValueTotal:
+    state.dam.listDam &&
+    state.dam.listDam.reduce(
+      (accumator, currentValue) =>
+        Number(accumator) + Number(currentValue.valor_total),
+      0
+    ),
+  listReceita: state.receita.listReceita,
+  paramsFilter: state.paramsFilter.listParams
 });
 
 const mapDispatchToProps = (dispatch) =>
-  bindActionCreators({ requestDam, requestReceita }, dispatch);
+  bindActionCreators({ requestDam, requestReceita, setParams }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Dam);

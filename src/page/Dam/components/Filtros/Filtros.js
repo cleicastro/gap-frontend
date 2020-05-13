@@ -41,6 +41,7 @@ function Filtros({
   const [checked, setChecked] = useState([]);
   const [left, setLeft] = useState([]);
   const [right, setRight] = useState([]);
+  const [paramsFilter, setParamsFilter] = useState([]);
 
   const leftChecked = intersection(checked, left);
   const rightChecked = intersection(checked, right);
@@ -117,11 +118,8 @@ function Filtros({
   );
 
   const setParams = () => {
-    const filter = {
-      title: right,
-      value: 100
-    };
-    return filter;
+    const filter = { ...paramsFilter, receitaFilter: right.join(',') };
+    handleParams(filter);
   };
 
   return (
@@ -183,17 +181,17 @@ function Filtros({
             </Grid>
             <Grid item>{customList(right)}</Grid>
             <Grid item>
-              <FormFilter />
+              <FormFilter handleOnSubmit={setParamsFilter} />
             </Grid>
           </Grid>
         </div>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => handleParams(setParams)} color="primary">
+        <Button color="primary" onClick={setParams}>
           Filtrar
         </Button>
         <Button onClick={handleFiltroShow} color="primary">
-          Fechar
+          Limpar
         </Button>
       </DialogActions>
     </Dialog>
