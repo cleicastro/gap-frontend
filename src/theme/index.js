@@ -9,15 +9,15 @@ const dark = false;
 const theme = createMuiTheme({
   palette: dark
     ? {
-      type: 'dark',
+      type: 'dark'
     }
     : palette,
   typography,
   overrides,
   zIndex: {
     appBar: 1200,
-    drawer: 1100,
-  },
+    drawer: 1100
+  }
 });
 
 export default theme;

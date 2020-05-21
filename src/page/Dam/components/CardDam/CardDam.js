@@ -61,13 +61,21 @@ function CardDam({ className, listDam, handleDamDetail, ...rest }) {
           timeZone: 'UTC'
         }).format(new Date(vencimento))}`;
       default:
-        return days > 0
-          ? `${days} dia(s) para vencer ${Intl.DateTimeFormat('pt-BR', {
-            timeZone: 'UTC'
-          }).format(new Date(vencimento))}`
-          : `Vence hoje ${Intl.DateTimeFormat('pt-BR', {
+        // eslint-disable-next-line no-case-declarations
+        let msgVencimento = '';
+        if (days > 0) {
+          msgVencimento = `${days} dia(s) para vencer ${Intl.DateTimeFormat(
+            'pt-BR',
+            {
+              timeZone: 'UTC'
+            }
+          ).format(new Date(vencimento))}`;
+        } else {
+          msgVencimento = `Vence hoje ${Intl.DateTimeFormat('pt-BR', {
             timeZone: 'UTC'
           }).format(new Date(vencimento))}`;
+        }
+        return msgVencimento;
     }
   };
 
@@ -88,7 +96,7 @@ function CardDam({ className, listDam, handleDamDetail, ...rest }) {
                   <Avatar
                     aria-label="recipe"
                     className={classAvatar(dam.status)}>
-                    {dam.cod_dam}
+                    {dam.id}
                   </Avatar>
                 }
                 title={dam.receita.descricao}

@@ -80,7 +80,10 @@ function TableDam({ listDam, handleDamDetail, handleOrderSort, handleParams }) {
 
   return (
     <TableContainer component={Paper}>
-      <Table className={classes.table} aria-label="customized table">
+      <Table
+        className={classes.table}
+        size="small"
+        aria-label="customized table">
         <TableHead>
           <TableRow>
             <StyledTableCell onClick={() => handleOrderSort('id')}>

@@ -49,7 +49,6 @@ function Dam({
 }) {
   const [showFiltro, setShowFiltro] = useState(false);
   const [showNewDam, setShowNewDam] = useState(false);
-  const [listReceitaFiltro, setListReceitaFiltro] = useState([]);
   const [viewTable, setViewTable] = useState(false);
   const [showReview, setReviewShow] = useState(false);
   const [damView, setDamView] = useState({});
@@ -67,24 +66,13 @@ function Dam({
   }
 
   useEffect(() => {
-    const listReceitaMap = [];
     const tokenReceita = Axios.CancelToken.source();
-    listReceita.map((d) => listReceitaMap.push(d.descricao));
-    setListReceitaFiltro(listReceitaMap, tokenReceita.token);
-
+    handleListReceita();
     return () => {
       tokenReceita.cancel('Request cancell');
       clearTimeout(timerToClearSomewhere.current);
     };
-  }, [listReceita]);
-
-  useEffect(() => {
-    handleListReceita();
   }, [handleListReceita]);
-
-  useEffect(() => {
-    handleParams(params);
-  }, [handleParams, params]);
 
   useEffect(() => {
     const tokenDam = Axios.CancelToken.source();
@@ -96,7 +84,15 @@ function Dam({
       },
       tokenDam.token
     );
+    return () => {
+      tokenDam.cancel('Request cancell');
+      clearTimeout(timerToClearSomewhere.current);
+    };
   }, [handleListDam, order, sort]);
+
+  useEffect(() => {
+    handleParams(params);
+  }, [handleParams, params]);
 
   useEffect(() => {
     const tokenDam = Axios.CancelToken.source();
@@ -238,7 +234,7 @@ function Dam({
       />
       <Filtros
         showFiltro={showFiltro}
-        listReceita={listReceitaFiltro}
+        listReceita={listReceita}
         handleParams={(data) => {
           setParams(data);
           setShowFiltro((show) => !show);
@@ -251,6 +247,7 @@ function Dam({
       <NewDam
         handleClose={() => setShowNewDam((show) => !show)}
         open={showNewDam}
+        receitas={listReceita}
       />
       <Fab
         color="primary"
@@ -276,7 +273,8 @@ const mapStateToProps = (state) => ({
       0
     ),
   listReceita: state.receita.listReceita,
-  paramsFilter: state.paramsFilter.listParams
+  paramsFilter: state.paramsFilter.listParams,
+  updateDam: state.dam.updateDam
 });
 
 const mapDispatchToProps = (dispatch) =>

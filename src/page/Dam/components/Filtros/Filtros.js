@@ -47,7 +47,9 @@ function Filtros({
   const rightChecked = intersection(checked, right);
 
   useEffect(() => {
-    setLeft(listReceita);
+    const listReceitaMap = [];
+    listReceita.map((d) => listReceitaMap.push(d.descricao));
+    setLeft(listReceitaMap);
   }, [listReceita]);
 
   const theme = useTheme();

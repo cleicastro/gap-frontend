@@ -10,19 +10,19 @@ const useStyles = makeStyles((theme) => ({
     width: '5ch'
   },
   searchReceita: {
-    width: '12ch'
+    width: '10ch'
   },
   searchEmitido: {
     width: '16ch'
   },
   searchContribuinte: {
-    width: '20ch'
+    width: '18ch'
   },
   searchVencimento: {
     width: '16ch'
   },
   searchValor: {
-    width: '8ch'
+    width: '7ch'
   },
   btnPago: {
     color: theme.palette.success.main,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   AppBar,
@@ -12,43 +12,69 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 
 import useStyles from './styles';
-import { StepComponent } from '../../../../components';
+import { StepComponent, Contribuintes } from '../../../../components';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function NewDam({ open, handleClose }) {
+function NewDam({ open, handleClose, receitas }) {
   const classes = useStyles();
 
+  const [isopen, setIsOpen] = useState(false);
+
   return (
-    <Dialog
-      fullScreen
-      open={open}
-      onClose={handleClose}
-      TransitionComponent={Transition}>
-      <AppBar className={classes.appBar}>
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            onClick={handleClose}
-            aria-label="close">
-            <CloseIcon />
-          </IconButton>
-          <Typography variant="h6" className={classes.title}>
-            Ryatec-GAP
-          </Typography>
-          <Button autoFocus color="inherit" onClick={handleClose}>
-            Salvar
-          </Button>
-        </Toolbar>
-      </AppBar>
-      <StepComponent
-        steps={['Contribuinte', 'Documento', 'Confirmar dados']}
-        title="Emissão de DAM"
-      />
-    </Dialog>
+    <>
+      <Dialog
+        disableBackdropClick
+        fullScreen
+        open={open}
+        onClose={handleClose}
+        TransitionComponent={Transition}>
+        <AppBar className={classes.appBar}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={handleClose}
+              aria-label="close">
+              <CloseIcon />
+            </IconButton>
+            <Typography variant="h6" className={classes.title}>
+              RGP
+            </Typography>
+            <Button autoFocus color="inherit" onClick={() => setIsOpen(true)}>
+              Contribuintes
+            </Button>
+          </Toolbar>
+        </AppBar>
+        <StepComponent
+          steps={['Receita', 'Contribuinte', 'Documento', 'Confirmar dados']}
+          title="Emissão de DAM"
+          receitas={receitas}
+          handleClose={handleClose}
+        />
+      </Dialog>
+      <Dialog
+        disableBackdropClick
+        fullScreen
+        open={isopen}
+        onClose={() => setIsOpen(false)}
+        TransitionComponent={Transition}>
+        <AppBar className={classes.appBar}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={() => setIsOpen(false)}
+              aria-label="close">
+              <CloseIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+        <Contribuintes />
+      </Dialog>
+    </>
   );
 }
 

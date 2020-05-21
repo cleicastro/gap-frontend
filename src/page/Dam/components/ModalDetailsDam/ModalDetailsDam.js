@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import clsx from 'clsx';
 import {
@@ -9,121 +9,95 @@ import {
   DialogTitle,
   DialogActions,
   useTheme,
-  useMediaQuery,
-  ButtonGroup,
-  Menu,
-  MenuItem,
-  Fade
+  useMediaQuery
 } from '@material-ui/core';
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+
+import { updateStatusDam } from '../../../../store/damReducer';
+
 import useStyles from './styles';
 import { Review } from '../../../../components';
+import MenuDocumentEvents from '../../../../components/MenuDocumentEvents/MenuDocumentEvents';
 
 function ModalDetailsDam({
   className,
   handleReviewShow,
   showReview,
   handleDamView,
+  updateStatusDam: handleUpate,
+  updateDam: updateDamData,
   ...rest
 }) {
   const theme = useTheme();
   const fullScreenModal = useMediaQuery(theme.breakpoints.down('sm'));
   const classes = useStyles();
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+  const items = [
+    {
+      item: handleDamView.receita ? handleDamView.receita.descricao : '',
+      valor: handleDamView.valor_principal
+    },
+    {
+      item: 'Taxa de expedição',
+      valor: handleDamView.taxa_expedicao
+    },
+    {
+      item: 'Juros',
+      valor: handleDamView.valor_juros
+    }
+  ];
+  const receitaInfo = {
+    emissao: handleDamView.emissao,
+    vencimento: handleDamView.vencimento,
+    status: handleDamView.status
   };
+  const contribuintes = [handleDamView.contribuinte];
+  const infoAdicionais = handleDamView.info_adicionais;
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const [statusCancelar, setStatusCancelar] = useState(false);
+  const [statusPagar, setStatusPagar] = useState(false);
+  const [handleUpdateStatus, setHandleUpdateStatus] = useState({});
 
-  const infoAditional = handleDamView.info_adicionais;
-  const valueDocument = handleDamView.valor_principal && [
-    { name: 'Valor Principal', price: handleDamView.valor_principal },
-    { name: 'Valor do juros', price: handleDamView.valor_juros },
-    { name: 'Taxa de expedição', price: handleDamView.taxa_expedicao }
-  ];
-  const contribuinte = handleDamView.contribuinte && [
-    handleDamView.contribuinte.nome,
-    handleDamView.contribuinte.endereco,
-    handleDamView.contribuinte.numero,
-    handleDamView.contribuinte.bairro,
-    handleDamView.contribuinte.cidade
-  ];
-  const document = handleDamView.emissao && [
-    {
-      name: 'receita',
-      detail: handleDamView.receita ? handleDamView.receita.cod : '0000000'
-    },
-    {
-      name: 'descricao',
-      detail: handleDamView.receita.descricao
-        ? handleDamView.receita.descricao
-        : 'Receita inválida'
-    },
-    { name: 'Referência', detail: handleDamView.referencia },
-    {
-      name: 'Data de emissão',
-      detail: Intl.DateTimeFormat('pt-BR', {
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric',
-        hour12: false
-      }).format(new Date(handleDamView.emissao))
-    },
-    {
-      name: 'Data de vencimento',
-      detail: Intl.DateTimeFormat('pt-BR').format(
-        new Date(handleDamView.vencimento)
-      )
-    },
-    { name: 'Documento de origem', detail: handleDamView.n_ref }
-  ];
+  useEffect(() => {
+    if (updateDamData.pago === 1 && handleDamView.id === updateDamData.id) {
+      setStatusPagar(true);
+      setHandleUpdateStatus(updateDamData);
+    } else if (
+      updateDamData.situacao === 0 &&
+      handleDamView.id === updateDamData.id
+    ) {
+      setStatusCancelar(true);
+      setHandleUpdateStatus(updateDamData);
+    } else {
+      setHandleUpdateStatus({});
+      setStatusPagar(
+        handleDamView.status === 'Pago' && handleDamView.status === 'Cancelado'
+      );
+      setStatusCancelar(handleDamView.status === 'Cancelado');
+    }
+  }, [updateDamData, handleDamView]);
 
   return (
     <Dialog
       fullScreen={fullScreenModal}
       open={showReview}
-      maxWidth="sm"
+      maxWidth="md"
       onClose={handleReviewShow}
       aria-labelledby="customized-dialog-title">
       <DialogTitle id="customized-dialog-title">
-        <ButtonGroup
-          size="small"
-          variant="contained"
-          color="primary"
-          aria-label="contained primary button group">
-          <Button>Pagar</Button>
-          <Button
-            aria-controls="fade-menu"
-            aria-haspopup="true"
-            onClick={handleClick}>
-            Imprimir
-          </Button>
-          <Button>Copiar</Button>
-          <Button>Editar</Button>
-          <Button>Cancelar</Button>
-        </ButtonGroup>
+        <MenuDocumentEvents
+          handleUpate={handleUpate}
+          updateDamData={handleUpdateStatus}
+          status={handleDamView.status}
+          id={handleDamView.id}
+          statusPagar={statusPagar}
+          statusCancelar={statusCancelar}
+        />
       </DialogTitle>
       <DialogContent dividers>
         <div {...rest} className={clsx(classes.root, className)}>
-          <Menu
-            id="fade-menu"
-            anchorEl={anchorEl}
-            keepMounted
-            open={open}
-            onClose={handleClose}
-            TransitionComponent={Fade}>
-            <MenuItem onClick={handleClose}>DAM</MenuItem>
-            <MenuItem onClick={handleClose}>Alvará</MenuItem>
-            <MenuItem onClick={handleClose}>NFSA</MenuItem>
-            <MenuItem onClick={handleClose}>Recibo</MenuItem>
-          </Menu>
           <Grid
             container
             spacing={2}
@@ -132,10 +106,10 @@ function ModalDetailsDam({
             className={classes.root}>
             <Grid item>
               <Review
-                valueDocument={valueDocument}
-                contribuinte={contribuinte}
-                document={document}
-                infoAditional={infoAditional}
+                items={items}
+                contribuintes={contribuintes}
+                infoAdicionais={infoAdicionais}
+                receitaInfo={receitaInfo}
               />
             </Grid>
           </Grid>
@@ -150,4 +124,11 @@ function ModalDetailsDam({
   );
 }
 
-export default ModalDetailsDam;
+const mapStateToProps = (state) => ({
+  updateDam: state.dam.updateDam
+});
+
+const mapDispatchToProps = (dispatch) =>
+  bindActionCreators({ updateStatusDam }, dispatch);
+
+export default connect(mapStateToProps, mapDispatchToProps)(ModalDetailsDam);
