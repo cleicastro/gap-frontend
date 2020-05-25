@@ -1,5 +1,4 @@
 import React from 'react';
-// import clsx from 'clsx';
 
 import {
   Grid,
@@ -12,9 +11,6 @@ import {
   CircularProgress,
   Button
 } from '@material-ui/core';
-/* import Fab from '@material-ui/core/Fab';
-import CheckIcon from '@material-ui/icons/Check';
-import SaveIcon from '@material-ui/icons/Save'; */
 
 import { Alert } from '@material-ui/lab';
 import useStyles from './styles';
@@ -43,10 +39,6 @@ function MenuDocumentEvents({
   const handleOpenCancelar = (event) => {
     setAnchorElCancelar(event.currentTarget);
   };
-
-  /*  const buttonClassname = clsx({
-     [classes.buttonSuccess]: updateDamData.message
-   }); */
 
   return (
     <Grid
@@ -93,17 +85,6 @@ function MenuDocumentEvents({
           autoHideDuration={6000}
           onClose={() => setOpenSnackbar(false)}>
           <>
-            {/* <div className={classes.wrapper}>
-              <Fab
-                aria-label="save"
-                color="primary"
-                className={buttonClassname}>
-                {classes ? <CheckIcon /> : <SaveIcon />}
-              </Fab>
-              {!updateDamData.message && (
-                <CircularProgress size={68} className={classes.fabProgress} />
-              )}
-            </div> */}
             {updateDamData.message ? (
               <Alert onClose={() => setOpenSnackbar(false)} severity="success">
                 {updateDamData.message}

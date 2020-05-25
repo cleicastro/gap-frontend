@@ -33,6 +33,7 @@ function Filtros({
   listReceita,
   handleParams,
   handleFiltroShow,
+  handleSair,
   showFiltro,
   ...rest
 }) {
@@ -119,6 +120,10 @@ function Filtros({
     </Paper>
   );
 
+  const handleParamsFilter = (value) => {
+    setParamsFilter({ ...paramsFilter, ...value });
+  };
+
   const setParams = () => {
     const filter = { ...paramsFilter, receitaFilter: right.join(',') };
     handleParams(filter);
@@ -183,7 +188,7 @@ function Filtros({
             </Grid>
             <Grid item>{customList(right)}</Grid>
             <Grid item>
-              <FormFilter handleOnSubmit={setParamsFilter} />
+              <FormFilter handleChangeValues={handleParamsFilter} />
             </Grid>
           </Grid>
         </div>
@@ -194,6 +199,9 @@ function Filtros({
         </Button>
         <Button onClick={handleFiltroShow} color="primary">
           Limpar
+        </Button>
+        <Button onClick={handleSair} color="primary">
+          Sair
         </Button>
       </DialogActions>
     </Dialog>

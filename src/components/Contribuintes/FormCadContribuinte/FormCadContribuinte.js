@@ -1,24 +1,47 @@
-import React from 'react';
-import {
-  Tabs,
-  Tab,
-  AppBar,
-  TextField,
-  Grid,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  Button
-} from '@material-ui/core';
-import SaveIcon from '@material-ui/icons/Save';
+import React, { useEffect } from 'react';
+import { Tabs, Tab, AppBar, Button, Box } from '@material-ui/core';
+import { Save, Edit, Add } from '@material-ui/icons';
+import PropTypes from 'prop-types';
 
-import TabPanel from './TabPanel';
+// import TabPanel from './TabPanel';
 
 import useStyles from './styles';
+import {
+  FormInformacoesPessoais,
+  FormInformacoesBancaria,
+  FormEndereco
+} from './components';
 
-function FormCadContribuinte() {
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
+      {...other}>
+      {value === index && <Box p={3}>{children}</Box>}
+    </div>
+  );
+}
+
+function FormCadContribuinte({
+  handleContribuinte,
+  handleSavlarContribuinte,
+  handleNovoContribuinte
+}) {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
+  const [contribuinte, setContribuinte] = React.useState(handleContribuinte);
+  const [isDisbledForm, setIsDisabledForm] = React.useState(false);
+
+  useEffect(() => {
+    setContribuinte(handleContribuinte);
+    if (handleContribuinte.id) {
+      setIsDisabledForm(true);
+    }
+  }, [handleContribuinte]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -31,25 +54,22 @@ function FormCadContribuinte() {
     };
   }
 
-  const [valuess, setValuess] = React.useState({
-    amount: '',
-    password: '',
-    weight: '',
-    weightRange: '',
-    showPassword: false
-  });
-
-  const handleChangess = (prop) => (event) => {
-    setValuess({ ...valuess, [prop]: event.target.value });
+  const handleChangeContribuinte = (event) => {
+    setContribuinte({
+      ...contribuinte,
+      [event.target.name]: event.target.value
+    });
   };
 
-  const handleSubmitContribuinte = (event) => {
-    event.preventDefault();
-    console.log(event);
+  const handleSubmitContribuinte = (data) => {
+    data.preventDefault();
+    handleSavlarContribuinte(contribuinte);
+    // setIsDisabledForm(true);
   };
 
   return (
     <div>
+      <p />
       <AppBar position="static" color="default">
         <Tabs
           value={value}
@@ -65,114 +85,73 @@ function FormCadContribuinte() {
       </AppBar>
       <form onSubmit={handleSubmitContribuinte}>
         <TabPanel value={value} index={0}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={3}>
-              <RadioGroup
-                row
-                aria-label="position"
-                name="tipo"
-                defaultValue="PF">
-                <FormControlLabel value="PF" control={<Radio />} label="CPF" />
-                <FormControlLabel value="PJ" control={<Radio />} label="CNPJ" />
-              </RadioGroup>
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <TextField fullWidth label="CPF/CNPJ" name="doc" required />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="Nome" name="nome" required />
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <TextField fullWidth label="Inscrição Municipal" name="im" />
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <TextField fullWidth label="RG" name="doc_estadual" />
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <TextField fullWidth label="Data de emissão" name="doc_emissao" />
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <TextField fullWidth label="Orgão emissor" name="doc_orgao" />
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <TextField fullWidth label="Telefone" name="telefone" />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="email" name="email" />
-            </Grid>
-          </Grid>
+          <FormInformacoesPessoais
+            handleChangeContribuinte={handleChangeContribuinte}
+            contribuinte={contribuinte}
+            isDisbledForm={isDisbledForm}
+          />
         </TabPanel>
         <TabPanel value={value} index={1}>
-          <Grid container spacing={3}>
-            <Grid item xs={6} sm={3}>
-              <TextField fullWidth label="CEP" name="cep" />
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <TextField fullWidth label="UF" name="uf" />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="Cidade" name="cidade" />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="Endereço" name="endereco" />
-            </Grid>
-            <Grid item xs={4} sm={2}>
-              <TextField fullWidth label="Número" name="numero" />
-            </Grid>
-            <Grid item xs={8} sm={4}>
-              <TextField fullWidth label="Complemento" name="complemento" />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField fullWidth label="Bairro" name="bairro" />
-            </Grid>
-          </Grid>
+          <FormEndereco
+            handleChangeContribuinte={handleChangeContribuinte}
+            contribuinte={contribuinte}
+            isDisbledForm={isDisbledForm}
+          />
         </TabPanel>
         <TabPanel value={value} index={2}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <RadioGroup
-                row
-                aria-label="position"
-                name="tipoConta"
-                defaultValue="CC">
-                <FormControlLabel
-                  value="CC"
-                  control={<Radio />}
-                  label="Conta Corrente"
-                />
-                <FormControlLabel
-                  value="CP"
-                  control={<Radio />}
-                  label="Conta Poupança"
-                />
-              </RadioGroup>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="Banco" name="banco" />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="Agência" name="agencia" />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="Conta" name="conta" />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="Variação" name="variacao" />
-            </Grid>
-          </Grid>
+          <FormInformacoesBancaria
+            handleChangeContribuinte={handleChangeContribuinte}
+            contribuinte={contribuinte}
+            isDisbledForm={isDisbledForm}
+          />
         </TabPanel>
+        {!isDisbledForm && (
+          <Button
+            disabled={isDisbledForm}
+            type="submit"
+            variant="contained"
+            color="primary"
+            size="small"
+            className={classes.button}
+            startIcon={<Save />}>
+            Salvar
+          </Button>
+        )}
+        {isDisbledForm && (
+          <Button
+            disabled={!isDisbledForm}
+            onClick={() => {
+              setIsDisabledForm(false);
+            }}
+            variant="contained"
+            color="primary"
+            size="small"
+            className={classes.button}
+            startIcon={<Edit />}>
+            Editar
+          </Button>
+        )}
         <Button
-          type="submit"
+          onClick={() => {
+            handleNovoContribuinte();
+            setIsDisabledForm(false);
+          }}
           variant="contained"
-          color="primary"
+          color="secondary"
           size="small"
           className={classes.button}
-          startIcon={<SaveIcon />}>
-          Salvar
+          startIcon={<Add />}>
+          Novo
         </Button>
       </form>
     </div>
   );
 }
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.any.isRequired,
+  value: PropTypes.any.isRequired
+};
 
 export default FormCadContribuinte;

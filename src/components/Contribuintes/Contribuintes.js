@@ -1,5 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useRef, useState } from 'react';
+import clsx from 'clsx';
+
 import {
   CssBaseline,
   Paper,
@@ -12,29 +14,72 @@ import {
   TableCell,
   TextField,
   CircularProgress,
-  Link
+  Link,
+  Snackbar
 } from '@material-ui/core';
+
+import Fab from '@material-ui/core/Fab';
+import CheckIcon from '@material-ui/icons/Check';
+import SaveIcon from '@material-ui/icons/Save';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import Axios from 'axios';
 import InfiniteScroll from 'react-infinite-scroller';
-import { requestContribuinte } from '../../store/contribuinteReducer';
+import {
+  requestContribuinte,
+  saveContribuinte,
+  updateContribuinte
+} from '../../store/contribuinteReducer';
 
 import { useStyles, StyledTableCell } from './styles';
 import FormCadContribuinte from './FormCadContribuinte';
 
 function Contribuintes({
   requestContribuinte: handleRequestContribuinte,
+  saveContribuinte: handleSaveContribuinte,
+  updateContribuinte: handleUpdateContribuinte,
+  updateDataContribuinte,
   listContribuinte,
   pagination
 }) {
+  const dataInit = {
+    tipo: 'PF',
+    doc: '',
+    nome: '',
+    docEstadual: '',
+    im: '',
+    docEmissao: '',
+    docOrgao: '',
+    telefone: '',
+    email: '',
+    cep: '',
+    uf: '',
+    cidade: '',
+    endereco: '',
+    numero: '',
+    complemento: '',
+    bairro: '',
+    banco: '',
+    agencia: '',
+    conta: '',
+    variacao: '',
+    tipoConta: ''
+  };
   const classes = useStyles();
   const timerToClearSomewhere = useRef(false);
   const [order, setOrder] = useState('id');
   const [sort, setSort] = useState(false);
   const [params, setParams] = useState({});
+  const [dataContribuinte, setDataContribuinte] = useState(dataInit);
+  const [isProgress, setIsProgress] = useState(false);
+
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const buttonClassname = clsx({
+    [classes.buttonSuccess]:
+      updateDataContribuinte && updateDataContribuinte.message
+  });
 
   useEffect(() => {
     const tokenDam = Axios.CancelToken.source();
@@ -62,6 +107,12 @@ function Contribuintes({
       clearTimeout(timerToClearSomewhere.current);
     };
   }, [handleRequestContribuinte, order, sort, params]);
+
+  useEffect(() => {
+    setIsProgress(false);
+    setDataContribuinte(dataInit);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [updateDataContribuinte, listContribuinte]);
 
   const setPagination = () => {
     const tokenDam = Axios.CancelToken.source();
@@ -91,12 +142,26 @@ function Contribuintes({
     }
   };
 
+  const salvarContribuinte = (data) => {
+    setOpenSnackbar(true);
+    setIsProgress(true);
+    if (data.id) {
+      handleUpdateContribuinte(data.id, data);
+    } else {
+      handleSaveContribuinte(data);
+    }
+  };
+
   return (
     <>
       <CssBaseline />
       <main className={classes.layout}>
         <Paper className={classes.paper}>
-          <FormCadContribuinte />
+          <FormCadContribuinte
+            handleContribuinte={dataContribuinte}
+            handleSavlarContribuinte={salvarContribuinte}
+            handleNovoContribuinte={() => setDataContribuinte(dataInit)}
+          />
         </Paper>
         <Paper
           className={classes.paper}
@@ -131,7 +196,6 @@ function Contribuintes({
                       CPF/CNPJ
                     </StyledTableCell>
                     <StyledTableCell
-                      align="center"
                       onClick={() => handleOrderSort('nome', false)}>
                       Nome
                     </StyledTableCell>
@@ -141,7 +205,6 @@ function Contribuintes({
                       Tipo
                     </StyledTableCell>
                     <StyledTableCell
-                      align="center"
                       onClick={() => handleOrderSort('enderecoCidade', false)}>
                       Endereço
                     </StyledTableCell>
@@ -198,7 +261,7 @@ function Contribuintes({
                       <TableCell align="center">
                         <Link
                           component="button"
-                          onClick={() => console.log(contribuinte.id)}
+                          onClick={() => setDataContribuinte(contribuinte)}
                           variant="body2">
                           {contribuinte.id}
                         </Link>
@@ -226,6 +289,26 @@ function Contribuintes({
             </TableContainer>
           </InfiniteScroll>
         </Paper>
+        <Snackbar
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          key="load"
+          open={openSnackbar}
+          autoHideDuration={6000}
+          onClose={() => setOpenSnackbar(false)}>
+          <>
+            <div className={classes.wrapper}>
+              <Fab
+                aria-label="save"
+                color="primary"
+                className={buttonClassname}>
+                {!isProgress ? <CheckIcon /> : <SaveIcon />}
+              </Fab>
+              {isProgress && (
+                <CircularProgress size={68} className={classes.fabProgress} />
+              )}
+            </div>
+          </>
+        </Snackbar>
       </main>
     </>
   );
@@ -233,10 +316,14 @@ function Contribuintes({
 
 const mapStateToProps = (state) => ({
   listContribuinte: state.contribuinte.listContribuinte,
+  updateDataContribuinte: state.contribuinte.updateDataContribuinte,
   pagination: state.contribuinte.pagination
 });
 
 const mapDispatchToProps = (dispatch) =>
-  bindActionCreators({ requestContribuinte }, dispatch);
+  bindActionCreators(
+    { requestContribuinte, saveContribuinte, updateContribuinte },
+    dispatch
+  );
 
 export default connect(mapStateToProps, mapDispatchToProps)(Contribuintes);

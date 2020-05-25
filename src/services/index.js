@@ -1,3 +1,3 @@
-export { default as Receita } from './receita';
-export { default as contribuinte } from './contribuinte';
-export { default as Dam } from './dam';
+export { default as Receita } from './Receita';
+export { default as Contribuinte } from './Contribuinte';
+export { default as Dam } from './Dam';

@@ -1,16 +1,20 @@
-import { contribuinte } from '../services';
+/* eslint-disable no-case-declarations */
+/* eslint-disable no-param-reassign */
+import { Contribuinte } from '../services';
 
 const ACTIONS = {
-  ISLOAD: 'DAM_ISLOAD',
+  ISLOAD: 'Contribuinte_ISLOAD',
   LIST: 'Contribuinte_LIST',
   LIST_INITIAL: 'Contribuinte_LIST_INITIAL',
   ADD: 'Contribuinte_ADD',
-  ERROR: 'DAM_ERROR'
+  UPDATE: 'Contribuinte_UPDATE',
+  ERROR: 'Contribuinte_ERROR'
 };
 
 const INITIAL_STATE = {
   error: [],
   listContribuinte: [],
+  updateDataContribuinte: {},
   pagination: {},
   isload: true
 };
@@ -38,11 +42,77 @@ export const contribuinteReducer = (state = INITIAL_STATE, action) => {
         pagination: action.listContribuinte.meta,
         isload: false
       };
+    case ACTIONS.ADD:
+      return {
+        ...state,
+        listContribuinte: [
+          action.listContribuinte.data,
+          ...state.listContribuinte
+        ],
+        isload: false
+      };
+    case ACTIONS.UPDATE:
+      const lst = state.listContribuinte.slice();
+
+      const {
+        tipo,
+        doc,
+        nome,
+        docEstadual,
+        docEmissao,
+        docOrgao,
+        telefone,
+        email,
+        cep,
+        uf,
+        cidade,
+        endereco,
+        numero,
+        complemento,
+        bairro,
+        banco,
+        agencia,
+        conta,
+        variacao,
+        tipoConta
+      } = action.updateDataContribuinte.params;
+      lst.forEach((contribuinte) => {
+        if (contribuinte.id === action.id) {
+          contribuinte.tipo = tipo;
+          contribuinte.doc = doc;
+          contribuinte.nome = nome;
+          contribuinte.docEstadual = docEstadual;
+          // contribuinte.im = im;
+          contribuinte.docEmissao = docEmissao;
+          contribuinte.docOrgao = docOrgao;
+          contribuinte.telefone = telefone;
+          contribuinte.email = email;
+          contribuinte.cep = cep;
+          contribuinte.uf = uf;
+          contribuinte.cidade = cidade;
+          contribuinte.endereco = endereco;
+          contribuinte.numero = numero;
+          contribuinte.complemento = complemento;
+          contribuinte.bairro = bairro;
+          contribuinte.banco = banco;
+          contribuinte.agencia = agencia;
+          contribuinte.conta = conta;
+          contribuinte.variacao = variacao;
+          contribuinte.tipoConta = tipoConta;
+        }
+      });
+      return {
+        ...state,
+        updateDataContribuinte: action.updateDataContribuinte,
+        listContribuinte: lst,
+        isload: false
+      };
     case ACTIONS.ERROR:
       return {
         error: action.error,
         isload: false,
-        listContribuinte: []
+        listContribuinte: [...state.listContribuinte],
+        pagination: { ...state.pagination.meta }
       };
     default:
       return state;
@@ -53,12 +123,56 @@ export function requestContribuinte(params, token) {
   return async (dispatch) => {
     // dispatch({ type: 'ISLOAD' });
     try {
-      const response = await contribuinte.getContribuinte({ ...params }, token);
+      const response = await Contribuinte.getContribuinte({ ...params }, token);
       dispatch({
         type: params.page > 1 ? ACTIONS.LIST : ACTIONS.LIST_INITIAL,
         listContribuinte: response.data
       });
     } catch (error) {
+      dispatch({
+        type: ACTIONS.ERROR,
+        error
+      });
+    }
+  };
+}
+
+export function saveContribuinte(contribuinte) {
+  return async (dispatch) => {
+    try {
+      const response = await Contribuinte.salveContribuinte({
+        ...contribuinte
+      });
+      dispatch({
+        type: ACTIONS.ADD,
+        listContribuinte: response
+      });
+    } catch (error) {
+      console.log(error);
+      dispatch({
+        type: ACTIONS.ERROR,
+        error
+      });
+    }
+  };
+}
+
+export function updateContribuinte(id, params) {
+  return async (dispatch) => {
+    try {
+      const response = await Contribuinte.updateContribuinte(id, params);
+      dispatch({
+        type: ACTIONS.UPDATE,
+        id,
+        updateDataContribuinte: {
+          id,
+          params,
+          message: response.data.message,
+          status: response.status
+        }
+      });
+    } catch (error) {
+      console.log('erro', error);
       dispatch({
         type: ACTIONS.ERROR,
         error

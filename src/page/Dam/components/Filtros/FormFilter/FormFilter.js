@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 import {
   FormControlLabel,
@@ -11,16 +11,8 @@ import {
 
 import useStyles from './styles';
 
-function FormFilter({ handleOnSubmit }) {
+function FormFilter({ handleChangeValues }) {
   const classes = useStyles();
-  const [params, setParams] = useState({
-    dataInicialFilter: '',
-    dataFinalFilter: '',
-    docContribuinte: '',
-    id: '',
-    nameContribuinteFilter: '',
-    docContribuinteFilter: ''
-  });
 
   const [selectedSituacao, setSelectedSituacao] = useState('all');
 
@@ -28,33 +20,21 @@ function FormFilter({ handleOnSubmit }) {
 
   const handleChangeSlide = (event, newValue) => {
     setValue(newValue);
+    handleChangeValues({
+      valorTotalFilter: newValue.join(','),
+      situacaoFilter: selectedSituacao
+    });
   };
   const handleChangeTexField = (event) => {
-    setParams({ ...params, [event.target.id]: event.target.value });
+    handleChangeValues({
+      [event.target.id]: event.target.value,
+      situacaoFilter: selectedSituacao
+    });
   };
   const handleChangeRadioSituacao = (event) => {
     setSelectedSituacao(event.target.value);
+    handleChangeValues({ situacaoFilter: event.target.value });
   };
-
-  useEffect(() => {
-    const {
-      dataInicialFilter,
-      dataFinalFilter,
-      docContribuinteFilter,
-      id,
-      nameContribuinteFilter
-    } = params;
-
-    handleOnSubmit({
-      dataInicialFilter,
-      dataFinalFilter,
-      docContribuinteFilter,
-      id,
-      nameContribuinteFilter,
-      situacaoFilter: selectedSituacao,
-      valorTotalFilter: value.join(',')
-    });
-  }, [handleOnSubmit, params, selectedSituacao, value]);
 
   return (
     <form

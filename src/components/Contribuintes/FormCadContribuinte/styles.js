@@ -5,17 +5,8 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexWrap: 'wrap'
   },
-  margin: {
+  button: {
     margin: theme.spacing(1)
-  },
-  withoutLabel: {
-    marginTop: theme.spacing(3)
-  },
-  textField: {
-    width: '25ch'
-  },
-  textFieldNome: {
-    width: '53ch'
   }
 }));
 

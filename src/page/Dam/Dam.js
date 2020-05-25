@@ -40,11 +40,8 @@ function Dam({
   listDam,
   pagination,
   ValueTotal,
-  isload,
   requestDam: handleListDam,
   listReceita,
-  setParams: handleParams,
-  paramsFilter,
   requestReceita: handleListReceita
 }) {
   const [showFiltro, setShowFiltro] = useState(false);
@@ -54,7 +51,9 @@ function Dam({
   const [damView, setDamView] = useState({});
   const [order, setOrder] = useState('id');
   const [sort, setSort] = useState(false);
-  const [params, setParams] = useState();
+  const [params, setParams] = useState({});
+  const [paramsFilter, setParamsFilter] = useState({});
+  const [isProgress, setIsProgress] = useState(false);
   const timerToClearSomewhere = useRef(false);
 
   const classes = useStyles();
@@ -76,42 +75,29 @@ function Dam({
 
   useEffect(() => {
     const tokenDam = Axios.CancelToken.source();
-    handleListDam(
-      {
-        order,
-        sort,
-        page: 1
-      },
-      tokenDam.token
-    );
-    return () => {
-      tokenDam.cancel('Request cancell');
-      clearTimeout(timerToClearSomewhere.current);
-    };
-  }, [handleListDam, order, sort]);
-
-  useEffect(() => {
-    handleParams(params);
-  }, [handleParams, params]);
-
-  useEffect(() => {
-    const tokenDam = Axios.CancelToken.source();
     function requestDam() {
-      if (Object.keys(paramsFilter).length !== 0) {
-        timerToClearSomewhere.current = setTimeout(() => {
-          handleListDam(
-            { ...paramsFilter, order, sort, page: 1 },
-            tokenDam.token
-          );
-        }, 500);
-      }
+      setIsProgress(true);
+      handleListDam(
+        { ...paramsFilter, ...params, order, sort, page: 1 },
+        tokenDam.token
+      );
     }
-    requestDam();
+    if (Object.keys(params).length !== 0) {
+      timerToClearSomewhere.current = setTimeout(() => {
+        requestDam(tokenDam);
+      }, 500);
+    } else {
+      requestDam(tokenDam);
+    }
     return () => {
       tokenDam.cancel('Request cancell');
       clearTimeout(timerToClearSomewhere.current);
     };
-  }, [handleListDam, paramsFilter, order, sort]);
+  }, [handleListDam, order, params, paramsFilter, sort]);
+
+  useEffect(() => {
+    setIsProgress(false);
+  }, [listDam]);
 
   const setPagination = () => {
     const tokenDam = Axios.CancelToken.source();
@@ -142,6 +128,17 @@ function Dam({
       setSort((isSort) => (isDefaultOrder ? true : !isSort));
       setOrder(campo);
     }
+  };
+
+  const handleParamsSearch = (event) => {
+    setParamsFilter({});
+    setParams({ ...params, [event.target.id]: event.target.value });
+  };
+
+  const handleParamsFilter = (data) => {
+    setParams({});
+    setParamsFilter(data);
+    setShowFiltro((show) => !show);
   };
 
   return (
@@ -202,7 +199,9 @@ function Dam({
           </Paper>
         </Grid>
         <Grid item xs={12}>
-          {isload && <CardDocumentSkeletron quantSkeletron={itensSkeletron} />}
+          {isProgress && (
+            <CardDocumentSkeletron quantSkeletron={itensSkeletron} />
+          )}
           <InfiniteScroll
             pageStart={0}
             hasMore={
@@ -219,7 +218,8 @@ function Dam({
                 listDam={listDam}
                 handleDamDetail={handleModalDetails}
                 handleOrderSort={handleOrderSort}
-                handleParams={setParams}
+                handleChangeParams={handleParamsSearch}
+                params={params}
               />
             ) : (
                 <CardDam listDam={listDam} handleDamDetail={handleModalDetails} />
@@ -235,14 +235,13 @@ function Dam({
       <Filtros
         showFiltro={showFiltro}
         listReceita={listReceita}
-        handleParams={(data) => {
-          setParams(data);
-          setShowFiltro((show) => !show);
-        }}
+        handleParams={handleParamsFilter}
         handleFiltroShow={() => {
           setShowFiltro((show) => !show);
+          setParamsFilter({});
           setParams({});
         }}
+        handleSair={() => setShowFiltro((show) => !show)}
       />
       <NewDam
         handleClose={() => setShowNewDam((show) => !show)}
@@ -264,7 +263,6 @@ function Dam({
 const mapStateToProps = (state) => ({
   listDam: state.dam.listDam,
   pagination: state.dam.pagination,
-  isload: state.dam.isload,
   ValueTotal:
     state.dam.listDam &&
     state.dam.listDam.reduce(
@@ -273,7 +271,6 @@ const mapStateToProps = (state) => ({
       0
     ),
   listReceita: state.receita.listReceita,
-  paramsFilter: state.paramsFilter.listParams,
   updateDam: state.dam.updateDam
 });
 

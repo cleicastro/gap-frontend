@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   TableContainer,
   Paper,
@@ -15,33 +15,13 @@ import InfoIcon from '@material-ui/icons/Info';
 
 import { useStyles, StyledTableCell, StyledTableRow } from './styles';
 
-function TableDam({ listDam, handleDamDetail, handleOrderSort, handleParams }) {
-  const [id, setId] = useState('');
-  const [receita, setReceita] = useState('');
-  const [emissao, setEmissao] = useState('');
-  const [contribuinte, setContribuinte] = useState('');
-  const [vencimento, setVencimento] = useState('');
-  const [valorTotal, setValorTotal] = useState('');
-
-  useEffect(() => {
-    handleParams({
-      id,
-      receita,
-      emissao,
-      vencimento,
-      contribuinte,
-      valorTotal
-    });
-  }, [
-    emissao,
-    handleParams,
-    id,
-    contribuinte,
-    receita,
-    valorTotal,
-    vencimento
-  ]);
-
+function TableDam({
+  listDam,
+  handleDamDetail,
+  handleOrderSort,
+  handleChangeParams,
+  params
+}) {
   const classes = useStyles();
 
   const valorGeral =
@@ -77,6 +57,8 @@ function TableDam({ listDam, handleDamDetail, handleOrderSort, handleParams }) {
         return days > 0 ? `${days} dia(s) para vencer` : `Vence hoje`;
     }
   };
+
+  console.log(params);
 
   return (
     <TableContainer component={Paper}>
@@ -127,9 +109,9 @@ function TableDam({ listDam, handleDamDetail, handleOrderSort, handleParams }) {
                 type="number"
                 className={classes.searchNDam}
                 size="small"
-                id="input-numero-dam"
-                value={id}
-                onChange={(e) => setId(e.target.value)}
+                id="id"
+                onChange={handleChangeParams}
+                defaultValue={params.id}
               />
             </TableCell>
             <TableCell>
@@ -137,9 +119,10 @@ function TableDam({ listDam, handleDamDetail, handleOrderSort, handleParams }) {
                 type="text"
                 className={classes.searchReceita}
                 size="small"
-                id="input-receita"
-                value={receita}
-                onChange={(e) => setReceita(e.target.value)}
+                receita="receita"
+                id="receita"
+                onChange={handleChangeParams}
+                defaultValue={params.receita}
               />
             </TableCell>
             <TableCell>
@@ -147,18 +130,18 @@ function TableDam({ listDam, handleDamDetail, handleOrderSort, handleParams }) {
                 type="date"
                 className={classes.searchEmitido}
                 size="small"
-                id="input-data-emissao"
-                value={emissao}
-                onChange={(e) => setEmissao(e.target.value)}
+                id="emissao"
+                onChange={handleChangeParams}
+                defaultValue={params.emissao}
               />
             </TableCell>
             <TableCell>
               <TextField
                 className={classes.searchContribuinte}
                 size="small"
-                id="input-contribuinte"
-                value={contribuinte}
-                onChange={(e) => setContribuinte(e.target.value)}
+                id="contribuinte"
+                onChange={handleChangeParams}
+                defaultValue={params.contribuinte}
               />
             </TableCell>
             <TableCell />
@@ -167,9 +150,9 @@ function TableDam({ listDam, handleDamDetail, handleOrderSort, handleParams }) {
                 type="date"
                 className={classes.searchVencimento}
                 size="small"
-                id="input-data-vencimento"
-                value={vencimento}
-                onChange={(e) => setVencimento(e.target.value)}
+                id="vencimento"
+                onChange={handleChangeParams}
+                defaultValue={params.vencimento}
               />
             </TableCell>
             <TableCell>
@@ -177,9 +160,9 @@ function TableDam({ listDam, handleDamDetail, handleOrderSort, handleParams }) {
                 type="number"
                 className={classes.searchValor}
                 size="small"
-                id="input-valor"
-                value={valorTotal}
-                onChange={(e) => setValorTotal(e.target.value)}
+                id="valorTotal"
+                onChange={handleChangeParams}
+                defaultValue={params.valorTotal}
               />
             </TableCell>
             <TableCell />

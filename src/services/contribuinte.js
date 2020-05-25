@@ -25,6 +25,76 @@ class Contribuinte {
       }
     );
   }
+
+  salveContribuinte(
+    {
+      tipo,
+      doc,
+      nome,
+      docEstadual,
+      inscricaoMunicipal,
+      docEmissao,
+      docOrgao,
+      telefone,
+      email,
+      cep,
+      uf,
+      cidade,
+      endereco,
+      numero,
+      complemento,
+      bairro,
+      banco,
+      agencia,
+      conta,
+      variacao,
+      tipoConta
+    },
+    cancelToken
+  ) {
+    // const token = sessionStorage.getItem('JWT_Token');
+    return api.post(
+      'v1/api/contribuinte',
+      {
+        tipo,
+        doc,
+        nome,
+        docEstadual,
+        inscricaoMunicipal,
+        docEmissao,
+        docOrgao,
+        telefone,
+        email,
+        cep,
+        uf,
+        cidade,
+        endereco,
+        numero,
+        complemento,
+        bairro,
+        banco,
+        agencia,
+        conta,
+        variacao,
+        tipoConta
+      },
+      {
+        cancelToken
+      }
+    );
+  }
+
+  updateContribuinte(id, params, cancelToken) {
+    return api.put(
+      `v1/api/contribuinte/${id}`,
+      {
+        ...params
+      },
+      {
+        cancelToken
+      }
+    );
+  }
 }
 
 export default new Contribuinte();
