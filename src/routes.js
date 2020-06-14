@@ -5,7 +5,8 @@ import PrivateRoute from './PrivateRoute';
 import {
   Dashboard as DashboardView,
   Login as LoginView,
-  Dam as DamView
+  Dam as DamView,
+  Contribuinte as ContribuinteView
 } from './page';
 import { Main as MainLayout } from './layouts';
 
@@ -22,10 +23,16 @@ const Routes = () => (
       />
       <PrivateRoute component={DamView} exact layout={MainLayout} path="/dam" />
       <PrivateRoute
-        component={<h1>NFSA</h1>}
+        component={() => <h1>NFSA</h1>}
         exact
         layout={MainLayout}
         path="/nfsa"
+      />
+      <PrivateRoute
+        component={ContribuinteView}
+        exact
+        layout={MainLayout}
+        path="/cadastro/contribuinte"
       />
     </Switch>
   </BrowserRouter>

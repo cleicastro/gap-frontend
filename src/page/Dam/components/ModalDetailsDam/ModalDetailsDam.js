@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 
 import clsx from 'clsx';
 import {
@@ -28,6 +29,8 @@ function ModalDetailsDam({
   handleDamView,
   updateStatusDam: handleUpate,
   updateDam: updateDamData,
+  handleOpenDam,
+  handleDataDam,
   ...rest
 }) {
   const theme = useTheme();
@@ -79,6 +82,17 @@ function ModalDetailsDam({
     }
   }, [updateDamData, handleDamView]);
 
+  const handleEdit = () => {
+    handleDataDam(handleDamView);
+    handleReviewShow(false);
+    handleOpenDam(true);
+  };
+  const handleCopy = () => {
+    handleDataDam({ ...handleDamView, id: undefined });
+    handleReviewShow(false);
+    handleOpenDam(true);
+  };
+
   return (
     <Dialog
       fullScreen={fullScreenModal}
@@ -88,12 +102,22 @@ function ModalDetailsDam({
       aria-labelledby="customized-dialog-title">
       <DialogTitle id="customized-dialog-title">
         <MenuDocumentEvents
+          handleEdit={handleEdit}
+          handleCopy={handleCopy}
           handleUpate={handleUpate}
           updateDamData={handleUpdateStatus}
           status={handleDamView.status}
           id={handleDamView.id}
           statusPagar={statusPagar}
           statusCancelar={statusCancelar}
+          isVisibleOptions={{
+            imprimir: true,
+            pagar: true,
+            copiar: true,
+            editar: true,
+            cancelar: true,
+            sair: false
+          }}
         />
       </DialogTitle>
       <DialogContent dividers>
@@ -123,6 +147,20 @@ function ModalDetailsDam({
     </Dialog>
   );
 }
+
+ModalDetailsDam.defaultProps = {
+  // eslint-disable-next-line react/default-props-match-prop-types
+  updateDam: {}
+};
+
+ModalDetailsDam.propTypes = {
+  handleReviewShow: PropTypes.func.isRequired,
+  showReview: PropTypes.bool.isRequired,
+  handleDamView: PropTypes.object.isRequired,
+  // updateDam: PropTypes.object.isRequired,
+  handleOpenDam: PropTypes.func.isRequired,
+  handleDataDam: PropTypes.func.isRequired
+};
 
 const mapStateToProps = (state) => ({
   updateDam: state.dam.updateDam

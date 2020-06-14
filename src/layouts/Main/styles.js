@@ -6,7 +6,8 @@ const useStyles = makeStyles((theme) => ({
     height: '100%',
     [theme.breakpoints.up('sm')]: {
       paddingTop: 64
-    }
+    },
+    background: theme.palette.cammon.light
   },
   shiftContent: {
     paddingLeft: 240

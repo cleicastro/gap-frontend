@@ -1,10 +1,10 @@
 import api from './api';
 
-class Receita {
-  getReceita(cancelToken) {
+class CorreiosCEP {
+  RequestCEP(cep, cancelToken) {
     // const token = sessionStorage.getItem('JWT_Token');
     return api.get(
-      'v1/api/receita',
+      `https://viacep.com.br/ws/${cep}/json/`,
       {},
       {
         cancelToken
@@ -13,4 +13,4 @@ class Receita {
   }
 }
 
-export default new Receita();
+export default new CorreiosCEP();

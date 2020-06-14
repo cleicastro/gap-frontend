@@ -3,11 +3,12 @@
 import { Dam } from '../services';
 
 const ACTIONS = {
-  ISLOAD: 'DAM_ISLOAD',
   LIST: 'DAM_LIST',
   LIST_INITIAL: 'LIST_INITIAL',
   ADD: 'DAM_ADD',
   UPDATE_STATUS: 'DAM_UPDATE_STATUS',
+  UPDATE_DAM: 'DAM_UPDATE',
+  CLEAN_DAM: 'CLEAN_DAM',
   ERROR: 'DAM_ERROR'
 };
 
@@ -15,37 +16,30 @@ const INITIAL_STATE = {
   error: [],
   listDam: [],
   newDamData: {},
-  pagination: {},
   updateDam: {},
-  isload: false
+  pagination: {}
 };
 
 export const damReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case ACTIONS.ISLOAD:
-      return {
-        isload: true
-      };
     case ACTIONS.LIST_INITIAL:
       return {
         ...state,
         listDam: action.listDam.data,
-        pagination: action.listDam.meta,
-        isload: false
+        pagination: action.listDam.meta
       };
     case ACTIONS.LIST:
       return {
         ...state,
         listDam: [...state.listDam, ...action.listDam.data],
-        pagination: action.listDam.meta,
-        isload: false
+        pagination: action.listDam.meta
       };
     case ACTIONS.ADD:
       return {
         ...state,
         newDamData: action.listDam.data,
         listDam: [action.listDam.data, ...state.listDam],
-        isload: false
+        pagination: { ...state.pagination }
       };
     case ACTIONS.UPDATE_STATUS:
       const lst = state.listDam.slice();
@@ -63,14 +57,85 @@ export const damReducer = (state = INITIAL_STATE, action) => {
         ...state,
         updateDam: action.updateDam,
         listDam: lst,
-        isload: false
+        pagination: { ...state.pagination }
+      };
+    case ACTIONS.UPDATE_DAM:
+      const lstDam = state.listDam.slice();
+      const {
+        bairro,
+        cep,
+        cidade,
+        cod,
+        descricao,
+        doc,
+        docOrigem,
+        endereco,
+        idContribuinte,
+        infoAdicionais,
+        juros,
+        nome,
+        referencia,
+        sigla,
+        taxaExp,
+        uf,
+        valorMulta,
+        valorPrincipal,
+        valorTotal,
+        valor_fixo: valorFixo,
+        vencimento
+      } = action.updateDam.params;
+
+      const { id } = action;
+      lstDam.forEach((dam) => {
+        if (dam.id === id) {
+          dam.contribuinte = {
+            bairro,
+            cep,
+            cidade,
+            doc,
+            endereco,
+            id: idContribuinte,
+            nome,
+            uf
+          };
+          dam.data_pagamento = null;
+          dam.dias_vencimento = 6;
+          dam.id = id;
+          dam.info_adicionais = infoAdicionais;
+          dam.n_ref = docOrigem;
+          dam.receita = {
+            cod,
+            receita: cod,
+            sigla,
+            descricao,
+            valor_fixo: valorFixo
+          };
+          dam.referencia = referencia;
+          dam.taxa_expedicao = taxaExp;
+          dam.valor_juros = juros;
+          dam.valor_multa = valorMulta;
+          dam.valor_principal = valorPrincipal;
+          dam.valor_total = valorTotal;
+          dam.vencimento = vencimento;
+        }
+      });
+      return {
+        ...state,
+        updateDam: action.updateDam,
+        listDam: lstDam,
+        pagination: { ...state.pagination }
+      };
+    case ACTIONS.CLEAN_DAM:
+      return {
+        ...state,
+        updateDam: {},
+        newDamData: {}
       };
     case ACTIONS.ERROR:
       return {
         error: action.error,
         listDam: [],
-        pagination: {},
-        isload: false
+        pagination: {}
       };
     default:
       return state;
@@ -79,7 +144,6 @@ export const damReducer = (state = INITIAL_STATE, action) => {
 
 export function requestDam(params, token) {
   return async (dispatch) => {
-    // dispatch({ type: ACTIONS.ISLOAD });
     try {
       const response = await Dam.getDam({ ...params }, token);
       dispatch({
@@ -97,7 +161,6 @@ export function requestDam(params, token) {
 
 export function salvarDam(dam) {
   return async (dispatch) => {
-    // dispatch({ type: ACTIONS.ISLOAD });
     try {
       const response = await Dam.salvarDam({ ...dam });
       dispatch({
@@ -117,6 +180,8 @@ export function salvarDam(dam) {
 export function updateStatusDam(id, params) {
   return async (dispatch) => {
     const { status: situacao, pago } = params;
+    console.log(params);
+
     try {
       const response = await Dam.updateDam(id, params);
       dispatch({
@@ -139,3 +204,42 @@ export function updateStatusDam(id, params) {
     }
   };
 }
+
+export function updateDataDam(id, params) {
+  return async (dispatch) => {
+    try {
+      const response = await Dam.updateDam(id, params);
+      dispatch({
+        type: ACTIONS.UPDATE_DAM,
+        id,
+        updateDam: {
+          id,
+          params: { ...params, ...params.documentoToUpdateCard },
+          message: response.data.message,
+          status: response.status
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      dispatch({
+        type: ACTIONS.ERROR,
+        error
+      });
+    }
+  };
+}
+
+export const cleanDataDAM = () => {
+  return (dispatch) => {
+    try {
+      dispatch({
+        type: ACTIONS.CLEAN_DAM
+      });
+    } catch (error) {
+      dispatch({
+        type: ACTIONS.ERROR,
+        error
+      });
+    }
+  };
+};

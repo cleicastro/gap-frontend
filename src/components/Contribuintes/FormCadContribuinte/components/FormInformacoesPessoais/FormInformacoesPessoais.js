@@ -9,7 +9,12 @@ import {
 // import { Container } from './styles';
 
 function FormInformacoesPessoais(props) {
-  const { handleChangeContribuinte, contribuinte, isDisbledForm } = props;
+  const {
+    handleChangeContribuinte,
+    contribuinte,
+    isDisbledForm,
+    formik
+  } = props;
   return (
     <Grid container spacing={3}>
       <Grid item xs={12} sm={3}>
@@ -18,7 +23,7 @@ function FormInformacoesPessoais(props) {
           aria-label="position"
           name="tipo"
           onChange={handleChangeContribuinte}
-          value={contribuinte.tipo}>
+          value={formik.values.tipo}>
           <FormControlLabel
             disabled={isDisbledForm}
             value="PF"
@@ -40,8 +45,8 @@ function FormInformacoesPessoais(props) {
           label="CPF/CNPJ"
           name="doc"
           required
-          onChange={handleChangeContribuinte}
-          value={contribuinte.doc}
+          // onChange={handleChangeContribuinte}
+          values={formik.values.doc}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -51,8 +56,8 @@ function FormInformacoesPessoais(props) {
           label="Nome"
           name="nome"
           required
-          onChange={handleChangeContribuinte}
-          value={contribuinte.nome}
+          // onChange={handleChangeContribuinte}
+          values={formik.values.nome}
         />
       </Grid>
       {/* <Grid item xs={12} sm={3}>
@@ -72,7 +77,7 @@ function FormInformacoesPessoais(props) {
           label="RG"
           name="docEstadual"
           onChange={handleChangeContribuinte}
-          value={contribuinte.docEstadual}
+          values={contribuinte.docEstadual}
         />
       </Grid>
       <Grid item xs={12} sm={3}>
@@ -82,7 +87,7 @@ function FormInformacoesPessoais(props) {
           label="Data de emissão"
           name="docEmissao"
           onChange={handleChangeContribuinte}
-          value={contribuinte.docEmissao}
+          values={contribuinte.docEmissao}
         />
       </Grid>
       <Grid item xs={12} sm={3}>
@@ -92,7 +97,7 @@ function FormInformacoesPessoais(props) {
           label="Orgão emissor"
           name="docOrgao"
           onChange={handleChangeContribuinte}
-          value={contribuinte.docOrgao}
+          values={contribuinte.docOrgao}
         />
       </Grid>
       <Grid item xs={12} sm={3}>
@@ -102,7 +107,7 @@ function FormInformacoesPessoais(props) {
           label="Telefone"
           name="telefone"
           onChange={handleChangeContribuinte}
-          value={contribuinte.telefone}
+          values={contribuinte.telefone}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -113,7 +118,7 @@ function FormInformacoesPessoais(props) {
           name="email"
           type="email"
           onChange={handleChangeContribuinte}
-          value={contribuinte.email}
+          values={contribuinte.email}
         />
       </Grid>
     </Grid>

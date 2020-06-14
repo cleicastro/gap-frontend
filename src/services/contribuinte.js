@@ -2,7 +2,18 @@ import api from './api';
 
 class Contribuinte {
   getContribuinte(
-    { id, doc, nome, tipo, contribuinte, enderecoCidade, order, sort, page },
+    {
+      id,
+      doc,
+      nome,
+      tipo,
+      contribuinte,
+      enderecoCidade,
+      limit,
+      order,
+      sort,
+      page
+    },
     cancelToken
   ) {
     // const token = sessionStorage.getItem('JWT_Token');
@@ -16,6 +27,7 @@ class Contribuinte {
           tipo,
           contribuinte,
           enderecoCidade,
+          limit,
           sort: order ? `${order},${sort ? 'asc' : 'desc'}` : null,
           page
         }

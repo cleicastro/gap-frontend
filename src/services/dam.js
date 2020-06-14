@@ -52,7 +52,7 @@ class Dam {
 
   salvarDam(
     {
-      id,
+      idContribuinte,
       receita,
       docOrigem,
       infoAdicionais,
@@ -71,7 +71,7 @@ class Dam {
       'v1/api/dam',
       {
         docOrigem,
-        idContribuinte: id,
+        idContribuinte,
         receita,
         infoAdicionais,
         referencia,

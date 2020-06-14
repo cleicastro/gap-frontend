@@ -52,7 +52,7 @@ export default {
     contrastText: white,
     dark: colors.blueGrey[200],
     main: colors.blueGrey[100],
-    light: colors.grey[50]
+    light: colors.grey[100]
   },
   text: {
     main: '#550052',

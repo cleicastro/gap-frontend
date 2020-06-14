@@ -41,8 +41,20 @@ export default function Sidebar({
     },
     {
       title: 'Cadastros',
-      href: '/registers',
-      icon: <RegisterIcon />
+      href: '/cadastro',
+      icon: <RegisterIcon />,
+      subMenu: [
+        {
+          title: 'Contribuinte',
+          href: '/cadastro/contribuinte',
+          icon: <RegisterIcon />
+        },
+        {
+          title: 'Usuários',
+          href: '/user',
+          icon: <RegisterIcon />
+        }
+      ]
     },
     {
       title: 'Relatórios',

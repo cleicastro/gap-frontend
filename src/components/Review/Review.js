@@ -98,7 +98,7 @@ export default function Review({
             </Grid>
             <Grid item xs={4} align="center">
               <Typography>
-                {Intl.DateTimeFormat('pt-BR').format(
+                {Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' }).format(
                   new Date(receitaInfo.vencimento)
                 )}
               </Typography>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 
 import {
   CssBaseline,
@@ -11,166 +11,67 @@ import {
   CircularProgress
 } from '@material-ui/core';
 
+import { useForm } from 'react-hook-form';
+
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import { salvarDam, updateStatusDam } from '../../store/damReducer';
+import {
+  salvarDam,
+  updateStatusDam,
+  updateDataDam,
+  cleanDataDAM
+} from '../../store/damReducer';
 
 import useStyles from './styles';
 import FormReceita from '../FormReceita';
-import FormContribuinte from '../Contribuintes/FormCadContribuinte';
+import FormContribuinte from '../FormContribuinte';
 import FormDocumento from '../FormDocumento';
 import Review from '../Review';
+import { NewDocumentArrecadacaoContext } from '../../contexts/NewDocumentArrecadacao';
 import MenuDocumentEvents from '../MenuDocumentEvents/MenuDocumentEvents';
 
 function StepComponent({
-  handleClose,
   steps,
   title,
-  receitas,
-  salvarDam: handleSalvar,
   newDamData,
+  updateDam,
+  salvarDam: handleSalvar,
+  updateDataDam: handleUpdateData,
   updateStatusDam: handleUpate,
-  updateDam: updateDamData
+  cleanDataDAM: handleCleanDam,
+  handleClose
 }) {
+  const {
+    handleBack,
+    handleNext,
+    activeStep,
+    selectedReceita,
+    dataPreview,
+    valuesInitial,
+    isClosed
+  } = useContext(NewDocumentArrecadacaoContext);
+
+  const { handleSubmit } = useForm();
   const classes = useStyles();
-  const [activeStep, setActiveStep] = useState(0);
-  const [receita, setReceita] = useState({});
-  const [receitaInfo, setReceitaInfo] = useState({});
-  const [contribuinte, setContribuinte] = useState({
-    nome: '',
-    doc: '',
-    endereco: '',
-    cidade: '',
-    uf: '',
-    cep: '',
-    bairro: ''
-  });
-  const [documento, setDocumento] = useState({});
-  const [itensPreview, setItemsPreview] = useState([]);
-
-  useEffect(() => {
-    const toDay = new Date();
-    const weekDay = toDay.getDay();
-    let diasVencer = 5;
-
-    if (weekDay === 1) {
-      diasVencer = 7;
-    } else if (weekDay === 2) {
-      diasVencer = 6;
-    }
-    const referencia = Intl.DateTimeFormat('fr-CA', {
-      year: 'numeric',
-      month: '2-digit'
-    }).format(toDay);
-    const emissao = Intl.DateTimeFormat('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    }).format(toDay);
-    const vencimento = Intl.DateTimeFormat('fr-CA', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    }).format(toDay.setDate(toDay.getDate() + diasVencer));
-
-    setDocumento({
-      referencia,
-      emissao,
-      receita: receita.cod,
-      vencimento,
-      docOrigem: '',
-      infoAdicionais: 'teste',
-      valorPrincipal: receita.valor_fixo,
-      juros: 0.0,
-      taxaExp: receita.valor_fixo > 0 ? 0 : 5,
-      valorTotal: receita.valor_fixo > 0 ? 0 : 5,
-      valorMulta: 0
-    });
-    setItemsPreview([
-      {
-        item: receita.descricao,
-        valor: receita.valor_fixo
-      },
-      {
-        item: 'Taxa de expedição',
-        valor: receita.valor_fixo > 0 ? 0 : 5
-      },
-      {
-        item: 'Juros',
-        valor: 0.0
-      }
-    ]);
-  }, [receita]);
-
-  const handleDocumento = useCallback(
-    (doc) => {
-      setDocumento({
-        receita: receita.cod,
-        emissao: doc.emissao,
-        referencia: doc.referencia,
-        vencimento: doc.vencimento,
-        docOrigem: doc.docOrigem,
-        infoAdicionais: doc.infoAdicionais,
-        valorPrincipal: doc.valorPrincipal,
-        juros: doc.juros,
-        taxaExp: doc.taxaExp,
-        valorTotal: doc.valorTotal,
-        valorMulta: doc.valorMulta
-      });
-
-      setItemsPreview([
-        {
-          item: receita.descricao,
-          valor: doc.valorTotal
-        },
-        {
-          item: 'Taxa de expedição',
-          valor: doc.taxaExp
-        },
-        {
-          item: 'Juros',
-          valor: doc.juros
-        }
-      ]);
-
-      setReceitaInfo({
-        emissao: new Date(`${new Date().toString().split('GMT')[0]} UTC`)
-          .toISOString()
-          .split('.')[0]
-          .replace('T', ' '),
-        vencimento: doc.vencimento,
-        status: ''
-      });
-    },
-    [receita.cod, receita.descricao]
-  );
-
-  const handleNext = () => {
-    if (activeStep + 1 === steps.length) {
-      handleSalvar({ ...receita, ...documento, ...contribuinte });
-    }
-    setActiveStep(activeStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep(activeStep - 1);
-  };
-
+  const [isProgressSave, setIsProgressSave] = useState(false);
   const [statusCancelar, setStatusCancelar] = useState(false);
   const [statusPagar, setStatusPagar] = useState(false);
   const [handleUpdateStatus, setHandleUpdateStatus] = useState({});
 
   useEffect(() => {
-    if (updateDamData.pago === 1 && newDamData.id === updateDamData.id) {
+    if (isClosed) {
+      handleCleanDam();
+    }
+  }, [handleCleanDam, isClosed]);
+
+  useEffect(() => {
+    if (updateDam.pago === 1 && newDamData.id === updateDam.id) {
       setStatusPagar(true);
-      setHandleUpdateStatus(updateDamData);
-    } else if (
-      updateDamData.situacao === 0 &&
-      newDamData.id === updateDamData.id
-    ) {
+      setHandleUpdateStatus(updateDam);
+    } else if (updateDam.situacao === 0 && newDamData.id === updateDam.id) {
       setStatusCancelar(true);
-      setHandleUpdateStatus(updateDamData);
+      setHandleUpdateStatus(updateDam);
     } else {
       setHandleUpdateStatus({});
       setStatusPagar(
@@ -178,110 +79,184 @@ function StepComponent({
       );
       setStatusCancelar(newDamData.status === 'Cancelado');
     }
-  }, [newDamData, updateDamData]);
+    setIsProgressSave(false);
+  }, [newDamData, updateDam]);
 
   function getStepContent(step) {
     switch (step) {
       case 0:
-        return (
-          <FormReceita
-            receitas={receitas}
-            handleReceita={(data) => {
-              setReceita(data);
-              handleNext();
-            }}
-            receitaSelected={receita}
-          />
-        );
+        return <FormReceita />;
       case 1:
-        return (
-          <FormContribuinte
-            handleContribuinte={setContribuinte}
-            contribuinteSelected={contribuinte}
-          />
-        );
+        return <FormContribuinte />;
       case 2:
-        return (
-          <FormDocumento
-            handleDocumento={handleDocumento}
-            documentoSelected={documento}
-          />
-        );
+        return <FormDocumento />;
       case 3:
         return (
           <Review
-            items={itensPreview}
-            contribuintes={[contribuinte]}
-            infoAdicionais={documento.info_adicionais}
-            receitaInfo={receitaInfo}
+            items={dataPreview.itensPreview}
+            contribuintes={[dataPreview.contribuinte]}
+            infoAdicionais={dataPreview.documento.infoAdicionais}
+            receitaInfo={dataPreview.receitaInfo}
           />
         );
+
       default:
         throw new Error('Unknown step');
     }
   }
+
+  function onSubmit(data) {
+    // console.log(data);
+  }
+
+  function saveDam() {
+    setIsProgressSave(true);
+
+    const {
+      receita,
+      docOrigem,
+      infoAdicionais,
+      referencia,
+      emissao,
+      vencimento,
+      valorPrincipal,
+      juros,
+      valorMulta,
+      taxaExp,
+      valorTotal
+    } = dataPreview.documento;
+
+    if (valuesInitial.id) {
+      handleUpdateData(valuesInitial.id, {
+        documentoToUpdateCard: {
+          doc: dataPreview.contribuinte.doc,
+          nome: dataPreview.contribuinte.nome,
+          endereco: dataPreview.contribuinte.endereco,
+          bairro: dataPreview.contribuinte.bairro,
+          cep: dataPreview.contribuinte.cep,
+          uf: dataPreview.contribuinte.uf,
+          cidade: dataPreview.contribuinte.cidade,
+          cod: selectedReceita.doc,
+          descricao: selectedReceita.descricao,
+          sigla: selectedReceita.sigla,
+          valor_fixo: selectedReceita.valor_fixo
+        },
+        receita,
+        docOrigem,
+        infoAdicionais,
+        referencia,
+        emissao,
+        vencimento,
+        valorPrincipal,
+        juros,
+        valorMulta,
+        taxaExp,
+        valorTotal,
+        idContribuinte: dataPreview.contribuinte.id
+      });
+    } else {
+      handleSalvar({
+        receita: selectedReceita.cod,
+        docOrigem,
+        infoAdicionais,
+        referencia,
+        emissao,
+        vencimento,
+        valorPrincipal,
+        juros,
+        valorMulta,
+        taxaExp,
+        valorTotal,
+        idContribuinte: dataPreview.contribuinte.id
+      });
+    }
+  }
+
+  const MenuActionsDam = () => {
+    return (
+      <>
+        <Typography variant="h5" gutterBottom>
+          {updateDam.status === 200 && updateDam.id
+            ? 'DAM alterado com sucesso!'
+            : 'DAM gerado com sucesso!'}
+        </Typography>
+        <Typography variant="subtitle1">
+          {!updateDam.status &&
+            `O Número do seu DAM é #${newDamData.id}. Selecione um
+                        envento para este documento.`}
+        </Typography>
+        <MenuDocumentEvents
+          id={newDamData.id}
+          status={newDamData.status}
+          handleUpate={handleUpate}
+          updateDamData={handleUpdateStatus}
+          statusPagar={statusPagar}
+          statusCancelar={statusCancelar}
+          handleClose={handleClose}
+          isVisibleOptions={{
+            imprimir: true,
+            pagar: true,
+            copiar: false,
+            editar: false,
+            cancelar: true,
+            sair: true
+          }}
+        />
+      </>
+    );
+  };
+
+  const ProgressRequest = () => {
+    return (
+      <div className={classes.progress}>
+        <CircularProgress />
+      </div>
+    );
+  };
+
   return (
     <>
       <CssBaseline />
       <main className={classes.layout}>
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
-            {title}
+            {title} - {selectedReceita.descricao}
           </Typography>
-          <Stepper activeStep={activeStep} className={classes.stepper}>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-          <>
-            {activeStep === steps.length && newDamData ? (
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Stepper activeStep={activeStep} className={classes.stepper}>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+            {!isProgressSave && !newDamData.id && !updateDam.status && (
               <>
-                {newDamData.id ? (
-                  <>
-                    <Typography variant="h5" gutterBottom>
-                      DAM gerado com sucesso!
-                    </Typography>
-                    <Typography variant="subtitle1">
-                      O Número do seu DAM é #{newDamData.id}. Selecione um
-                      envento para este documento.
-                    </Typography>
-                    <MenuDocumentEvents
-                      handleUpate={handleUpate}
-                      updateDamData={handleUpdateStatus}
-                      status={newDamData.status}
-                      id={newDamData.id}
-                      statusPagar={statusPagar}
-                      statusCancelar={statusCancelar}
-                    />
-                  </>
-                ) : (
-                    <div className={classes.progress}>
-                      <CircularProgress />
-                    </div>
-                  )}
-              </>
-            ) : (
-                <>
-                  {getStepContent(activeStep)}
-                  <div className={classes.buttons}>
-                    {activeStep !== 0 && (
-                      <Button onClick={handleBack} className={classes.button}>
-                        Voltar
-                      </Button>
-                    )}
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleNext}
-                      className={classes.button}>
-                      {activeStep === steps.length - 1 ? 'Salvar' : 'Avançar'}
+                {getStepContent(activeStep)}
+                <div className={classes.buttons}>
+                  {activeStep !== 0 && (
+                    <Button onClick={handleBack} className={classes.button}>
+                      Voltar
                     </Button>
-                  </div>
-                </>
-              )}
-          </>
+                  )}
+                  <Button
+                    type="submit"
+                    onClick={() =>
+                      activeStep === steps.length - 1 ? saveDam() : handleNext()
+                    }
+                    variant="contained"
+                    color="primary"
+                    className={classes.button}>
+                    {activeStep === steps.length - 1 ? 'Salvar' : 'Avançar'}
+                  </Button>
+                </div>
+              </>
+            )}
+            {!isProgressSave && (newDamData.id || updateDam.status) && (
+              <MenuActionsDam />
+            )}
+            {isProgressSave && <ProgressRequest />}
+          </form>
         </Paper>
       </main>
     </>
@@ -290,11 +265,18 @@ function StepComponent({
 
 const mapStateToProps = (state) => ({
   newDamData: state.dam.newDamData,
-  updateDam: state.dam.updateDam,
-  isload: state.dam.isload
+  updateDam: state.dam.updateDam
 });
 
 const mapDispatchToProps = (dispatch) =>
-  bindActionCreators({ salvarDam, updateStatusDam }, dispatch);
+  bindActionCreators(
+    {
+      salvarDam,
+      updateStatusDam,
+      updateDataDam,
+      cleanDataDAM
+    },
+    dispatch
+  );
 
 export default connect(mapStateToProps, mapDispatchToProps)(StepComponent);

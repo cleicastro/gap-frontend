@@ -1,12 +1,18 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { List, ListItem, ListItemText, Divider, Grid } from '@material-ui/core';
+
+import { NewDocumentArrecadacaoContext } from '../../contexts/NewDocumentArrecadacao';
 
 import useStyles from './styles';
 
-function FormReceita({ receitas, handleReceita, receitaSelected }) {
+function FormReceita() {
+  const { selectedReceita, listReceita, handleSelectReceita } = useContext(
+    NewDocumentArrecadacaoContext
+  );
+
   const classes = useStyles();
 
-  const receitaSelect = receitas.filter(
+  const receitaSelect = listReceita.filter(
     (r) => r.cod !== '1121250000' && r.cod !== '1113050101'
   );
 
@@ -22,9 +28,9 @@ function FormReceita({ receitas, handleReceita, receitaSelected }) {
               <ListItem
                 button
                 divider
-                onClick={() => handleReceita(receita)}
+                onClick={() => handleSelectReceita(receita)}
                 dense
-                selected={receita.cod === receitaSelected.cod}>
+                selected={receita.cod === selectedReceita.cod}>
                 <ListItemText
                   primary={`${receita.descricao} - ${receita.sigla}`}
                   secondary={receita.cod}

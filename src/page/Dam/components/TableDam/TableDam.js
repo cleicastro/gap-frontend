@@ -21,6 +21,7 @@ function TableDam({
   handleOrderSort,
   handleChangeParams,
   params
+  // loadSearch
 }) {
   const classes = useStyles();
 
@@ -57,8 +58,6 @@ function TableDam({
         return days > 0 ? `${days} dia(s) para vencer` : `Vence hoje`;
     }
   };
-
-  console.log(params);
 
   return (
     <TableContainer component={Paper}>
@@ -111,7 +110,7 @@ function TableDam({
                 size="small"
                 id="id"
                 onChange={handleChangeParams}
-                defaultValue={params.id}
+                value={params.id}
               />
             </TableCell>
             <TableCell>
@@ -122,7 +121,7 @@ function TableDam({
                 receita="receita"
                 id="receita"
                 onChange={handleChangeParams}
-                defaultValue={params.receita}
+                value={params.receita}
               />
             </TableCell>
             <TableCell>
@@ -132,7 +131,7 @@ function TableDam({
                 size="small"
                 id="emissao"
                 onChange={handleChangeParams}
-                defaultValue={params.emissao}
+                value={params.emissao}
               />
             </TableCell>
             <TableCell>
@@ -141,7 +140,7 @@ function TableDam({
                 size="small"
                 id="contribuinte"
                 onChange={handleChangeParams}
-                defaultValue={params.contribuinte}
+                value={params.contribuinte}
               />
             </TableCell>
             <TableCell />
@@ -152,7 +151,7 @@ function TableDam({
                 size="small"
                 id="vencimento"
                 onChange={handleChangeParams}
-                defaultValue={params.vencimento}
+                value={params.vencimento}
               />
             </TableCell>
             <TableCell>
@@ -162,7 +161,7 @@ function TableDam({
                 size="small"
                 id="valorTotal"
                 onChange={handleChangeParams}
-                defaultValue={params.valorTotal}
+                value={params.valorTotal}
               />
             </TableCell>
             <TableCell />
@@ -219,7 +218,6 @@ function TableDam({
         </TableBody>
         <TableFooter>
           <TableRow>
-            <StyledTableCell align="right" />
             <StyledTableCell align="right">Registros</StyledTableCell>
             <StyledTableCell align="right">{listDam.length}</StyledTableCell>
             <StyledTableCell align="right" />

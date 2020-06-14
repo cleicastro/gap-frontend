@@ -13,12 +13,13 @@ import CloseIcon from '@material-ui/icons/Close';
 
 import useStyles from './styles';
 import { StepComponent, Contribuintes } from '../../../../components';
+import NewDocumentArrecadacaoProvider from '../../../../contexts/NewDocumentArrecadacao';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function NewDam({ open, handleClose, receitas }) {
+function NewDam({ open, handleClose, receitas, handleDataDam }) {
   const classes = useStyles();
 
   const [isopen, setIsOpen] = useState(false);
@@ -41,19 +42,24 @@ function NewDam({ open, handleClose, receitas }) {
               <CloseIcon />
             </IconButton>
             <Typography variant="h6" className={classes.title}>
-              RGP
+              GAP
             </Typography>
             <Button autoFocus color="inherit" onClick={() => setIsOpen(true)}>
               Contribuintes
             </Button>
           </Toolbar>
         </AppBar>
-        <StepComponent
-          steps={['Receita', 'Contribuinte', 'Documento', 'Confirmar dados']}
-          title="Emissão de DAM"
-          receitas={receitas}
-          handleClose={handleClose}
-        />
+        <NewDocumentArrecadacaoProvider
+          isClosed={!open}
+          valuesInitial={handleDataDam}
+          listReceita={receitas}>
+          <StepComponent
+            steps={['Receita', 'Contribuinte', 'Documento', 'Confirmar dados']}
+            title="Emissão de DAM"
+            handleClose={handleClose}
+            handleDataDam={handleDataDam}
+          />
+        </NewDocumentArrecadacaoProvider>
       </Dialog>
       <Dialog
         disableBackdropClick

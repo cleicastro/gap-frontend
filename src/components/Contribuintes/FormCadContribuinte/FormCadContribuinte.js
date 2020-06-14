@@ -3,7 +3,8 @@ import { Tabs, Tab, AppBar, Button, Box } from '@material-ui/core';
 import { Save, Edit, Add } from '@material-ui/icons';
 import PropTypes from 'prop-types';
 
-// import TabPanel from './TabPanel';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 
 import useStyles from './styles';
 import {
@@ -12,7 +13,12 @@ import {
   FormEndereco
 } from './components';
 
-function TabPanel(props) {
+import {
+  requestReceitaWS,
+  requestCorreiosCEP
+} from '../../../store/webServices';
+
+const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
   return (
     <div
@@ -24,12 +30,16 @@ function TabPanel(props) {
       {value === index && <Box p={3}>{children}</Box>}
     </div>
   );
-}
+};
 
 function FormCadContribuinte({
   handleContribuinte,
   handleSavlarContribuinte,
-  handleNovoContribuinte
+  handleNovoContribuinte,
+  requestReceitaWS: handleRequestReceitaWS,
+  requestCorreiosCEP: handleCEP,
+  empresaResponse,
+  enderecoResponse
 }) {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
@@ -42,6 +52,36 @@ function FormCadContribuinte({
       setIsDisabledForm(true);
     }
   }, [handleContribuinte]);
+
+  useEffect(() => {
+    if (enderecoResponse) {
+      setContribuinte((prev) => ({
+        ...prev,
+        uf: enderecoResponse.uf,
+        cidade: enderecoResponse.localidade,
+        endereco: enderecoResponse.logradouro,
+        bairro: enderecoResponse.bairro,
+        complemento: enderecoResponse.complemento
+      }));
+    }
+  }, [enderecoResponse]);
+
+  useEffect(() => {
+    if (empresaResponse.name) {
+      setContribuinte({
+        ...contribuinte,
+        nome: empresaResponse.name,
+        cidade: empresaResponse.address.city.name,
+        cep: empresaResponse.address.postalCode,
+        endereco: empresaResponse.address.street,
+        numero: empresaResponse.address.number,
+        uf: empresaResponse.address.state,
+        telefone: `(${empresaResponse.phones[0].ddd})${empresaResponse.phones[0].number}`,
+        email: empresaResponse.email
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [empresaResponse]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -59,6 +99,16 @@ function FormCadContribuinte({
       ...contribuinte,
       [event.target.name]: event.target.value
     });
+    if (event.target.name === 'cep') {
+      if (event.target.value.length === 9) {
+        handleCEP(event.target.value);
+      }
+    }
+    if (event.target.name === 'doc') {
+      if (event.target.value.length === 14) {
+        handleRequestReceitaWS(event.target.value);
+      }
+    }
   };
 
   const handleSubmitContribuinte = (data) => {
@@ -154,4 +204,24 @@ TabPanel.propTypes = {
   value: PropTypes.any.isRequired
 };
 
-export default FormCadContribuinte;
+const mapStateToProps = (state) => ({
+  listContribuinte: state.contribuinte.listContribuinte,
+  updateDataContribuinte: state.contribuinte.updateDataContribuinte,
+  pagination: state.contribuinte.pagination,
+  empresaResponse: state.webservice.empresa,
+  enderecoResponse: state.webservice.endereco
+});
+
+const mapDispatchToProps = (dispatch) =>
+  bindActionCreators(
+    {
+      requestReceitaWS,
+      requestCorreiosCEP
+    },
+    dispatch
+  );
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(FormCadContribuinte);

@@ -1,54 +1,45 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { Typography, Grid, TextField } from '@material-ui/core';
+import { useForm } from 'react-hook-form';
+import { NewDocumentArrecadacaoContext } from '../../contexts/NewDocumentArrecadacao';
 
-function FormDocumento({ handleDocumento, documentoSelected }) {
-  const [documento, setDocumento] = useState(documentoSelected);
-  let sumValues = documentoSelected.valorTotal;
-  let jurosValues = documentoSelected.juros;
-  let taxaExptValues = documentoSelected.taxaExp;
-  let valorPrincipalValues = documentoSelected.valorPrincipal;
+function FormDocumento() {
+  const { dataInitDocument, valuesDam, handleDAM } = useContext(
+    NewDocumentArrecadacaoContext
+  );
+  const { register, setValue, getValues } = useForm({
+    defaultValues: valuesDam.documento ? valuesDam.documento : dataInitDocument
+  });
 
-  function sumValorTotal(principal, juros, taxa) {
-    const sum = Number(principal) + Number(juros) + Number(taxa);
-    return sum.toFixed(2);
+  function handleChange(data) {
+    const { name, value } = data.target;
+    handleDAM({
+      documento: {
+        ...dataInitDocument,
+        ...valuesDam.documento,
+        [name]: value
+      }
+    });
   }
 
-  const handleDoc = (event) => {
-    if (event.target.id === 'valorPrincipal') {
-      valorPrincipalValues = event.target.value;
-      sumValues = sumValorTotal(
-        valorPrincipalValues,
-        jurosValues,
-        taxaExptValues
-      );
-    }
-    if (event.target.id === 'taxaExp') {
-      taxaExptValues = event.target.value;
-      sumValues = sumValorTotal(
-        valorPrincipalValues,
-        jurosValues,
-        taxaExptValues
-      );
-    }
-    if (event.target.id === 'juros') {
-      jurosValues = event.target.value;
-      sumValues = sumValorTotal(
-        valorPrincipalValues,
-        jurosValues,
-        taxaExptValues
-      );
-    }
+  function handleCalcTotal() {
+    const valorPrincipal = getValues('valorPrincipal');
+    const juros = getValues('juros');
+    const taxaExp = getValues('taxaExp');
 
-    setDocumento({
-      ...documento,
-      [event.target.id]: event.target.value,
-      valorTotal: sumValues
+    const result = Number(valorPrincipal) + Number(juros) + Number(taxaExp);
+    setValue([{ valorTotal: result }]);
+    handleDAM({
+      documento: {
+        ...dataInitDocument,
+        ...valuesDam.documento,
+        valorPrincipal,
+        juros,
+        taxaExp,
+        valorTotal: result
+      }
     });
-  };
-
-  useEffect(() => {
-    handleDocumento(documento);
-  }, [documento, handleDocumento]);
+  }
 
   return (
     <>
@@ -58,9 +49,10 @@ function FormDocumento({ handleDocumento, documentoSelected }) {
       <Grid container spacing={3}>
         <Grid item xs={12} md={4}>
           <TextField
-            defaultValue={documentoSelected.referencia}
-            onChange={handleDoc}
+            onChange={handleChange}
+            inputRef={register}
             id="referencia"
+            name="referencia"
             type="month"
             required
             label="Referência"
@@ -69,9 +61,10 @@ function FormDocumento({ handleDocumento, documentoSelected }) {
         </Grid>
         <Grid item xs={12} md={4}>
           <TextField
-            defaultValue={documentoSelected.emissao}
-            onChange={handleDoc}
+            onChange={handleChange}
+            inputRef={register}
             id="emissao"
+            name="emissao"
             disabled
             required
             label="Data de emissão"
@@ -80,9 +73,10 @@ function FormDocumento({ handleDocumento, documentoSelected }) {
         </Grid>
         <Grid item xs={12} md={4}>
           <TextField
-            defaultValue={documentoSelected.vencimento}
-            onChange={handleDoc}
+            onChange={handleChange}
+            inputRef={register}
             id="vencimento"
+            name="vencimento"
             type="date"
             required
             label="Data de vencimento"
@@ -91,20 +85,20 @@ function FormDocumento({ handleDocumento, documentoSelected }) {
         </Grid>
         <Grid item xs={12} md={12}>
           <TextField
-            defaultValue={documentoSelected.infoAdicionais}
-            onChange={handleDoc}
-            id="infoAdicionais"
+            onChange={handleChange}
+            inputRef={register}
             multiline
             label="Descrição"
-            helperText="Informações adicionais"
+            name="infoAdicionais"
             fullWidth
           />
         </Grid>
         <Grid item xs={6} md={4}>
           <TextField
-            defaultValue={documentoSelected.receita}
-            onChange={handleDoc}
+            onChange={handleChange}
+            inputRef={register}
             id="receita"
+            name="receita"
             disabled
             required
             label="Receita"
@@ -113,50 +107,54 @@ function FormDocumento({ handleDocumento, documentoSelected }) {
         </Grid>
         <Grid item xs={6} md={4}>
           <TextField
-            defaultValue={documentoSelected.docOrigem}
-            onChange={handleDoc}
+            onChange={handleChange}
+            inputRef={register}
             id="docOrigem"
+            name="docOrigem"
             label="Documento de origem"
             fullWidth
           />
         </Grid>
         <Grid item xs={6} md={4}>
           <TextField
-            defaultValue={documentoSelected.valorPrincipal}
-            onChange={handleDoc}
+            inputRef={register}
             id="valorPrincipal"
+            name="valorPrincipal"
             type="number"
             required
             label="Valor principal"
             fullWidth
+            onChange={handleCalcTotal}
           />
         </Grid>
         <Grid item xs={6} md={4}>
           <TextField
-            defaultValue={documentoSelected.juros}
-            onChange={handleDoc}
+            inputRef={register}
             id="juros"
+            name="juros"
             type="number"
             label="Juros"
             required
             fullWidth
+            onChange={handleCalcTotal}
           />
         </Grid>
         <Grid item xs={6} md={4}>
           <TextField
-            defaultValue={documentoSelected.taxaExp}
-            onChange={handleDoc}
+            inputRef={register}
             id="taxaExp"
+            name="taxaExp"
             type="number"
             label="Taxa de expedição"
             required
             fullWidth
+            onChange={handleCalcTotal}
           />
         </Grid>
         <Grid item xs={6} md={4}>
           <TextField
-            value={sumValues}
-            id="valorTotal"
+            inputRef={register}
+            name="valorTotal"
             type="number"
             disabled
             label="Valor total"

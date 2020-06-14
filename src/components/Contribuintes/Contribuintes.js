@@ -32,6 +32,7 @@ import {
   saveContribuinte,
   updateContribuinte
 } from '../../store/contribuinteReducer';
+import { requestReceitaWS, requestCorreiosCEP } from '../../store/webServices';
 
 import { useStyles, StyledTableCell } from './styles';
 import FormCadContribuinte from './FormCadContribuinte';
@@ -317,12 +318,20 @@ function Contribuintes({
 const mapStateToProps = (state) => ({
   listContribuinte: state.contribuinte.listContribuinte,
   updateDataContribuinte: state.contribuinte.updateDataContribuinte,
-  pagination: state.contribuinte.pagination
+  pagination: state.contribuinte.pagination,
+  empresaResponse: state.webservice.empresa,
+  enderecoResponse: state.webservice.endereco
 });
 
 const mapDispatchToProps = (dispatch) =>
   bindActionCreators(
-    { requestContribuinte, saveContribuinte, updateContribuinte },
+    {
+      requestContribuinte,
+      saveContribuinte,
+      updateContribuinte,
+      requestReceitaWS,
+      requestCorreiosCEP
+    },
     dispatch
   );
 

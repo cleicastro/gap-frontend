@@ -23,9 +23,8 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import InfiniteScroll from 'react-infinite-scroller';
 
-import { requestDam } from '../../store/damReducer';
+import { requestDam, cleanDataDAM } from '../../store/damReducer';
 import { requestReceita } from '../../store/receitaReducer';
-import { setParams } from '../../store/paramsReducer';
 import {
   CardDam,
   Filtros,
@@ -41,6 +40,8 @@ function Dam({
   pagination,
   ValueTotal,
   requestDam: handleListDam,
+  cleanDataDAM: handleCleanDam,
+  updateDataDam: handleUpdateData,
   listReceita,
   requestReceita: handleListReceita
 }) {
@@ -54,6 +55,7 @@ function Dam({
   const [params, setParams] = useState({});
   const [paramsFilter, setParamsFilter] = useState({});
   const [isProgress, setIsProgress] = useState(false);
+  const [dataDam, setDataDam] = useState({});
   const timerToClearSomewhere = useRef(false);
 
   const classes = useStyles();
@@ -63,6 +65,12 @@ function Dam({
   for (let i = 0; i < quantSkeletron; i++) {
     itensSkeletron.push(i);
   }
+
+  useEffect(() => {
+    if (showNewDam) {
+      handleCleanDam();
+    }
+  }, [handleCleanDam, showNewDam]);
 
   useEffect(() => {
     const tokenReceita = Axios.CancelToken.source();
@@ -75,11 +83,11 @@ function Dam({
 
   useEffect(() => {
     const tokenDam = Axios.CancelToken.source();
-    function requestDam() {
+    function requestDam(tokenRequest) {
       setIsProgress(true);
       handleListDam(
         { ...paramsFilter, ...params, order, sort, page: 1 },
-        tokenDam.token
+        tokenRequest.token
       );
     }
     if (Object.keys(params).length !== 0) {
@@ -96,7 +104,9 @@ function Dam({
   }, [handleListDam, order, params, paramsFilter, sort]);
 
   useEffect(() => {
-    setIsProgress(false);
+    if (listDam.length > 0) {
+      setIsProgress(false);
+    }
   }, [listDam]);
 
   const setPagination = () => {
@@ -105,6 +115,7 @@ function Dam({
       handleListDam(
         {
           ...paramsFilter,
+          ...params,
           order,
           sort,
           page: Number(pagination.current_page) + 1
@@ -136,6 +147,7 @@ function Dam({
   };
 
   const handleParamsFilter = (data) => {
+    setViewTable(false);
     setParams({});
     setParamsFilter(data);
     setShowFiltro((show) => !show);
@@ -199,7 +211,7 @@ function Dam({
           </Paper>
         </Grid>
         <Grid item xs={12}>
-          {isProgress && (
+          {isProgress && !viewTable && (
             <CardDocumentSkeletron quantSkeletron={itensSkeletron} />
           )}
           <InfiniteScroll
@@ -213,17 +225,26 @@ function Dam({
                 <CircularProgress color="primary" />
               </div>
             }>
-            {viewTable ? (
+            {viewTable && (
               <TableDam
                 listDam={listDam}
                 handleDamDetail={handleModalDetails}
                 handleOrderSort={handleOrderSort}
                 handleChangeParams={handleParamsSearch}
                 params={params}
+                loadSearch={
+                  isProgress &&
+                  viewTable && (
+                    <div className={classes.loader} key={0}>
+                      <CircularProgress color="primary" />
+                    </div>
+                  )
+                }
               />
-            ) : (
-                <CardDam listDam={listDam} handleDamDetail={handleModalDetails} />
-              )}
+            )}
+            {!viewTable && (
+              <CardDam listDam={listDam} handleDamDetail={handleModalDetails} />
+            )}
           </InfiniteScroll>
         </Grid>
       </Grid>
@@ -231,6 +252,8 @@ function Dam({
         handleReviewShow={() => setReviewShow((show) => !show)}
         showReview={showReview}
         handleDamView={damView}
+        handleOpenDam={(show) => setShowNewDam(show)}
+        handleDataDam={setDataDam}
       />
       <Filtros
         showFiltro={showFiltro}
@@ -238,21 +261,29 @@ function Dam({
         handleParams={handleParamsFilter}
         handleFiltroShow={() => {
           setShowFiltro((show) => !show);
+          setViewTable(false);
           setParamsFilter({});
           setParams({});
         }}
         handleSair={() => setShowFiltro((show) => !show)}
       />
       <NewDam
-        handleClose={() => setShowNewDam((show) => !show)}
+        handleClose={() => {
+          setShowNewDam((show) => !show);
+          setDataDam({});
+        }}
         open={showNewDam}
         receitas={listReceita}
+        handleDataDam={dataDam}
       />
       <Fab
         color="primary"
         size="medium"
         aria-label="add"
-        onClick={() => setShowNewDam((show) => !show)}
+        onClick={() => {
+          setShowNewDam((show) => !show);
+          // console.log(dataDam);
+        }}
         className={classes.fab}>
         <AddIcon />
       </Fab>
@@ -275,6 +306,6 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) =>
-  bindActionCreators({ requestDam, requestReceita, setParams }, dispatch);
+  bindActionCreators({ requestDam, cleanDataDAM, requestReceita }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Dam);
