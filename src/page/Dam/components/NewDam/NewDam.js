@@ -14,6 +14,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import useStyles from './styles';
 import { StepComponent, Contribuintes } from '../../../../components';
 import NewDocumentArrecadacaoProvider from '../../../../contexts/NewDocumentArrecadacao';
+import { ContribuinteProvier } from '../../../../contexts';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -78,7 +79,9 @@ function NewDam({ open, handleClose, receitas, handleDataDam }) {
             </IconButton>
           </Toolbar>
         </AppBar>
-        <Contribuintes />
+        <ContribuinteProvier>
+          <Contribuintes />
+        </ContribuinteProvier>
       </Dialog>
     </>
   );

@@ -2,13 +2,15 @@ import { ReceitaWS, CorreiosCEP } from '../services';
 
 const ACTIONS = {
   CNPJ: 'WEBSERVICE_EMPRESA',
-  CEP: 'WEBSERVICE_CEP'
+  CEP: 'WEBSERVICE_CEP',
+  CLEAN_WEBSERVICE: 'CLEAN_WEBSERVICE',
+  ERROR: 'Webservice_ERROR'
 };
 
 const INITIAL_STATE = {
-  empresa: {},
-  endereco: {},
-  erro: {}
+  empresa: null,
+  endereco: null,
+  erro: null
 };
 
 export const webServiceReducer = (state = INITIAL_STATE, action) => {
@@ -22,6 +24,17 @@ export const webServiceReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         endereco: action.endereco
+      };
+    case ACTIONS.CLEAN_WEBSERVICE:
+      return {
+        ...state,
+        empresa: null,
+        endereco: null
+      };
+    case ACTIONS.ERROR:
+      return {
+        ...state,
+        error: action.error
       };
     default:
       return state;
@@ -39,6 +52,10 @@ export function requestReceitaWS(cnpj, token) {
       });
     } catch (error) {
       console.log(error);
+      dispatch({
+        type: ACTIONS.ERROR,
+        error
+      });
     }
   };
 }
@@ -53,6 +70,25 @@ export function requestCorreiosCEP(cep, token) {
       });
     } catch (error) {
       console.log(error);
+      dispatch({
+        type: ACTIONS.ERROR,
+        error
+      });
     }
   };
 }
+
+export const cleanDataSearch = () => {
+  return (dispatch) => {
+    try {
+      dispatch({
+        type: ACTIONS.CLEAN_WEBSERVICE
+      });
+    } catch (error) {
+      dispatch({
+        type: ACTIONS.ERROR,
+        error
+      });
+    }
+  };
+};

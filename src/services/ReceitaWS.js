@@ -2,7 +2,6 @@ import api from './api';
 
 const token = process.env.REACT_APP_TOKEN_API_RECEITAWS;
 class ReceitaWS {
-
   getReceitaWS(cnpj, cancelToken) {
     // const token = sessionStorage.getItem('JWT_Token');
     console.log(token);

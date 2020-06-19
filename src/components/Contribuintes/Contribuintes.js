@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, memo } from 'react';
 import clsx from 'clsx';
 
 import {
@@ -22,147 +22,38 @@ import Fab from '@material-ui/core/Fab';
 import CheckIcon from '@material-ui/icons/Check';
 import SaveIcon from '@material-ui/icons/Save';
 
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-
-import Axios from 'axios';
 import InfiniteScroll from 'react-infinite-scroller';
-import {
-  requestContribuinte,
-  saveContribuinte,
-  updateContribuinte
-} from '../../store/contribuinteReducer';
-import { requestReceitaWS, requestCorreiosCEP } from '../../store/webServices';
-
 import { useStyles, StyledTableCell } from './styles';
+
 import FormCadContribuinte from './FormCadContribuinte';
+import { ContribuinteContext } from '../../contexts';
 
-function Contribuintes({
-  requestContribuinte: handleRequestContribuinte,
-  saveContribuinte: handleSaveContribuinte,
-  updateContribuinte: handleUpdateContribuinte,
-  updateDataContribuinte,
-  listContribuinte,
-  pagination
-}) {
-  const dataInit = {
-    tipo: 'PF',
-    doc: '',
-    nome: '',
-    docEstadual: '',
-    im: '',
-    docEmissao: '',
-    docOrgao: '',
-    telefone: '',
-    email: '',
-    cep: '',
-    uf: '',
-    cidade: '',
-    endereco: '',
-    numero: '',
-    complemento: '',
-    bairro: '',
-    banco: '',
-    agencia: '',
-    conta: '',
-    variacao: '',
-    tipoConta: ''
-  };
+function Contribuintes() {
+  const {
+    handleOrderSort,
+    handleSelectedContribuinte,
+    updateDataContribuinte,
+    setPagination,
+    setOpenSnackbar,
+    handleParams,
+    pagination,
+    listContribuinte,
+    openSnackbar,
+    isProgress
+  } = useContext(ContribuinteContext);
+
   const classes = useStyles();
-  const timerToClearSomewhere = useRef(false);
-  const [order, setOrder] = useState('id');
-  const [sort, setSort] = useState(false);
-  const [params, setParams] = useState({});
-  const [dataContribuinte, setDataContribuinte] = useState(dataInit);
-  const [isProgress, setIsProgress] = useState(false);
-
-  const [openSnackbar, setOpenSnackbar] = React.useState(false);
   const buttonClassname = clsx({
     [classes.buttonSuccess]:
       updateDataContribuinte && updateDataContribuinte.message
   });
-
-  useEffect(() => {
-    const tokenDam = Axios.CancelToken.source();
-    function requestDam(token) {
-      return handleRequestContribuinte(
-        {
-          ...params,
-          order,
-          sort,
-          page: 1
-        },
-        token.token
-      );
-    }
-    if (Object.keys(params).length !== 0) {
-      timerToClearSomewhere.current = setTimeout(() => {
-        requestDam(tokenDam);
-      }, 500);
-    } else {
-      requestDam(tokenDam);
-    }
-
-    return () => {
-      tokenDam.cancel('Request cancell');
-      clearTimeout(timerToClearSomewhere.current);
-    };
-  }, [handleRequestContribuinte, order, sort, params]);
-
-  useEffect(() => {
-    setIsProgress(false);
-    setDataContribuinte(dataInit);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updateDataContribuinte, listContribuinte]);
-
-  const setPagination = () => {
-    const tokenDam = Axios.CancelToken.source();
-    if (pagination.current_page < pagination.last_page) {
-      handleRequestContribuinte(
-        {
-          ...params,
-          order,
-          sort,
-          page: Number(pagination.current_page) + 1
-        },
-        tokenDam.token
-      );
-    }
-  };
-
-  const handleParams = (event) => {
-    setParams({ ...params, [event.target.id]: event.target.value });
-  };
-
-  const handleOrderSort = (campo, isDefaultOrder) => {
-    if (campo === order) {
-      setSort((isSort) => !isSort);
-    } else {
-      setSort((isSort) => (isDefaultOrder ? true : !isSort));
-      setOrder(campo);
-    }
-  };
-
-  const salvarContribuinte = (data) => {
-    setOpenSnackbar(true);
-    setIsProgress(true);
-    if (data.id) {
-      handleUpdateContribuinte(data.id, data);
-    } else {
-      handleSaveContribuinte(data);
-    }
-  };
 
   return (
     <>
       <CssBaseline />
       <main className={classes.layout}>
         <Paper className={classes.paper}>
-          <FormCadContribuinte
-            handleContribuinte={dataContribuinte}
-            handleSavlarContribuinte={salvarContribuinte}
-            handleNovoContribuinte={() => setDataContribuinte(dataInit)}
-          />
+          <FormCadContribuinte />
         </Paper>
         <Paper
           className={classes.paper}
@@ -257,22 +148,21 @@ function Contribuintes({
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {listContribuinte.map((contribuinte) => (
-                    <TableRow key={contribuinte.id}>
+                  {listContribuinte.map((value) => (
+                    <TableRow key={value.id}>
                       <TableCell align="center">
                         <Link
                           component="button"
-                          onClick={() => setDataContribuinte(contribuinte)}
+                          onClick={() => handleSelectedContribuinte(value)}
                           variant="body2">
-                          {contribuinte.id}
+                          {value.id}
                         </Link>
                       </TableCell>
-                      <TableCell>{contribuinte.doc}</TableCell>
-                      <TableCell>{contribuinte.nome}</TableCell>
-                      <TableCell align="center">{contribuinte.tipo}</TableCell>
+                      <TableCell>{value.doc}</TableCell>
+                      <TableCell>{value.nome}</TableCell>
+                      <TableCell align="center">{value.tipo}</TableCell>
                       <TableCell>
-                        {contribuinte.cidade} | {contribuinte.bairro} |{' '}
-                        {contribuinte.endereco}
+                        {value.cidade} | {value.bairro} | {value.endereco}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -315,24 +205,4 @@ function Contribuintes({
   );
 }
 
-const mapStateToProps = (state) => ({
-  listContribuinte: state.contribuinte.listContribuinte,
-  updateDataContribuinte: state.contribuinte.updateDataContribuinte,
-  pagination: state.contribuinte.pagination,
-  empresaResponse: state.webservice.empresa,
-  enderecoResponse: state.webservice.endereco
-});
-
-const mapDispatchToProps = (dispatch) =>
-  bindActionCreators(
-    {
-      requestContribuinte,
-      saveContribuinte,
-      updateContribuinte,
-      requestReceitaWS,
-      requestCorreiosCEP
-    },
-    dispatch
-  );
-
-export default connect(mapStateToProps, mapDispatchToProps)(Contribuintes);
+export default memo(Contribuintes);

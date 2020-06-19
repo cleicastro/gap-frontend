@@ -7,7 +7,8 @@ import {
   Settings as SettingsIcon,
   InsertDriveFile as InsertDriveFileIcon,
   BarChartRounded as RelatorioIcon,
-  PostAddOutlined as RegisterIcon
+  PostAddOutlined as RegisterIcon,
+  CardMembership as Alvara
 } from '@material-ui/icons';
 
 import { Drawer, Divider } from '@material-ui/core';
@@ -33,6 +34,11 @@ export default function Sidebar({
       title: 'DAM',
       href: '/dam',
       icon: <ApartmentIcon />
+    },
+    {
+      title: 'Alvará',
+      href: '/alvara',
+      icon: <Alvara />
     },
     {
       title: 'NFSA',

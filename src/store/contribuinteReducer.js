@@ -8,15 +8,17 @@ const ACTIONS = {
   LIST_INITIAL: 'Contribuinte_LIST_INITIAL',
   ADD: 'Contribuinte_ADD',
   UPDATE: 'Contribuinte_UPDATE',
+  CLEAN_CONTRIBUINTE: 'CLEAN_CONTRIBUINTE',
   ERROR: 'Contribuinte_ERROR'
 };
 
 const INITIAL_STATE = {
   error: [],
   listContribuinte: [],
+  newDataContribuinte: null,
   updateDataContribuinte: {},
   pagination: {},
-  isload: true
+  isload: false
 };
 
 export const contribuinteReducer = (state = INITIAL_STATE, action) => {
@@ -49,6 +51,7 @@ export const contribuinteReducer = (state = INITIAL_STATE, action) => {
           action.listContribuinte.data,
           ...state.listContribuinte
         ],
+        newDataContribuinte: action.status,
         isload: false
       };
     case ACTIONS.UPDATE:
@@ -105,10 +108,18 @@ export const contribuinteReducer = (state = INITIAL_STATE, action) => {
         ...state,
         updateDataContribuinte: action.updateDataContribuinte,
         listContribuinte: lst,
+        newDataContribuinte: state.newDataContribuinte,
         isload: false
+      };
+    case ACTIONS.CLEAN_CONTRIBUINTE:
+      return {
+        ...state,
+        updateDataContribuinte: {},
+        newDataContribuinte: null
       };
     case ACTIONS.ERROR:
       return {
+        ...state,
         error: action.error,
         isload: false,
         listContribuinte: [...state.listContribuinte],
@@ -145,7 +156,8 @@ export function saveContribuinte(contribuinte) {
       });
       dispatch({
         type: ACTIONS.ADD,
-        listContribuinte: response
+        listContribuinte: response,
+        status: response.status
       });
     } catch (error) {
       console.log(error);
@@ -180,3 +192,18 @@ export function updateContribuinte(id, params) {
     }
   };
 }
+
+export const cleanDataContribuinte = () => {
+  return (dispatch) => {
+    try {
+      dispatch({
+        type: ACTIONS.CLEAN_CONTRIBUINTE
+      });
+    } catch (error) {
+      dispatch({
+        type: ACTIONS.ERROR,
+        error
+      });
+    }
+  };
+};

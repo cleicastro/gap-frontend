@@ -6,7 +6,11 @@ const useStyles = makeStyles((theme) => ({
     flexWrap: 'wrap'
   },
   button: {
-    margin: theme.spacing(1)
+    marginTop: theme.spacing(3),
+    marginRight: theme.spacing(1)
+  },
+  form: {
+    padding: theme.spacing(3)
   }
 }));
 
