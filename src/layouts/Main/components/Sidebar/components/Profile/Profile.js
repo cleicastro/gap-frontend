@@ -4,20 +4,23 @@ import { Avatar, Typography } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import useStyles from './styles';
+import userPerfil from '../../../../../../assets/logo.png';
 
 export default function Profile({ className, ...rest }) {
   const classes = useStyles();
   const getUsuer = JSON.parse(localStorage.getItem('app-token'));
+  // const imagePerfil = '/images/avatars/avatar_1.png';
   const user = {
     name: getUsuer.nome,
-    avatar: '/images/avatars/avatar_1.png',
+    avatar: userPerfil,
     bio: getUsuer.tipoUsuario
   };
 
   return (
     <div {...rest} className={clsx(classes.root, className)}>
       <Avatar
-        alt="Person"
+        variant="rounded"
+        alt="PMI"
         className={classes.avatar}
         component={Link}
         src={user.avatar}

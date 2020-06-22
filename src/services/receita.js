@@ -4,7 +4,7 @@ class Receita {
   getReceita(cancelToken) {
     // const token = sessionStorage.getItem('JWT_Token');
     return api.get(
-      'v1/api/receita',
+      'receita',
       {},
       {
         cancelToken

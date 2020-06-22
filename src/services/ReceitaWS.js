@@ -27,6 +27,15 @@ class ReceitaWS {
       }
     );
   }
+
+  getConsultaCNPJA(cnpj, cancelToken) {
+    return api.get(`https://api.cnpja.com.br/companies/${cnpj}`, {
+      cancelToken,
+      headers: {
+        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJnaXZlbl9uYW1lIjoiQ2xlaWRlbmlsc29uIiwiZmFtaWx5X25hbWUiOiJDYXN0cm8iLCJuaWNrbmFtZSI6ImNsZWljYXN0cm8udGkiLCJuYW1lIjoiQ2xlaWRlbmlsc29uIENhc3RybyIsInBpY3R1cmUiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS0vQU9oMTRHanJ4QnNBX1Ywd3A5a1FNRVIzd0diaERHOTlfSGdNMUJrQ1ZxekxNdyIsImxvY2FsZSI6InB0LUJSIiwidXBkYXRlZF9hdCI6IjIwMjAtMDYtMjFUMDU6MDI6MzguMjMxWiIsImVtYWlsIjoiY2xlaWNhc3Ryby50aUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6Ly9jbnBqYS5hdXRoMC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMTE5MjA3NzcwMzU0MTM3ODA3NDYiLCJhdWQiOiJITVlKOTg2OUVmY2JhdVVOS1BMSEdSMzUyVXFWczQzNSIsImlhdCI6MTU5MjcxNTc1OCwiZXhwIjoxNTkzMzIwNTU4LCJhdF9oYXNoIjoiaHNrYWsteG9MM1o1cjdmRWdGVkZ0ZyIsIm5vbmNlIjoiY25wamEtd2Vic2l0ZSJ9.aiQiTvmUkn5L_yumek4hv_lEel4UwgBQEbdkiNmBDhU`
+      }
+    });
+  }
 }
 
 export default new ReceitaWS();

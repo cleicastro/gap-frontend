@@ -8,8 +8,8 @@ const useStyles = makeStyles((theme) => ({
     minHeight: 'fit-content'
   },
   avatar: {
-    width: 80,
-    height: 80
+    width: 60,
+    height: 60
   },
   name: {
     marginTop: theme.spacing(1)

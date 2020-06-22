@@ -10,7 +10,8 @@ function FormEndereco() {
     control,
     register,
     searchCEP,
-    enderecoResponse
+    enderecoResponse,
+    empresaResponse
   } = useContext(ContribuinteContext);
   const [data, setData] = useState(contribuinte);
 
@@ -38,6 +39,31 @@ function FormEndereco() {
       }));
     }
   }, [enderecoResponse]);
+
+  useEffect(() => {
+    if (empresaResponse) {
+      const {
+        city,
+        zip,
+        state,
+        street,
+        neighborhood: district,
+        number: numberAddress,
+        details: additionalInformation
+      } = empresaResponse.address;
+
+      setData((prev) => ({
+        ...prev,
+        cep: zip || '',
+        cidade: city || '',
+        endereco: street || '',
+        uf: state || '',
+        complemento: additionalInformation || '',
+        numero: numberAddress || '',
+        bairro: district || ''
+      }));
+    }
+  }, [empresaResponse]);
 
   function onChangeHandler(e) {
     const { name, value } = e.target;

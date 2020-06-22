@@ -45,10 +45,11 @@ export function requestReceitaWS(cnpj, token) {
   return async (dispatch) => {
     try {
       // const response = await ReceitaWS.getReceitaWS(cnpj, token);
-      const response = await ReceitaWS.getConsultaGuru(cnpj, token);
+      // const response = await ReceitaWS.getConsultaGuru(cnpj, token);
+      const response = await ReceitaWS.getConsultaCNPJA(cnpj, token);
       dispatch({
         type: ACTIONS.CNPJ,
-        empresa: response.data.legalEntity
+        empresa: response.data
       });
     } catch (error) {
       console.log(error);

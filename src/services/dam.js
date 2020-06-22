@@ -1,6 +1,10 @@
 import api from './api';
 
 class Dam {
+  getDamIndex(id, cancelToken) {
+    return api.get(`dam/${id}`, {}, { cancelToken });
+  }
+
   getDam(
     {
       id,
@@ -24,7 +28,7 @@ class Dam {
   ) {
     // const token = sessionStorage.getItem('JWT_Token');
     return api.get(
-      'v1/api/dam',
+      'dam',
       {
         params: {
           id,
@@ -68,7 +72,7 @@ class Dam {
     cancelToken
   ) {
     return api.post(
-      'v1/api/dam',
+      'dam',
       {
         docOrigem,
         idContribuinte,
@@ -93,7 +97,7 @@ class Dam {
 
   updateDam(id, params, cancelToken) {
     return api.put(
-      `v1/api/dam/${id}`,
+      `dam/${id}`,
       {
         ...params
       },

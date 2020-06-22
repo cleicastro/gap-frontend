@@ -26,37 +26,23 @@ function FormInfoPessoais() {
 
   useEffect(() => {
     if (empresaResponse) {
-      const { name, email } = empresaResponse;
-      const { ddd, number } = empresaResponse.phones[0];
-      const {
-        city,
-        state,
-        street,
-        streetSuffix,
-        district,
-        number: numberAddress,
-        additionalInformation
-      } = empresaResponse.address;
-
+      const { name, email, phone: number } = empresaResponse;
       setData((prev) => ({
         ...prev,
         nome: name,
         email,
-        telefone: `(${ddd}) ${number}`,
-        cep: city.code,
-        cidade: city.name,
-        endereco: `${streetSuffix} ${street}`,
-        uf: state,
-        complemento: additionalInformation,
-        numero: numberAddress,
-        bairro: district
+        telefone: `${number}`
       }));
     }
   }, [empresaResponse]);
 
   function onChangeHandler(e) {
     const { name, value } = e.target;
-    if (name === 'doc' && value.length === 14) {
+    if (
+      (name === 'doc' || name === 'tipo') &&
+      data.tipo === 'PJ' &&
+      value.length === 14
+    ) {
       searchCNPJ(value);
     }
     setData((prev) => ({ ...prev, [name]: value }));
@@ -124,7 +110,7 @@ function FormInfoPessoais() {
           onChange={onChangeHandler}
           disabled={isDisbledForm}
           fullWidth
-          label={contribuinte.tipo === 'PF' ? 'RG' : 'Inscrição Estadual'}
+          label={data.tipo === 'PF' ? 'RG' : 'Inscrição Estadual'}
           name="docEstadual"
         />
       </Grid>

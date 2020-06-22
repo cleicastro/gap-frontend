@@ -18,7 +18,7 @@ class Contribuinte {
   ) {
     // const token = sessionStorage.getItem('JWT_Token');
     return api.get(
-      'v1/api/contribuinte',
+      'contribuinte',
       {
         params: {
           id,
@@ -66,7 +66,7 @@ class Contribuinte {
   ) {
     // const token = sessionStorage.getItem('JWT_Token');
     return api.post(
-      'v1/api/contribuinte',
+      'contribuinte',
       {
         tipo,
         doc,
@@ -98,7 +98,7 @@ class Contribuinte {
 
   updateContribuinte(id, params, cancelToken) {
     return api.put(
-      `v1/api/contribuinte/${id}`,
+      `contribuinte/${id}`,
       {
         ...params
       },

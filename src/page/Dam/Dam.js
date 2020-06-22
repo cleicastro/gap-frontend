@@ -41,7 +41,7 @@ function Dam({
   ValueTotal,
   requestDam: handleListDam,
   cleanDataDAM: handleCleanDam,
-  updateDataDam: handleUpdateData,
+  // updateDataDam: handleUpdateData,
   listReceita,
   requestReceita: handleListReceita
 }) {

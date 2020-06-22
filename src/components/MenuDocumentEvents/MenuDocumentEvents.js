@@ -15,6 +15,7 @@ import {
 } from '@material-ui/core';
 
 import { Alert } from '@material-ui/lab';
+import { Link } from 'react-router-dom';
 import useStyles from './styles';
 
 function MenuDocumentEvents({
@@ -120,7 +121,11 @@ function MenuDocumentEvents({
           open={Boolean(anchorElPrint)}
           onClose={() => setAnchorElPrint(null)}
           TransitionComponent={Fade}>
-          <MenuItem onClick={() => setAnchorElPrint(null)}>DAM</MenuItem>
+          <MenuItem onClick={() => setAnchorElPrint(null)}>
+            <Link to={`pdf/dam/${id}`} target="_blank">
+              DAM
+            </Link>
+          </MenuItem>
           <MenuItem onClick={() => setAnchorElPrint(null)}>Alvará</MenuItem>
           <MenuItem onClick={() => setAnchorElPrint(null)}>NFSA</MenuItem>
           <MenuItem onClick={() => setAnchorElPrint(null)}>Recibo</MenuItem>
