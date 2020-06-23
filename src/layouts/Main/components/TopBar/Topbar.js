@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -14,16 +14,37 @@ import {
   Menu as MenuIcon
 } from '@material-ui/icons';
 
-import { Link } from 'react-router-dom';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+
+import { Link, useHistory } from 'react-router-dom';
+
+import { logout } from '../../../../store/loginRedux';
+
 import useStyles from './styles';
 
-function TopBar({ className, onSidebarOpen, ...rest }) {
+function TopBar({
+  logout: actionLogout,
+  logoutMsg,
+  error,
+  className,
+  onSidebarOpen,
+  ...rest
+}) {
   const classes = useStyles();
+  const history = useHistory();
 
-  function logout() {
-    localStorage.clear();
-    window.location.href = '/';
+  function logoutUser() {
+    actionLogout();
   }
+
+  useEffect(() => {
+    if (logoutMsg) {
+      localStorage.clear();
+      alert(logoutMsg.message);
+      history.push('/');
+    }
+  }, [history, logoutMsg]);
 
   return (
     <AppBar {...rest} className={clsx(classes.root, className)}>
@@ -42,7 +63,7 @@ function TopBar({ className, onSidebarOpen, ...rest }) {
           <IconButton
             className={classes.signOutButton}
             color="inherit"
-            onClick={logout}>
+            onClick={logoutUser}>
             <InputIcon />
           </IconButton>
         </Hidden>
@@ -56,4 +77,17 @@ function TopBar({ className, onSidebarOpen, ...rest }) {
   );
 }
 
-export default memo(TopBar);
+const mapStateToProps = (state) => ({
+  logoutMsg: state.auth.logout,
+  error: state.auth.error
+});
+
+const mapDispatchToProps = (dispatch) =>
+  bindActionCreators(
+    {
+      logout
+    },
+    dispatch
+  );
+
+export default connect(mapStateToProps, mapDispatchToProps)(memo(TopBar));

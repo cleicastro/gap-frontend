@@ -142,7 +142,10 @@ export function requestContribuinte(params, token) {
     } catch (error) {
       dispatch({
         type: ACTIONS.ERROR,
-        error
+        error: {
+          ...error.response.data,
+          status: error.response.status
+        }
       });
     }
   };
@@ -163,7 +166,10 @@ export function saveContribuinte(contribuinte) {
       console.log(error);
       dispatch({
         type: ACTIONS.ERROR,
-        error
+        error: {
+          ...error.response.data,
+          status: error.response.status
+        }
       });
     }
   };
@@ -187,7 +193,10 @@ export function updateContribuinte(id, params) {
       console.log('erro', error);
       dispatch({
         type: ACTIONS.ERROR,
-        error
+        error: {
+          ...error.response.data,
+          status: error.response.status
+        }
       });
     }
   };

@@ -7,7 +7,8 @@ import {
   Login as LoginView,
   Dam as DamView,
   Contribuinte as ContribuinteView,
-  PrinterDAM as PDFDAM
+  PrinterDAM as PDFDAM,
+  User as UserView
 } from './page';
 import { Main as MainLayout } from './layouts';
 
@@ -41,6 +42,12 @@ const Routes = () => (
         exact
         layout={MainLayout}
         path="/cadastro/contribuinte"
+      />
+      <PrivateRoute
+        component={UserView}
+        exact
+        layout={MainLayout}
+        path="/cadastro/user"
       />
     </Switch>
   </BrowserRouter>

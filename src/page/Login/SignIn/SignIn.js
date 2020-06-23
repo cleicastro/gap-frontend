@@ -1,12 +1,21 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
-import { Grid, Avatar, Typography, TextField, Button } from '@material-ui/core';
+import {
+  Grid,
+  Avatar,
+  Typography,
+  TextField,
+  Button,
+  CircularProgress
+} from '@material-ui/core';
+import { useForm } from 'react-hook-form';
 
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
 import useStyles from './styles';
 
-const SignIn = ({ handleShowForgot, handleLogar }) => {
+const SignIn = ({ handleShowForgot, handleLogar, load }) => {
+  const { register, handleSubmit } = useForm();
   const classes = useStyles();
 
   return (
@@ -20,23 +29,28 @@ const SignIn = ({ handleShowForgot, handleLogar }) => {
       <Typography variant="body2">
         Por favor entre com seu login/email e senha abaixo.
       </Typography>
-      <form className={classes.form} noValidate>
+      <form
+        className={classes.form}
+        noValidate
+        onSubmit={handleSubmit(handleLogar)}>
         <TextField
+          inputRef={register}
           variant="outlined"
           margin="normal"
           fullWidth
           required
-          id="email"
+          name="email"
           label="Email ou Usuário"
           autoFocus
           autoComplete="email"
         />
         <TextField
+          inputRef={register}
           variant="outlined"
           margin="normal"
           fullWidth
           required
-          id="passwoard"
+          name="password"
           label="Senha"
           type="password"
           autoComplete="current-password"
@@ -46,10 +60,8 @@ const SignIn = ({ handleShowForgot, handleLogar }) => {
           fullWidth
           variant="contained"
           className={classes.btnSubmit}
-          color="primary"
-          onClick={handleLogar}
-        >
-          Entrar
+          color="primary">
+          {load ? <CircularProgress color="secondary" /> : 'Entrar'}
         </Button>
         <Grid container>
           <Grid item xs>

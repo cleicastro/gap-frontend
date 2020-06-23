@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles((theme) => ({
   root: {
     height: '100vh',
+    display: 'flex'
   },
 
   image: {
@@ -13,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
         ? theme.palette.grey[50]
         : theme.palette.grey[900],
     backgroundSize: 'cover',
-    backgroundPosition: 'center',
+    backgroundPosition: 'center'
   },
 
   paper: {
@@ -21,9 +22,9 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    height: '87vh',
     justifyContent: 'center',
-  },
+    height: '85vh'
+  }
 }));
 
 export default useStyles;

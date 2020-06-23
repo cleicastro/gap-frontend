@@ -10,8 +10,9 @@ export default function Profile({ className, ...rest }) {
   const classes = useStyles();
   const getUsuer = JSON.parse(localStorage.getItem('app-token'));
   // const imagePerfil = '/images/avatars/avatar_1.png';
+  const prepareUserName = getUsuer.nome.split(' ');
   const user = {
-    name: getUsuer.nome,
+    name: `${prepareUserName.shift()} ${prepareUserName.pop()}`,
     avatar: userPerfil,
     bio: getUsuer.tipoUsuario
   };

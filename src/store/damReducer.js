@@ -153,7 +153,10 @@ export function requestDam(params, token) {
     } catch (error) {
       dispatch({
         type: ACTIONS.ERROR,
-        error
+        error: {
+          ...error.response.data,
+          status: error.response.status
+        }
       });
     }
   };
@@ -171,7 +174,10 @@ export function salvarDam(dam) {
       console.log(error);
       dispatch({
         type: ACTIONS.ERROR,
-        error
+        error: {
+          ...error.response.data,
+          status: error.response.status
+        }
       });
     }
   };
@@ -180,7 +186,6 @@ export function salvarDam(dam) {
 export function updateStatusDam(id, params) {
   return async (dispatch) => {
     const { status: situacao, pago } = params;
-    console.log(params);
 
     try {
       const response = await Dam.updateDam(id, params);
@@ -199,7 +204,10 @@ export function updateStatusDam(id, params) {
       console.log(error);
       dispatch({
         type: ACTIONS.ERROR,
-        error
+        error: {
+          ...error.response.data,
+          status: error.response.status
+        }
       });
     }
   };
@@ -223,7 +231,10 @@ export function updateDataDam(id, params) {
       console.log(error);
       dispatch({
         type: ACTIONS.ERROR,
-        error
+        error: {
+          ...error.response.data,
+          status: error.response.status
+        }
       });
     }
   };

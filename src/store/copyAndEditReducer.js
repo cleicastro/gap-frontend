@@ -142,7 +142,10 @@ export const dataPrepareRequest = (data) => {
     } catch (error) {
       dispatch({
         type: ACTIONS.ERROR,
-        error
+        error: {
+          ...error.response.data,
+          status: error.response.status
+        }
       });
     }
   };

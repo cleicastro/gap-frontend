@@ -1,31 +1,71 @@
-import React, { useState } from 'react';
-import { Grid, Paper, CssBaseline, Box } from '@material-ui/core';
+import React, { useState, useEffect } from 'react';
+import { Grid, Paper, CssBaseline, Box, Snackbar } from '@material-ui/core';
+import MuiAlert from '@material-ui/lab/Alert';
+
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 
 import { useHistory } from 'react-router-dom';
 import Copyright from '../../components/Copyright';
+import { logar, cleanMessgeUser } from '../../store/loginRedux';
 
 import useStyles from './styles';
 import SignIn from './SignIn';
 import Forgot from './Forgot';
 
-const Login = () => {
+const SnakebarMensage = ({ open, children, type }) => {
+  return (
+    <Snackbar
+      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      open={open}
+      autoHideDuration={4000}>
+      <MuiAlert elevation={6} variant="filled" severity={type}>
+        {children}
+      </MuiAlert>
+    </Snackbar>
+  );
+};
+
+const Login = ({
+  logar: actionLogar,
+  cleanMessgeUser: actionCleanDataUser,
+  user,
+  error
+}) => {
   const classes = useStyles();
 
   const [showLogin, setShowLogin] = useState(true);
   const history = useHistory();
+  const [load, setLoad] = useState(false);
+  const [messageBackend, setMessageBackend] = useState('');
 
-  const logar = (e) => {
-    e.preventDefault();
-    const token = {
-      nome: 'Clei Castro',
-      email: 'cleicastro.ti@hotmail.com',
-      token: 'fjakjffdslkjfakdfajskjrjewrew0rreiw90328328432328423wje',
-      tipoUsuario: 'ADMIN',
-    };
-    localStorage.setItem('app-token', JSON.stringify(token));
-    history.push('/');
+  const authentication = (e) => {
+    setLoad(true);
+    actionLogar(e);
   };
 
+  useEffect(() => {
+    if (error || user) actionCleanDataUser();
+  }, [actionCleanDataUser, error, user]);
+
+  useEffect(() => {
+    if (error) {
+      setMessageBackend(error);
+    }
+    if (user) {
+      const dataUser = {
+        id: user.id,
+        nome: user.name,
+        email: user.email,
+        token: user.token,
+        tipoUsuario: user.type
+      };
+      localStorage.setItem('app-token', JSON.stringify(dataUser));
+      history.push('/');
+    }
+    setLoad(false);
+  }, [history, user, error]);
+  console.log(error);
   return (
     <Grid container component="main" className={classes.root}>
       <CssBaseline />
@@ -34,7 +74,8 @@ const Login = () => {
           {showLogin && (
             <SignIn
               handleShowForgot={() => setShowLogin((show) => !show)}
-              handleLogar={logar}
+              handleLogar={authentication}
+              load={load}
             />
           )}
 
@@ -47,8 +88,26 @@ const Login = () => {
         </Box>
       </Grid>
       <Grid item xs={false} sm={4} md={7} className={classes.image} />
+
+      <SnakebarMensage type="error" open={messageBackend !== ''}>
+        {messageBackend.message}
+      </SnakebarMensage>
     </Grid>
   );
 };
 
-export default Login;
+const mapStateToProps = (state) => ({
+  user: state.auth.user,
+  error: state.auth.error
+});
+
+const mapDispatchToProps = (dispatch) =>
+  bindActionCreators(
+    {
+      logar,
+      cleanMessgeUser
+    },
+    dispatch
+  );
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

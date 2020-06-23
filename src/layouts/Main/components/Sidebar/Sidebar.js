@@ -57,7 +57,7 @@ export default function Sidebar({
         },
         {
           title: 'Usuários',
-          href: '/user',
+          href: '/cadastro/user',
           icon: <RegisterIcon />
         }
       ]

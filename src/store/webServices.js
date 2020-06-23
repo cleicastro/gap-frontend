@@ -55,7 +55,10 @@ export function requestReceitaWS(cnpj, token) {
       console.log(error);
       dispatch({
         type: ACTIONS.ERROR,
-        error
+        error: {
+          ...error.response.data,
+          status: error.response.status
+        }
       });
     }
   };
@@ -73,7 +76,10 @@ export function requestCorreiosCEP(cep, token) {
       console.log(error);
       dispatch({
         type: ACTIONS.ERROR,
-        error
+        error: {
+          ...error.response.data,
+          status: error.response.status
+        }
       });
     }
   };
