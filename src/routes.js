@@ -6,8 +6,10 @@ import {
   Dashboard as DashboardView,
   Login as LoginView,
   Dam as DamView,
+  Nfsa as NfsaView,
   Contribuinte as ContribuinteView,
-  PrinterDAM as PDFDAM,
+  PdfDam as PDFDAM,
+  PdfNfsa as PDFNFSA,
   User as UserView
 } from './page';
 import { Main as MainLayout } from './layouts';
@@ -18,6 +20,7 @@ const Routes = () => (
       <Redirect exact from="/" to="/dashboard" />
       <Route path="/login" component={LoginView} />
       <Route path="/pdf/dam" component={PDFDAM} />
+      <Route path="/pdf/nfsa" component={PDFNFSA} />
       <PrivateRoute
         component={DashboardView}
         exact
@@ -26,7 +29,7 @@ const Routes = () => (
       />
       <PrivateRoute component={DamView} exact layout={MainLayout} path="/dam" />
       <PrivateRoute
-        component={() => <h1>NFSA</h1>}
+        component={NfsaView}
         exact
         layout={MainLayout}
         path="/nfsa"

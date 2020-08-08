@@ -18,7 +18,7 @@ import { connect } from 'react-redux';
 
 import {
   salvarDam,
-  updateStatusDam,
+  alterStatusDam,
   updateDataDam,
   cleanDataDAM
 } from '../../store/damReducer';
@@ -38,7 +38,7 @@ function StepComponent({
   updateDam,
   salvarDam: handleSalvar,
   updateDataDam: handleUpdateData,
-  updateStatusDam: handleUpate,
+  alterStatusDam: handleUpate,
   cleanDataDAM: handleCleanDam,
   handleClose
 }) {
@@ -272,7 +272,7 @@ const mapDispatchToProps = (dispatch) =>
   bindActionCreators(
     {
       salvarDam,
-      updateStatusDam,
+      alterStatusDam,
       updateDataDam,
       cleanDataDAM
     },

@@ -5,6 +5,8 @@ import { contribuinteReducer } from './contribuinteReducer';
 import { webServiceReducer } from './webServices';
 import { copyAndEditReducer } from './copyAndEditReducer';
 import { authReducer } from './loginRedux';
+import { nfsaReducer } from './nfsaReducer';
+import { formReducer } from './formReducer';
 
 const mainReducer = combineReducers({
   dam: damReducer,
@@ -12,7 +14,9 @@ const mainReducer = combineReducers({
   contribuinte: contribuinteReducer,
   webservice: webServiceReducer,
   copyAndEdit: copyAndEditReducer,
-  auth: authReducer
+  auth: authReducer,
+  nfsa: nfsaReducer,
+  form: formReducer
 });
 
 export default mainReducer;

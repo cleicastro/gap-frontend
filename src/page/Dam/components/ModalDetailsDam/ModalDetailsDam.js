@@ -16,7 +16,7 @@ import {
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import { updateStatusDam } from '../../../../store/damReducer';
+import { alterStatusDam } from '../../../../store/damReducer';
 
 import useStyles from './styles';
 import { Review } from '../../../../components';
@@ -27,7 +27,7 @@ function ModalDetailsDam({
   handleReviewShow,
   showReview,
   handleDamView,
-  updateStatusDam: handleUpate,
+  alterStatusDam: handleUpate,
   updateDam: updateDamData,
   handleOpenDam,
   handleDataDam,
@@ -167,6 +167,6 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) =>
-  bindActionCreators({ updateStatusDam }, dispatch);
+  bindActionCreators({ alterStatusDam }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(ModalDetailsDam);

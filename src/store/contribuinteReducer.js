@@ -120,10 +120,7 @@ export const contribuinteReducer = (state = INITIAL_STATE, action) => {
     case ACTIONS.ERROR:
       return {
         ...state,
-        error: action.error,
-        isload: false,
-        listContribuinte: [...state.listContribuinte],
-        pagination: { ...state.pagination.meta }
+        error: action.error
       };
     default:
       return state;
@@ -202,7 +199,7 @@ export function updateContribuinte(id, params) {
   };
 }
 
-export const cleanDataContribuinte = () => {
+export function cleanDataContribuinte() {
   return (dispatch) => {
     try {
       dispatch({
@@ -215,4 +212,4 @@ export const cleanDataContribuinte = () => {
       });
     }
   };
-};
+}

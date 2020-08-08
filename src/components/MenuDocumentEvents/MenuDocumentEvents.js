@@ -9,46 +9,37 @@ import {
   MenuItem,
   Fade,
   TextField,
-  Snackbar,
-  CircularProgress,
   Button
 } from '@material-ui/core';
 
-import { Alert } from '@material-ui/lab';
 import { Link } from 'react-router-dom';
 import useStyles from './styles';
 
-function MenuDocumentEvents({
-  handleEdit,
-  handleCopy,
-  handleUpate,
-  updateDamData,
-  handleClose,
-  status,
-  id,
-  statusPagar,
-  statusCancelar,
-  isVisibleOptions
-}) {
+function MenuDocumentEvents(props) {
+  const {
+    idPrint,
+    handleEdit,
+    handleCopy,
+    handleAlterStatusDAM,
+    statusPagar,
+    statusCancelar,
+    handleClose,
+    visibleOptions
+  } = props;
   const classes = useStyles();
-  const { imprimir, pagar, copiar, editar, cancelar, sair } = isVisibleOptions;
-
-  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const { imprimir, pagar, copiar, editar, cancelar, sair } = visibleOptions;
 
   const [anchorElPrint, setAnchorElPrint] = React.useState(null);
   const [anchorElPagar, setAnchorElPagar] = React.useState(null);
   const [anchorElCancelar, setAnchorElCancelar] = React.useState(null);
-  const [isProgressSave, setIsProgressSave] = React.useState(false);
 
   const handleOpenPrint = (event) => {
     setAnchorElPrint(event.currentTarget);
   };
   const handleOpenPagar = (event) => {
-    setIsProgressSave(true);
     setAnchorElPagar(event.currentTarget);
   };
   const handleOpenCancelar = (event) => {
-    setIsProgressSave(true);
     setAnchorElCancelar(event.currentTarget);
   };
 
@@ -74,22 +65,19 @@ function MenuDocumentEvents({
             </Button>
           )}
 
-          {pagar &&
-            !statusPagar &&
-            status !== 'Pago' &&
-            status !== 'Cancelado' && (
-              <Button
-                onClick={handleOpenPagar}
-                aria-controls="fade-menu-pagar"
-                aria-haspopup="true">
-                Pagar
-              </Button>
-            )}
+          {pagar && !statusPagar && !statusCancelar && (
+            <Button
+              onClick={handleOpenPagar}
+              aria-controls="fade-menu-pagar"
+              aria-haspopup="true">
+              Pagar
+            </Button>
+          )}
           {copiar && <Button onClick={handleCopy}>Copiar</Button>}
-          {editar && status !== 'Cancelado' && (
+          {editar && !statusCancelar !== 'Cancelado' && (
             <Button onClick={handleEdit}>Editar</Button>
           )}
-          {cancelar && !statusCancelar && status !== 'Cancelado' && (
+          {cancelar && !statusCancelar && (
             <Button
               onClick={handleOpenCancelar}
               aria-controls="fade-menu-cancelar"
@@ -99,21 +87,6 @@ function MenuDocumentEvents({
           )}
           {sair && <Button onClick={handleClose}>Sair</Button>}
         </ButtonGroup>
-        <Snackbar
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-          key={id}
-          open={openSnackbar}
-          autoHideDuration={6000}
-          onClose={() => setOpenSnackbar(false)}>
-          <>
-            {updateDamData.message && (
-              <Alert onClose={() => setOpenSnackbar(false)} severity="success">
-                {updateDamData.message}
-              </Alert>
-            )}
-            {isProgressSave && !updateDamData.message && <CircularProgress />}
-          </>
-        </Snackbar>
         <Menu
           id="fade-menu"
           keepMounted
@@ -122,12 +95,18 @@ function MenuDocumentEvents({
           onClose={() => setAnchorElPrint(null)}
           TransitionComponent={Fade}>
           <MenuItem onClick={() => setAnchorElPrint(null)}>
-            <Link to={`pdf/dam/${id}`} target="_blank">
+            <Link to={`pdf/dam/${idPrint.idDAM}`} target="_blank">
               DAM
             </Link>
           </MenuItem>
           <MenuItem onClick={() => setAnchorElPrint(null)}>Alvará</MenuItem>
-          <MenuItem onClick={() => setAnchorElPrint(null)}>NFSA</MenuItem>
+          {idPrint.idNFSA && (
+            <MenuItem onClick={() => setAnchorElPrint(null)}>
+              <Link to={`pdf/nfsa/${idPrint.idNFSA}`} target="_blank">
+                NFSA
+              </Link>
+            </MenuItem>
+          )}
           <MenuItem onClick={() => setAnchorElPrint(null)}>Recibo</MenuItem>
         </Menu>
         <Menu
@@ -151,8 +130,7 @@ function MenuDocumentEvents({
           </Grid>
           <Button
             onClick={() => {
-              setOpenSnackbar(true);
-              handleUpate(id, { pago: 1 });
+              handleAlterStatusDAM('pago', { pago: 1 });
               setAnchorElPagar(null);
             }}>
             Sim
@@ -168,8 +146,7 @@ function MenuDocumentEvents({
           TransitionComponent={Fade}>
           <Button
             onClick={() => {
-              setOpenSnackbar(true);
-              handleUpate(id, { status: 0 });
+              handleAlterStatusDAM('cancelado', { status: 0 });
               setAnchorElCancelar(null);
             }}>
             Sim
@@ -182,7 +159,7 @@ function MenuDocumentEvents({
 }
 
 MenuDocumentEvents.defaultProps = {
-  isVisibleOptions: {
+  visibleOptions: {
     imprimir: false,
     pagar: false,
     copiar: false,
@@ -190,14 +167,13 @@ MenuDocumentEvents.defaultProps = {
     cancelar: false,
     sair: true
   },
-  id: 0
+  idPrint: { idDAM: 0 }
 };
 
 MenuDocumentEvents.propTypes = {
-  id: PropTypes.number.isRequired,
-  isVisibleOptions: PropTypes.object.isRequired,
-  updateDamData: PropTypes.object.isRequired,
-  handleUpate: PropTypes.func.isRequired,
+  idPrint: PropTypes.object.isRequired,
+  visibleOptions: PropTypes.object.isRequired,
+  handleAlterStatusDAM: PropTypes.func.isRequired,
   statusCancelar: PropTypes.bool.isRequired,
   statusPagar: PropTypes.bool.isRequired
 };

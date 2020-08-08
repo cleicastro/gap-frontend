@@ -17,6 +17,7 @@ const INITIAL_STATE = {
   listDam: [],
   newDamData: {},
   updateDam: {},
+  alterStatusDam: null,
   pagination: {}
 };
 
@@ -42,22 +43,12 @@ export const damReducer = (state = INITIAL_STATE, action) => {
         pagination: { ...state.pagination }
       };
     case ACTIONS.UPDATE_STATUS:
-      const lst = state.listDam.slice();
-      lst.forEach((dam) => {
-        if (dam.id === action.updateDam.id) {
-          if (action.updateDam.situacao === 0) {
-            dam.status = 'Cancelado';
-          } else if (action.updateDam.pago === 1) {
-            dam.status = 'Pago';
-            dam.pago = '1';
-          }
-        }
-      });
       return {
         ...state,
-        updateDam: action.updateDam,
-        listDam: lst,
-        pagination: { ...state.pagination }
+        alterStatusDam: {
+          ...action.response.data,
+          tipo: action.tipo
+        }
       };
     case ACTIONS.UPDATE_DAM:
       const lstDam = state.listDam.slice();
@@ -133,9 +124,8 @@ export const damReducer = (state = INITIAL_STATE, action) => {
       };
     case ACTIONS.ERROR:
       return {
-        error: action.error,
-        listDam: [],
-        pagination: {}
+        ...state,
+        error: action.error
       };
     default:
       return state;
@@ -183,19 +173,16 @@ export function salvarDam(dam) {
   };
 }
 
-export function updateStatusDam(id, params) {
+export function updateDataDam(id, params) {
   return async (dispatch) => {
-    const { status: situacao, pago } = params;
-
     try {
       const response = await Dam.updateDam(id, params);
       dispatch({
-        type: ACTIONS.UPDATE_STATUS,
+        type: ACTIONS.UPDATE_DAM,
         id,
         updateDam: {
           id,
-          situacao,
-          pago,
+          params: { ...params, ...params.documentoToUpdateCard },
           message: response.data.message,
           status: response.status
         }
@@ -213,19 +200,14 @@ export function updateStatusDam(id, params) {
   };
 }
 
-export function updateDataDam(id, params) {
+export function alterStatusDam(id, tipo, params) {
   return async (dispatch) => {
     try {
       const response = await Dam.updateDam(id, params);
       dispatch({
-        type: ACTIONS.UPDATE_DAM,
-        id,
-        updateDam: {
-          id,
-          params: { ...params, ...params.documentoToUpdateCard },
-          message: response.data.message,
-          status: response.status
-        }
+        type: ACTIONS.UPDATE_STATUS,
+        response,
+        tipo
       });
     } catch (error) {
       console.log(error);

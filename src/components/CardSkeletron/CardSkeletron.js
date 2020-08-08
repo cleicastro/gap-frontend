@@ -4,11 +4,11 @@ import { Skeleton } from '@material-ui/lab';
 
 import { useStyles } from './styles';
 
-function CardDocumentSkeletron({ quantSkeletron }) {
+function CardSkeletron({ quantSkeletron }) {
   const classes = useStyles();
 
   return (
-    <Grid container justify="space-between" spacing={3}>
+    <>
       {quantSkeletron.map((skeletron) => (
         <Grid item xl={4} lg={6} sm={6} xs={12} key={skeletron}>
           <Card className={classes.card}>
@@ -48,8 +48,8 @@ function CardDocumentSkeletron({ quantSkeletron }) {
           </Card>
         </Grid>
       ))}
-    </Grid>
+    </>
   );
 }
 
-export default CardDocumentSkeletron;
+export default CardSkeletron;

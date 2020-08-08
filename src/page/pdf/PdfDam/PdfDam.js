@@ -7,9 +7,9 @@ import { styles, useStyles, Pago, DataPagamento } from './styles';
 
 import SectionLeft from './SectionLeft';
 import SectionRight from './SectionRight';
-import { Dam } from '../../services';
+import { Dam } from '../../../services';
 
-const PrinterDAM = () => {
+const PdfDam = () => {
   const classes = useStyles();
 
   const path = window.location.pathname.split('/');
@@ -120,4 +120,4 @@ const PrinterDAM = () => {
   );
 };
 
-export default PrinterDAM;
+export default PdfDam;

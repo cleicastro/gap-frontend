@@ -32,7 +32,7 @@ import {
   TableDam,
   ModalDetailsDam
 } from './components';
-import { CardDocumentSkeletron } from '../../components';
+import { CardSkeletron } from '../../components';
 import useStyles from './styles';
 
 function Dam({
@@ -212,7 +212,7 @@ function Dam({
         </Grid>
         <Grid item xs={12}>
           {isProgress && !viewTable && (
-            <CardDocumentSkeletron quantSkeletron={itensSkeletron} />
+            <CardSkeletron quantSkeletron={itensSkeletron} />
           )}
           <InfiniteScroll
             pageStart={0}
