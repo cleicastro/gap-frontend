@@ -8,7 +8,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Axios from 'axios';
 import { requestContribuinte } from '../../store/contribuinteReducer';
-import { NewDocumentArrecadacaoContext } from '../../contexts/NewDocumentArrecadacao';
+import { DamContext } from '../../contexts';
 
 function FormContribuinte({
   requestContribuinte: handleRequestContribuinte,
@@ -18,7 +18,7 @@ function FormContribuinte({
     selectedContribuinte,
     dataInitContribuinte,
     handleSelectContribuinte
-  } = useContext(NewDocumentArrecadacaoContext);
+  } = useContext(DamContext);
 
   const { register, setValue } = useForm({
     defaultValues: selectedContribuinte || dataInitContribuinte

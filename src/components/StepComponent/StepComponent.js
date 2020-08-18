@@ -28,7 +28,7 @@ import FormReceita from '../FormReceita';
 import FormContribuinte from '../FormContribuinte';
 import FormDocumento from '../FormDocumento';
 import Review from '../Review';
-import { NewDocumentArrecadacaoContext } from '../../contexts/NewDocumentArrecadacao';
+import { DamContext } from '../../contexts';
 import MenuDocumentEvents from '../MenuDocumentEvents/MenuDocumentEvents';
 
 function StepComponent({
@@ -50,7 +50,7 @@ function StepComponent({
     dataPreview,
     valuesInitial,
     isClosed
-  } = useContext(NewDocumentArrecadacaoContext);
+  } = useContext(DamContext);
 
   const { handleSubmit } = useForm();
   const classes = useStyles();

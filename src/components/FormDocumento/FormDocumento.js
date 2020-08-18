@@ -38,19 +38,6 @@ function FormDocumento({
     setDocument(getValues());
   }
 
-  document.addEventListener('keydown', (event) => {
-    // nextPage
-    if (event.ctrlKey && event.keyCode === 39) {
-      setDocument(getValues());
-      setActiveStep(activeStep + 1);
-    }
-    // prevPage
-    if (event.ctrlKey && event.keyCode === 37) {
-      setDocument(getValues());
-      setActiveStep(activeStep - 1);
-    }
-  });
-
   const onSubmit = (data) => console.log(data);
 
   return (

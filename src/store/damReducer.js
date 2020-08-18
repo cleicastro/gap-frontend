@@ -141,12 +141,10 @@ export function requestDam(params, token) {
         listDam: response.data
       });
     } catch (error) {
+      console.log({ ...error });
       dispatch({
         type: ACTIONS.ERROR,
-        error: {
-          ...error.response.data,
-          status: error.response.status
-        }
+        error: null
       });
     }
   };

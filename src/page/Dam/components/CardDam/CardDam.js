@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import clsx from 'clsx';
 import {
   Card,
@@ -9,6 +9,9 @@ import {
   CardHeader,
   CardActionArea
 } from '@material-ui/core';
+
+import { DamContext } from '../../../../contexts';
+
 import {
   useStyles,
   useStylesPago,
@@ -16,68 +19,81 @@ import {
   useStylesVencido
 } from './styles';
 
-function CardDam({ className, listDam, handleDamDetail, ...rest }) {
+const classValueTotal = (
+  status,
+  classesPago,
+  classesCancelado,
+  classesVencido,
+  classes
+) => {
+  switch (status) {
+    case 'Pago':
+      return classesPago.differenceValue;
+    case 'Cancelado':
+      return classesCancelado.differenceValue;
+    case 'Inadimplente':
+      return classesVencido.differenceValue;
+    default:
+      return classes.differenceValue;
+  }
+};
+
+const classAvatar = (
+  status,
+  classesPago,
+  classesCancelado,
+  classesVencido,
+  classes
+) => {
+  switch (status) {
+    case 'Pago':
+      return classesPago.avatar;
+    case 'Cancelado':
+      return classesCancelado.avatar;
+    case 'Inadimplente':
+      return classesVencido.avatar;
+    default:
+      return classes.avatar;
+  }
+};
+
+const classCaption = (status, emissao, vencimento, days) => {
+  switch (status) {
+    case 'Pago':
+      return `Pago em ${Intl.DateTimeFormat('pt-BR').format(
+        new Date(emissao)
+      )}`;
+    case 'Cancelado':
+      return `Cancelado`;
+    case 'Inadimplente':
+      return `${days} dia(s) de atraso ${Intl.DateTimeFormat('pt-BR', {
+        timeZone: 'UTC'
+      }).format(new Date(vencimento))}`;
+    default:
+      // eslint-disable-next-line no-case-declarations
+      let msgVencimento = '';
+      if (days > 0) {
+        msgVencimento = `${days} dia(s) para vencer ${Intl.DateTimeFormat(
+          'pt-BR',
+          {
+            timeZone: 'UTC'
+          }
+        ).format(new Date(vencimento))}`;
+      } else {
+        msgVencimento = `Vence hoje ${Intl.DateTimeFormat('pt-BR', {
+          timeZone: 'UTC'
+        }).format(new Date(vencimento))}`;
+      }
+      return msgVencimento;
+  }
+};
+
+function CardDam({ className, handleDamDetail, ...rest }) {
+  const { dams: listDam } = useContext(DamContext);
   const classes = useStyles();
   const classesPago = useStylesPago();
   const classesCancelado = useStylesCancelado();
   const classesVencido = useStylesVencido();
-
-  const classValueTotal = (status) => {
-    switch (status) {
-      case 'Pago':
-        return classesPago.differenceValue;
-      case 'Cancelado':
-        return classesCancelado.differenceValue;
-      case 'Inadimplente':
-        return classesVencido.differenceValue;
-      default:
-        return classes.differenceValue;
-    }
-  };
-
-  const classAvatar = (status) => {
-    switch (status) {
-      case 'Pago':
-        return classesPago.avatar;
-      case 'Cancelado':
-        return classesCancelado.avatar;
-      case 'Inadimplente':
-        return classesVencido.avatar;
-      default:
-        return classes.avatar;
-    }
-  };
-
-  const classCaption = (status, emissao, vencimento, days) => {
-    switch (status) {
-      case 'Pago':
-        return `Pago em ${Intl.DateTimeFormat('pt-BR').format(
-          new Date(emissao)
-        )}`;
-      case 'Cancelado':
-        return `Cancelado`;
-      case 'Inadimplente':
-        return `${days} dia(s) de atraso ${Intl.DateTimeFormat('pt-BR', {
-          timeZone: 'UTC'
-        }).format(new Date(vencimento))}`;
-      default:
-        // eslint-disable-next-line no-case-declarations
-        let msgVencimento = '';
-        if (days > 0) {
-          msgVencimento = `${days} dia(s) para vencer ${Intl.DateTimeFormat(
-            'pt-BR',
-            {
-              timeZone: 'UTC'
-            }
-          ).format(new Date(vencimento))}`;
-        } else {
-          msgVencimento = `Vence hoje ${Intl.DateTimeFormat('pt-BR', {
-            timeZone: 'UTC'
-          }).format(new Date(vencimento))}`;
-        }
-        return msgVencimento;
-    }
-  };
 
   return (
     <Grid container justify="space-between" spacing={3}>
@@ -95,7 +111,13 @@ function CardDam({ className, listDam, handleDamDetail, ...rest }) {
                 avatar={
                   <Avatar
                     aria-label="recipe"
-                    className={classAvatar(dam.status)}>
+                    className={classAvatar(
+                      dam.status,
+                      classesPago,
+                      classesCancelado,
+                      classesVencido,
+                      classes
+                    )}>
                     {dam.id}
                   </Avatar>
                 }
@@ -133,7 +155,13 @@ function CardDam({ className, listDam, handleDamDetail, ...rest }) {
                   </Typography>
                   <Typography
                     variant="h3"
-                    className={classValueTotal(dam.status)}>
+                    className={classValueTotal(
+                      dam.status,
+                      classesPago,
+                      classesCancelado,
+                      classesVencido,
+                      classes
+                    )}>
                     {new Intl.NumberFormat('pt-BR', {
                       style: 'currency',
                       currency: 'BRL'

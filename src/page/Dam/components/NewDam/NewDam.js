@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   Dialog,
   AppBar,
@@ -12,15 +12,18 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 
 import useStyles from './styles';
-import { StepComponent, Contribuintes } from '../../../../components';
-import NewDocumentArrecadacaoProvider from '../../../../contexts/NewDocumentArrecadacao';
-import { ContribuinteProvier } from '../../../../contexts';
+
+import { DamContext, ContribuinteProvier } from '../../../../contexts';
+import { Contribuintes } from '../../../../components';
+import StepComponent from './StepComponent';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function NewDam({ open, handleClose, receitas, handleDataDam }) {
+function NewDam() {
+  const { handleCloseNewDam, showNewDam } = useContext(DamContext);
+
   const classes = useStyles();
 
   const [isopen, setIsOpen] = useState(false);
@@ -30,15 +33,15 @@ function NewDam({ open, handleClose, receitas, handleDataDam }) {
       <Dialog
         disableBackdropClick
         fullScreen
-        open={open}
-        onClose={handleClose}
+        open={showNewDam}
+        onClose={() => handleCloseNewDam(false)}
         TransitionComponent={Transition}>
         <AppBar className={classes.appBar}>
           <Toolbar>
             <IconButton
               edge="start"
               color="inherit"
-              onClick={handleClose}
+              onClick={() => handleCloseNewDam(false)}
               aria-label="close">
               <CloseIcon />
             </IconButton>
@@ -50,17 +53,7 @@ function NewDam({ open, handleClose, receitas, handleDataDam }) {
             </Button>
           </Toolbar>
         </AppBar>
-        <NewDocumentArrecadacaoProvider
-          isClosed={!open}
-          valuesInitial={handleDataDam}
-          listReceita={receitas}>
-          <StepComponent
-            steps={['Receita', 'Contribuinte', 'Documento', 'Confirmar dados']}
-            title="Emissão de DAM"
-            handleClose={handleClose}
-            handleDataDam={handleDataDam}
-          />
-        </NewDocumentArrecadacaoProvider>
+        <StepComponent />
       </Dialog>
       <Dialog
         disableBackdropClick

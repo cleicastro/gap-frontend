@@ -6,3 +6,6 @@ export { UserContext } from './UserContext';
 
 export { default as NfsaProvider } from './NfsaContext';
 export { NfsaContext } from './NfsaContext';
+
+export { default as DamProvider } from './DamContext';
+export { DamContext } from './DamContext';
