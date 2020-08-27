@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import React, { useContext, useCallback, useState, useEffect } from 'react';
 
-import clsx from 'clsx';
 import {
   Grid,
   Button,
@@ -13,160 +11,110 @@ import {
   useMediaQuery
 } from '@material-ui/core';
 
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-
-import { alterStatusDam } from '../../../../store/damReducer';
-
 import useStyles from './styles';
-import { Review } from '../../../../components';
-import MenuDocumentEvents from '../../../../components/MenuDocumentEvents/MenuDocumentEvents';
+import PreviewDam from '../PreviewDam';
+import { DamContext, ACTIONS } from '../../../../contexts';
+import { MenuDocumentEvents } from '../../../../components';
+import { useSaveDam, useOpenNewDam } from '../../../../hooks';
+import ModalSave from '../../../../components/ModalSave/ModalSave';
 
-function ModalDetailsDam({
-  className,
-  handleReviewShow,
-  showReview,
-  handleDamView,
-  alterStatusDam: handleUpate,
-  updateDam: updateDamData,
-  handleOpenDam,
-  handleDataDam,
-  ...rest
-}) {
+function ModalDetailsDam() {
   const theme = useTheme();
   const fullScreenModal = useMediaQuery(theme.breakpoints.down('sm'));
   const classes = useStyles();
+  const [openModalMenu, setOpenModalMenu] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [statusServer, successRequest, setSave, setEditStatus] = useSaveDam();
+  const setWindowNewDam = useOpenNewDam();
 
-  const items = [
-    {
-      item: handleDamView.receita ? handleDamView.receita.descricao : '',
-      valor: handleDamView.valor_principal
-    },
-    {
-      item: 'Taxa de expedição',
-      valor: handleDamView.taxa_expedicao
-    },
-    {
-      item: 'Juros',
-      valor: handleDamView.valor_juros
-    }
-  ];
-  const receitaInfo = {
-    emissao: handleDamView.emissao,
-    vencimento: handleDamView.vencimento,
-    status: handleDamView.status
-  };
-  const contribuintes = [handleDamView.contribuinte];
-  const infoAdicionais = handleDamView.info_adicionais;
-
-  const [statusCancelar, setStatusCancelar] = useState(false);
-  const [statusPagar, setStatusPagar] = useState(false);
-  const [handleUpdateStatus, setHandleUpdateStatus] = useState({});
+  const {
+    state: { showModalDetails, dataDam },
+    dispatch
+  } = useContext(DamContext);
 
   useEffect(() => {
-    if (updateDamData.pago === 1 && handleDamView.id === updateDamData.id) {
-      setStatusPagar(true);
-      setHandleUpdateStatus(updateDamData);
-    } else if (
-      updateDamData.situacao === 0 &&
-      handleDamView.id === updateDamData.id
-    ) {
-      setStatusCancelar(true);
-      setHandleUpdateStatus(updateDamData);
-    } else {
-      setHandleUpdateStatus({});
-      setStatusPagar(
-        handleDamView.status === 'Pago' && handleDamView.status === 'Cancelado'
-      );
-      setStatusCancelar(handleDamView.status === 'Cancelado');
+    if (successRequest) {
+      setOpenModalMenu(false);
     }
-  }, [updateDamData, handleDamView]);
+  }, [successRequest]);
 
-  const handleEdit = () => {
-    handleDataDam(handleDamView);
-    handleReviewShow(false);
-    handleOpenDam(true);
+  function handleClosedModalDetails() {
+    dispatch({
+      type: ACTIONS.MODAL_DETAILS,
+      payload: false
+    });
+  }
+
+  const handleAlterStatusDAM = useCallback(
+    (type, param) => {
+      setOpenModalMenu(true);
+      setEditStatus(dataDam.id, type, param);
+    },
+    [dataDam.id, setEditStatus]
+  );
+
+  const handleCopyDam = () => {
+    handleClosedModalDetails();
+    setWindowNewDam();
   };
-  const handleCopy = () => {
-    handleDataDam({ ...handleDamView, id: undefined });
-    handleReviewShow(false);
-    handleOpenDam(true);
+
+  const handleEditDam = () => {
+    dispatch({
+      type: ACTIONS.EDIT_DAM_OPERATION
+    });
+    handleClosedModalDetails();
+    setWindowNewDam();
   };
 
   return (
     <Dialog
       fullScreen={fullScreenModal}
-      open={showReview}
-      maxWidth="md"
-      onClose={handleReviewShow}
+      open={showModalDetails}
+      fullWidth
       aria-labelledby="customized-dialog-title">
       <DialogTitle id="customized-dialog-title">
         <MenuDocumentEvents
-          handleEdit={handleEdit}
-          handleCopy={handleCopy}
-          handleUpate={handleUpate}
-          updateDamData={handleUpdateStatus}
-          status={handleDamView.status}
-          id={handleDamView.id}
-          statusPagar={statusPagar}
-          statusCancelar={statusCancelar}
-          isVisibleOptions={{
+          values={{ id_dam: dataDam.id }}
+          handleAlterStatusDAM={handleAlterStatusDAM}
+          handleCopy={handleCopyDam}
+          handleEdit={handleEditDam}
+          handleClose={handleClosedModalDetails}
+          visibleOptions={{
             imprimir: true,
-            pagar: true,
-            copiar: true,
-            editar: true,
-            cancelar: true,
-            sair: false
+            pagar: !dataDam.pago && dataDam.status !== 'Cancelado',
+            copiar: showModalDetails,
+            editar: showModalDetails && dataDam.status !== 'Cancelado',
+            cancelar: dataDam.status !== 'Cancelado',
+            nfsa: false,
+            alvara: false,
+            recibo: false,
+            sair: true
           }}
         />
       </DialogTitle>
       <DialogContent dividers>
-        <div {...rest} className={clsx(classes.root, className)}>
-          <Grid
-            container
-            spacing={2}
-            justify="flex-start"
-            alignItems="flex-start"
-            className={classes.root}>
-            <Grid item>
-              <Review
-                items={items}
-                contribuintes={contribuintes}
-                infoAdicionais={infoAdicionais}
-                receitaInfo={receitaInfo}
-              />
-            </Grid>
+        <Grid
+          container
+          spacing={2}
+          justify="space-between"
+          alignItems="flex-start"
+          className={classes.root}>
+          <Grid item sm={12}>
+            <PreviewDam />
+            <ModalSave
+              openModalMenu={openModalMenu}
+              statusServer={statusServer}
+              successRequest={successRequest}
+            />
           </Grid>
-        </div>
+        </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleReviewShow} color="primary">
+        <Button onClick={handleClosedModalDetails} color="primary">
           Fechar
         </Button>
       </DialogActions>
     </Dialog>
   );
 }
-
-ModalDetailsDam.defaultProps = {
-  // eslint-disable-next-line react/default-props-match-prop-types
-  updateDam: {}
-};
-
-ModalDetailsDam.propTypes = {
-  handleReviewShow: PropTypes.func.isRequired,
-  showReview: PropTypes.bool.isRequired,
-  handleDamView: PropTypes.object.isRequired,
-  // updateDam: PropTypes.object.isRequired,
-  handleOpenDam: PropTypes.func.isRequired,
-  handleDataDam: PropTypes.func.isRequired
-};
-
-const mapStateToProps = (state) => ({
-  updateDam: state.dam.updateDam
-});
-
-const mapDispatchToProps = (dispatch) =>
-  bindActionCreators({ alterStatusDam }, dispatch);
-
-export default connect(mapStateToProps, mapDispatchToProps)(ModalDetailsDam);
+export default ModalDetailsDam;

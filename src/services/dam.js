@@ -87,6 +87,7 @@ class Dam {
         juros,
         valorMulta,
         pago: 0,
+        status: 1,
         retido: 1
       },
       {

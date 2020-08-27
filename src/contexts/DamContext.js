@@ -1,90 +1,104 @@
-import React, { createContext, useState, useEffect } from 'react';
-
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-
-import { requestDam } from '../store/damReducer';
-import { requestReceita } from '../store/receitaReducer';
-
-import {
-  requestContribuinte,
-  cleanDataContribuinte
-} from '../store/contribuinteReducer';
+import React, { createContext, useReducer } from 'react';
 
 export const DamContext = createContext();
 
-function DamProvider(props) {
-  const {
-    children,
-    listDam,
-    requestDam: handleRequestDam,
-    requestReceita: handleRequestReceita,
-    handleOpenNewDam,
-    openNewDam,
+export const ACTIONS = {
+  MODAL_NEW_DAM: 'MODAL_NEW_DAM',
+  MODAL_DETAILS: 'MODAL_DETAILS',
+  ACTIVE_STEP: 'ACTIVE_STEP',
+  EDIT_DAM_OPERATION: 'EDIT_DAM_OPERATION',
+  SELECT_DAM: 'SELECT_DAM',
+  SELECT_RECEITA: 'SELECT_RECEITA',
+  SELECT_TAXPAYER: 'SELECT_TAXPAYER',
+  DOCUMENT: 'DOCUMENT',
+  PARAMS_QUERY: 'PARAMS_QUERY_DAM'
+};
 
-    selectedReceita,
-    listReceita,
-    handleSelectReceita
-  } = props;
-  const [showNewDam, setShowNewDam] = useState(openNewDam);
-  const [dams, setDams] = useState([]);
-  const [receitas, setReceitas] = useState([]);
+export const STATE_INITIAL = {
+  receitaSeleted: {},
+  taxpayerSeleted: {},
+  dataDam: {},
+  activeStep: 0,
+  document: {},
+  editDam: false,
+  showModalNewDam: false,
+  showModalDetails: false,
+  paramsQuery: {}
+};
+export const damContextReducer = (state, action) => {
+  switch (action.type) {
+    case ACTIONS.SELECT_RECEITA:
+      return {
+        ...state,
+        receitaSeleted: action.payload
+      };
+    case ACTIONS.SELECT_TAXPAYER:
+      return {
+        ...state,
+        taxpayerSeleted: action.payload
+      };
+    case ACTIONS.DOCUMENT:
+      return {
+        ...state,
+        document: action.payload
+      };
 
-  useEffect(() => {
-    handleRequestDam({ page: 1 });
-    handleRequestReceita({ page: 1 });
-  }, [handleRequestDam, handleRequestReceita]);
+    case ACTIONS.SELECT_DAM:
+      return {
+        ...state,
+        dataDam: action.payload
+      };
+    case ACTIONS.EDIT_DAM_OPERATION:
+      return {
+        ...state,
+        editDam: true
+      };
+    case ACTIONS.ACTIVE_STEP:
+      return {
+        ...state,
+        activeStep: action.payload
+      };
 
-  useEffect(() => setShowNewDam(openNewDam), [openNewDam]);
-  useEffect(() => setDams(listDam), [listDam]);
-  useEffect(() => {
-    if (listReceita.length > 0) {
-      listReceita.filter(
-        (r) => r.cod !== '1121250000' && r.cod !== '1113050101'
-      );
-      setReceitas(listReceita);
-    }
-  }, [listReceita]);
+    case ACTIONS.MODAL_DETAILS:
+      return {
+        ...state,
+        showModalDetails: action.payload
+      };
 
-  const handleCloseNewDam = () => {
-    handleOpenNewDam(false);
-  };
-  console.log(receitas);
+    case ACTIONS.MODAL_NEW_DAM:
+      // executes when the modal closes to clear data
+      if (state.showModalNewDam) {
+        return {
+          receitaSeleted: {},
+          taxpayerSeleted: {},
+          dataDam: {},
+          activeStep: 0,
+          document: {},
+          editDam: false,
+          showModalDetails: false,
+          showModalNewDam: false
+        };
+      }
+      return {
+        ...state,
+        showModalNewDam: true
+      };
+    case ACTIONS.PARAMS_QUERY:
+      return {
+        ...state,
+        paramsQuery: action.payload
+      };
+    default:
+      return state;
+  }
+};
+
+export default function DamProvider({ children }) {
+  const [state, dispatch] = useReducer(damContextReducer, STATE_INITIAL);
+
   return (
-    <DamContext.Provider
-      value={{
-        dams,
-        handleCloseNewDam,
-        showNewDam,
-        selectedReceita,
-        receitas,
-        handleSelectReceita
-      }}>
+    <DamContext.Provider value={{ state, dispatch }}>
       {children}
     </DamContext.Provider>
   );
 }
-
-const mapStateToProps = (state) => ({
-  listDam: state.dam.listDam,
-  listReceita: state.receita.listReceita,
-  listContribuinte: state.contribuinte.listContribuinte,
-
-  valuesFormDocumento: state.form.documento,
-  calculatedTaxes: state.form.tributos,
-
-  responseStatusDam: state.dam.alterStatusDam
-});
-
-const mapDispatchToProps = (dispatch) =>
-  bindActionCreators(
-    {
-      requestDam,
-      requestReceita,
-      requestContribuinte,
-      cleanDataContribuinte
-    },
-    dispatch
-  );
-
-export default connect(mapStateToProps, mapDispatchToProps)(DamProvider);

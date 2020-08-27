@@ -6,67 +6,81 @@ import {
   IconButton,
   Typography,
   Button,
-  Slide
+  Slide,
+  Fab,
+  Box
 } from '@material-ui/core';
 
 import CloseIcon from '@material-ui/icons/Close';
-
+import { Add as AddIcon } from '@material-ui/icons';
 import useStyles from './styles';
 
-import { DamContext, ContribuinteProvier } from '../../../../contexts';
+import { ContribuinteProvier, DamContext } from '../../../../contexts';
 import { Contribuintes } from '../../../../components';
 import StepComponent from './StepComponent';
+import { useOpenNewDam } from '../../../../hooks';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 function NewDam() {
-  const { handleCloseNewDam, showNewDam } = useContext(DamContext);
-
   const classes = useStyles();
+  const {
+    state: { showModalNewDam }
+  } = useContext(DamContext);
 
-  const [isopen, setIsOpen] = useState(false);
+  const [openWindowContribuinte, setOpenWindowContribuinte] = useState(false);
+  const setWindow = useOpenNewDam();
 
   return (
     <>
+      <Box displayPrint="none" className={classes.fab}>
+        <Fab color="primary" size="medium" aria-label="add" onClick={setWindow}>
+          <AddIcon />
+        </Fab>
+      </Box>
       <Dialog
         disableBackdropClick
         fullScreen
-        open={showNewDam}
-        onClose={() => handleCloseNewDam(false)}
+        open={showModalNewDam}
         TransitionComponent={Transition}>
         <AppBar className={classes.appBar}>
           <Toolbar>
             <IconButton
               edge="start"
               color="inherit"
-              onClick={() => handleCloseNewDam(false)}
+              onClick={setWindow}
               aria-label="close">
               <CloseIcon />
             </IconButton>
             <Typography variant="h6" className={classes.title}>
               GAP
             </Typography>
-            <Button autoFocus color="inherit" onClick={() => setIsOpen(true)}>
+            <Button
+              autoFocus
+              color="inherit"
+              onClick={() => setOpenWindowContribuinte(true)}>
               Contribuintes
             </Button>
           </Toolbar>
         </AppBar>
+        {/* component new DAM */}
         <StepComponent />
       </Dialog>
+      {/* Cadastro do contribuinte */}
       <Dialog
         disableBackdropClick
         fullScreen
-        open={isopen}
-        onClose={() => setIsOpen(false)}
+        open={openWindowContribuinte}
+        onClose={() => setOpenWindowContribuinte(false)}
         TransitionComponent={Transition}>
         <AppBar className={classes.appBar}>
           <Toolbar>
             <IconButton
               edge="start"
               color="inherit"
-              onClick={() => setIsOpen(false)}
+              onClick={() => setOpenWindowContribuinte(false)}
               aria-label="close">
               <CloseIcon />
             </IconButton>

@@ -1,7 +1,7 @@
 import { Receita } from '../services';
 
-const ACTIONS = {
-  LIST_DAM: 'Receita_LIST',
+export const ACTIONS = {
+  LIST_RECEITA: 'Receita_LIST',
   ADD: 'Receita_ADD'
 };
 
@@ -11,7 +11,7 @@ const INITIAL_STATE = {
 
 export const receitaReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case ACTIONS.LIST_DAM:
+    case ACTIONS.LIST_RECEITA:
       return {
         ...state,
         listReceita: action.listReceita
@@ -26,7 +26,7 @@ export function requestReceita(token) {
     try {
       const response = await Receita.getReceita(token);
       dispatch({
-        type: ACTIONS.LIST_DAM,
+        type: ACTIONS.LIST_RECEITA,
         listReceita: response.data
       });
     } catch (error) {

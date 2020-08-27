@@ -34,7 +34,6 @@ function TableNfsa() {
   function handleOrderSort(e) {
     console.log(e);
   }
-
   return (
     <>
       {listNfsa.length === 0 && (

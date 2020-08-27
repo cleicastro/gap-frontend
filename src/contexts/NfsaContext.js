@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 import { requestNfsa, saveNFSA, editNFSA } from '../store/nfsaReducer';
-import { alterStatusDam } from '../store/damReducer';
 
 import {
   requestContribuinte,
@@ -22,7 +21,6 @@ function NfsaProvider(props) {
     editNFSA: serviceEditNFSA,
     calcTributsNFSA: handleCalcTributs,
     liquidToGrossNFSA: handleLiquidToGross,
-    alterStatusDam: handleAlterStatusDAM,
     handleOpenNewNfsa,
     openNewNfsa,
     listNfsa,
@@ -242,7 +240,7 @@ function NfsaProvider(props) {
         handleEditNFSA,
         handleCopyNFSA,
         actionFormNFSA,
-        handleAlterStatusDAM,
+        handleAlterStatusDAM: false,
         responseStatusDam,
         participantes,
         convertLiquid,
@@ -276,9 +274,7 @@ const mapStateToProps = (state) => ({
   listContribuinte: state.contribuinte.listContribuinte,
 
   valuesFormDocumento: state.form.documento,
-  calculatedTaxes: state.form.tributos,
-
-  responseStatusDam: state.dam.alterStatusDam
+  calculatedTaxes: state.form.tributos
 });
 
 const mapDispatchToProps = (dispatch) =>
@@ -290,8 +286,7 @@ const mapDispatchToProps = (dispatch) =>
       requestContribuinte,
       cleanDataContribuinte,
       calcTributsNFSA,
-      liquidToGrossNFSA,
-      alterStatusDam
+      liquidToGrossNFSA
     },
     dispatch
   );

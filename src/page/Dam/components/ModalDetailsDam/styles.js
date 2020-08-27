@@ -2,7 +2,8 @@ import { makeStyles } from '@material-ui/styles';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    margin: 'auto'
+    margin: 'auto',
+    width: '100%'
   },
   paper: {
     width: 200,

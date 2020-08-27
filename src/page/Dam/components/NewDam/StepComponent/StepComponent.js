@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   CssBaseline,
   Typography,
@@ -9,51 +9,30 @@ import {
 } from '@material-ui/core';
 
 import useStyles from './styles';
-import {
-  FormReceita,
-  FormDocumento,
-  FormContribuinte
-} from '../../../../../components';
+import { FormDocumento } from '../../../../../components';
+import { FormContribuinte, FormReceita, PreviewDam } from '../..';
+import { useStep } from '../../../../../hooks';
 
-const steps = ['Contribuinte', 'Receita', 'Documento', 'Confirmar dados'];
+const steps = ['Receita', 'Contribuinte', 'Documento', 'Confirmar dados'];
+
+function getStepContent(step) {
+  switch (step) {
+    case 0:
+      return <FormReceita />;
+    case 1:
+      return <FormContribuinte />;
+    case 2:
+      return <FormDocumento />;
+    case 3:
+      return <PreviewDam />;
+    default:
+      throw new Error('Unknown step');
+  }
+}
 
 function StepComponent() {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = useState(0);
-
-  function getStepContent(step) {
-    switch (step) {
-      case 0:
-        return (
-          <FormContribuinte
-            steps={steps}
-            activeStep={activeStep}
-            setActiveStep={setActiveStep}
-          />
-        );
-      case 1:
-        return (
-          <FormReceita
-            steps={steps}
-            activeStep={activeStep}
-            setActiveStep={setActiveStep}
-          />
-        );
-      case 2:
-        return (
-          <FormDocumento
-            steps={steps}
-            activeStep={activeStep}
-            setActiveStep={setActiveStep}
-          />
-        );
-      case 3:
-        return <h2>preview</h2>;
-      default:
-        throw new Error('Unknown step');
-    }
-  }
-
+  const [activeStep] = useStep();
   return (
     <>
       <CssBaseline />

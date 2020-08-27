@@ -3,3 +3,7 @@ export { default as Filtros } from './Filtros';
 export { default as NewDam } from './NewDam';
 export { default as TableDam } from './TableDam';
 export { default as ModalDetailsDam } from './ModalDetailsDam';
+export { default as PreviewDam } from './PreviewDam';
+export { default as FormContribuinte } from './FormContribuinte';
+export { default as FormReceita } from './FormReceita';
+export { default as Header } from './Header';

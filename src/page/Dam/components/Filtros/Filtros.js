@@ -11,14 +11,16 @@ import {
   ListItemText,
   Dialog,
   DialogContent,
-  DialogTitle,
   DialogActions,
   useTheme,
   useMediaQuery
 } from '@material-ui/core';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
+import { useForm } from 'react-hook-form';
+
 import useStyles from './styles';
 import FormFilter from './FormFilter';
+import { useStoreReceita, useFilterDam } from '../../../../hooks';
 
 function not(a, b) {
   return a.filter((value) => b.indexOf(value) === -1);
@@ -28,30 +30,55 @@ function intersection(a, b) {
   return a.filter((value) => b.indexOf(value) !== -1);
 }
 
-function Filtros({
-  className,
-  listReceita,
-  handleParams,
-  handleFiltroShow,
-  handleSair,
-  showFiltro,
-  ...rest
-}) {
+const customList = (items, checked, classes, handleToggle) => (
+  <Paper className={classes.paper}>
+    <List dense component="div" role="list">
+      {items.map((value) => {
+        const labelId = `transfer-list-item-${value}-label`;
+        return (
+          <ListItem
+            key={value}
+            role="listitem"
+            button
+            onClick={handleToggle(value)}>
+            <ListItemIcon>
+              <Checkbox
+                checked={checked.indexOf(value) !== -1}
+                tabIndex={-1}
+                disableRipple
+                inputProps={{ 'aria-labelledby': labelId }}
+              />
+            </ListItemIcon>
+            <ListItemText id={labelId} primary={value} />
+          </ListItem>
+        );
+      })}
+      <ListItem />
+    </List>
+  </Paper>
+);
+
+function Filtros({ className, handleSair, showFiltro, ...rest }) {
   const classes = useStyles();
 
   const [checked, setChecked] = useState([]);
   const [left, setLeft] = useState([]);
   const [right, setRight] = useState([]);
-  const [paramsFilter, setParamsFilter] = useState([]);
 
   const leftChecked = intersection(checked, left);
   const rightChecked = intersection(checked, right);
 
+  // eslint-disable-next-line no-unused-vars
+  const [statusServer, setFilter] = useFilterDam();
+  const [receitas] = useStoreReceita();
+
+  const { handleSubmit, control, register, setValue, reset } = useForm();
+
   useEffect(() => {
     const listReceitaMap = [];
-    listReceita.map((d) => listReceitaMap.push(d.descricao));
+    receitas.map((d) => listReceitaMap.push(d.descricao));
     setLeft(listReceitaMap);
-  }, [listReceita]);
+  }, [receitas]);
 
   const theme = useTheme();
   const fullScreenModal = useMediaQuery(theme.breakpoints.down('sm'));
@@ -91,42 +118,16 @@ function Filtros({
     setRight([]);
   };
 
-  const customList = (items) => (
-    <Paper className={classes.paper}>
-      <List dense component="div" role="list">
-        {items.map((value) => {
-          const labelId = `transfer-list-item-${value}-label`;
-
-          return (
-            <ListItem
-              key={value}
-              role="listitem"
-              button
-              onClick={handleToggle(value)}>
-              <ListItemIcon>
-                <Checkbox
-                  checked={checked.indexOf(value) !== -1}
-                  tabIndex={-1}
-                  disableRipple
-                  inputProps={{ 'aria-labelledby': labelId }}
-                />
-              </ListItemIcon>
-              <ListItemText id={labelId} primary={value} />
-            </ListItem>
-          );
-        })}
-        <ListItem />
-      </List>
-    </Paper>
-  );
-
-  const handleParamsFilter = (value) => {
-    setParamsFilter({ ...paramsFilter, ...value });
+  const handleClearFilter = () => {
+    setLeft(left.concat(right));
+    setRight([]);
+    setFilter({});
+    reset();
   };
-
-  const setParams = () => {
-    const filter = { ...paramsFilter, receitaFilter: right.join(',') };
-    handleParams(filter);
+  const setParams = (data) => {
+    console.log(data);
+    const filter = { ...data, receitaFilter: right.join(',') };
+    setFilter(filter);
   };
 
   return (
@@ -134,76 +135,96 @@ function Filtros({
       fullScreen={fullScreenModal}
       open={showFiltro}
       maxWidth="lg"
-      onClose={handleFiltroShow}
       aria-labelledby="customized-dialog-title">
-      <DialogTitle id="customized-dialog-title">Filtro</DialogTitle>
-      <DialogContent dividers>
-        <div {...rest} className={clsx(classes.root, className)}>
+      {/* <DialogTitle id="customized-dialog-title">Filtro</DialogTitle> */}
+      <form
+        onSubmit={handleSubmit(setParams)}
+        noValidate
+        autoComplete="off"
+        id="formFiltro">
+        <DialogContent dividers>
+          <div {...rest} className={clsx(classes.root, className)}>
+            <Grid
+              container
+              spacing={2}
+              justify="flex-start"
+              alignItems="flex-start"
+              className={classes.root}>
+              <Grid item>
+                {customList(left, checked, classes, handleToggle)}
+              </Grid>
+              <Grid item>
+                <Grid container direction="column" alignItems="center">
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    className={classes.button}
+                    onClick={handleAllRight}
+                    disabled={left.length === 0}
+                    aria-label="move all right">
+                    ≫
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    className={classes.button}
+                    onClick={handleCheckedRight}
+                    disabled={leftChecked.length === 0}
+                    aria-label="move selected right">
+                    &gt;
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    className={classes.button}
+                    onClick={handleCheckedLeft}
+                    disabled={rightChecked.length === 0}
+                    aria-label="move selected left">
+                    &lt;
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    className={classes.button}
+                    onClick={handleAllLeft}
+                    disabled={right.length === 0}
+                    aria-label="move all left">
+                    ≪
+                  </Button>
+                </Grid>
+              </Grid>
+              <Grid item>
+                {customList(right, checked, classes, handleToggle)}
+              </Grid>
+            </Grid>
+          </div>
           <Grid
             container
             spacing={2}
             justify="flex-start"
             alignItems="flex-start"
             className={classes.root}>
-            <Grid item>{customList(left)}</Grid>
             <Grid item>
-              <Grid container direction="column" alignItems="center">
-                <Button
-                  variant="outlined"
-                  size="small"
-                  className={classes.button}
-                  onClick={handleAllRight}
-                  disabled={left.length === 0}
-                  aria-label="move all right">
-                  ≫
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  className={classes.button}
-                  onClick={handleCheckedRight}
-                  disabled={leftChecked.length === 0}
-                  aria-label="move selected right">
-                  &gt;
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  className={classes.button}
-                  onClick={handleCheckedLeft}
-                  disabled={rightChecked.length === 0}
-                  aria-label="move selected left">
-                  &lt;
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  className={classes.button}
-                  onClick={handleAllLeft}
-                  disabled={right.length === 0}
-                  aria-label="move all left">
-                  ≪
-                </Button>
-              </Grid>
-            </Grid>
-            <Grid item>{customList(right)}</Grid>
-            <Grid item>
-              <FormFilter handleChangeValues={handleParamsFilter} />
+              <FormFilter
+                register={register}
+                control={control}
+                setValue={setValue}
+              />
             </Grid>
           </Grid>
-        </div>
-      </DialogContent>
-      <DialogActions>
-        <Button color="primary" onClick={setParams}>
-          Filtrar
-        </Button>
-        <Button onClick={handleFiltroShow} color="primary">
-          Limpar
-        </Button>
-        <Button onClick={handleSair} color="primary">
-          Sair
-        </Button>
-      </DialogActions>
+        </DialogContent>
+        <DialogActions>
+          <Button type="submit" color="primary">
+            Filtrar
+          </Button>
+          <Button onClick={handleClearFilter} color="primary">
+            Limpar
+          </Button>
+          <Button onClick={handleSair} color="primary">
+            Sair
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   );
 }

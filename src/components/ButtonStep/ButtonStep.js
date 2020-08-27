@@ -3,57 +3,63 @@ import PropTypes from 'prop-types';
 
 import { Button } from '@material-ui/core';
 import useStyles from './styles';
+import { useStep } from '../../hooks';
 
 function ButtonStep({
-  steps,
-  activeStep,
-  handleBack,
-  handleNext,
-  handleSave,
   disabledNext,
-  disabledBack
+  disabledBack,
+  disableSave,
+  handlePrevStep,
+  handleSave
 }) {
   const classes = useStyles();
-
+  const [activeStep] = useStep();
   return (
     <div className={classes.buttons}>
       {activeStep !== 0 && (
         <Button
+          type="submit"
+          onClick={handlePrevStep}
           disabled={disabledBack}
-          type="button"
-          onClick={handleBack}
           className={classes.button}>
           Voltar
         </Button>
       )}
-      <Button
-        disabled={disabledNext}
-        type={activeStep === steps.length - 1 ? 'submit' : 'button'}
-        onClick={() =>
-          activeStep === steps.length - 1 ? handleSave() : handleNext()
-        }
-        variant="contained"
-        color="primary"
-        className={classes.button}>
-        {activeStep === steps.length - 1 ? 'Salvar' : 'Avançar'}
-      </Button>
+      {disableSave ? (
+        <Button
+          disabled={disabledNext}
+          type="submit"
+          variant="contained"
+          color="primary"
+          className={classes.button}>
+          Avançar
+        </Button>
+      ) : (
+          <Button
+            onClick={handleSave}
+            type="button"
+            variant="contained"
+            color="primary"
+            className={classes.button}>
+            Salvar
+          </Button>
+        )}
     </div>
   );
 }
 
 ButtonStep.defaultProps = {
+  disableSave: true,
   disabledNext: false,
   disabledBack: false
 };
 
 ButtonStep.propTypes = {
-  steps: PropTypes.array.isRequired,
-  activeStep: PropTypes.number.isRequired,
-  handleBack: PropTypes.func,
-  handleNext: PropTypes.func,
-  handleSave: PropTypes.func,
   disabledNext: PropTypes.bool,
-  disabledBack: PropTypes.bool
+  disabledBack: PropTypes.bool,
+  disableSave: PropTypes.bool,
+  handlePrevStep: PropTypes.func,
+  handleSave: PropTypes.func
 };
 
 export default ButtonStep;

@@ -43,6 +43,12 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.primary.dark,
     border: 0,
     boxShadow: 'none'
+  },
+  loader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: theme.spacing(2)
   }
 }));
 

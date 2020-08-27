@@ -6,162 +6,182 @@ import {
   Typography,
   Slider,
   TextField,
-  Radio
+  Radio,
+  Grid
 } from '@material-ui/core';
 
 import useStyles from './styles';
 
-function FormFilter({ handleChangeValues }) {
+function FormFilter({ register, control, setValue }) {
   const classes = useStyles();
-
   const [selectedSituacao, setSelectedSituacao] = useState('all');
 
-  const [value, setValue] = useState([0, 1000]);
+  const [valueSlide, setValueSlide] = useState([0, 1000]);
 
   const handleChangeSlide = (event, newValue) => {
-    setValue(newValue);
-    handleChangeValues({
-      valorTotalFilter: newValue.join(','),
-      situacaoFilter: selectedSituacao
-    });
-  };
-  const handleChangeTexField = (event) => {
-    handleChangeValues({
-      [event.target.id]: event.target.value,
-      situacaoFilter: selectedSituacao
-    });
+    setValueSlide(newValue);
+    setValue('valorTotalFilter', newValue);
   };
   const handleChangeRadioSituacao = (event) => {
     setSelectedSituacao(event.target.value);
-    handleChangeValues({ situacaoFilter: event.target.value });
   };
 
   return (
-    <form
-      className={classes.root}
-      noValidate
-      autoComplete="off"
-      id="formFiltro">
-      <div>
-        <FormGroup row>
+    <div className={classes.root}>
+      <Grid container spacing={3}>
+        <Grid item xs={6}>
           <TextField
+            fullWidth
             id="dataInicialFilter"
+            name="dataInicialFilter"
             label="Data inicial:"
             type="date"
             className={classes.textField}
             InputLabelProps={{
               shrink: true
             }}
-            onChange={handleChangeTexField}
+            inputRef={register}
+            control={control}
           />
+        </Grid>
+        <Grid item xs={6}>
           <TextField
+            fullWidth
             id="dataFinalFilter"
+            name="dataFinalFilter"
             label="Data final:"
             type="date"
             className={classes.textField}
             InputLabelProps={{
               shrink: true
             }}
-            onChange={handleChangeTexField}
+            inputRef={register}
+            control={control}
           />
-        </FormGroup>
-        <FormGroup row>
+        </Grid>
+      </Grid>
+      <Grid container spacing={3}>
+        <Grid item xs={6}>
           <TextField
+            fullWidth
             id="docContribuinteFilter"
+            name="docContribuinteFilter"
             label="CNPJ/CPF:"
             className={classes.textField}
-            onChange={handleChangeTexField}
+            inputRef={register}
+            control={control}
           />
+        </Grid>
+        <Grid item xs={6}>
           <TextField
+            fullWidth
             id="id"
+            name="id"
             label="N° DAM"
             className={classes.textField}
-            onChange={handleChangeTexField}
+            inputRef={register}
+            control={control}
           />
-        </FormGroup>
+        </Grid>
+      </Grid>
+      <FormGroup row>
         <TextField
           id="nameContribuinteFilter"
+          name="nameContribuinteFilter"
           label="Contribuinte:"
           fullWidth
-          onChange={handleChangeTexField}
+          inputRef={register}
+          control={control}
         />
-        <FormGroup row>
-          <FormControlLabel
-            control={
-              <Radio
-                checked={selectedSituacao === 'pago'}
-                onChange={handleChangeRadioSituacao}
-                value="pago"
-                name="radio-button-demo"
-                inputProps={{ 'aria-label': 'Pago' }}
-              />
-            }
-            label="Pago"
-          />
-          <FormControlLabel
-            control={
-              <Radio
-                checked={selectedSituacao === 'vencer'}
-                onChange={handleChangeRadioSituacao}
-                value="vencer"
-                name="radio-button-demo"
-                inputProps={{ 'aria-label': 'Vencer' }}
-              />
-            }
-            label="À Vencer"
-          />
-          <FormControlLabel
-            control={
-              <Radio
-                checked={selectedSituacao === 'inadimplente'}
-                onChange={handleChangeRadioSituacao}
-                value="inadimplente"
-                name="radio-button-demo"
-                inputProps={{ 'aria-label': 'Inadimplente' }}
-              />
-            }
-            label="Inadimplente"
-          />
-          <FormControlLabel
-            control={
-              <Radio
-                checked={selectedSituacao === 'cancelado'}
-                onChange={handleChangeRadioSituacao}
-                value="cancelado"
-                name="radio-button-demo"
-                inputProps={{ 'aria-label': 'Cancelado' }}
-              />
-            }
-            label="Cancelado"
-          />
-          <FormControlLabel
-            control={
-              <Radio
-                checked={selectedSituacao === 'all'}
-                onChange={handleChangeRadioSituacao}
-                value="all"
-                name="radio-button-demo"
-                inputProps={{ 'aria-label': 'Todos' }}
-              />
-            }
-            label="Todos"
-          />
-        </FormGroup>
+      </FormGroup>
+      <FormGroup row>
+        <FormControlLabel
+          inputRef={register}
+          value="pago"
+          control={
+            <Radio
+              checked={selectedSituacao === 'pago'}
+              onChange={handleChangeRadioSituacao}
+              name="situacaoFilter"
+              inputProps={{ 'aria-label': 'Pago' }}
+            />
+          }
+          label="Pago"
+        />
+        <FormControlLabel
+          inputRef={register}
+          value="vencer"
+          control={
+            <Radio
+              checked={selectedSituacao === 'vencer'}
+              onChange={handleChangeRadioSituacao}
+              name="situacaoFilter"
+              inputProps={{ 'aria-label': 'Vencer' }}
+            />
+          }
+          label="À Vencer"
+        />
+        <FormControlLabel
+          inputRef={register}
+          value="inadimplente"
+          control={
+            <Radio
+              checked={selectedSituacao === 'inadimplente'}
+              onChange={handleChangeRadioSituacao}
+              name="situacaoFilter"
+              inputProps={{ 'aria-label': 'Inadimplente' }}
+            />
+          }
+          label="Inadimplente"
+        />
+        <FormControlLabel
+          inputRef={register}
+          value="cancelado"
+          control={
+            <Radio
+              checked={selectedSituacao === 'cancelado'}
+              onChange={handleChangeRadioSituacao}
+              name="situacaoFilter"
+              inputProps={{ 'aria-label': 'Cancelado' }}
+            />
+          }
+          label="Cancelado"
+        />
+        <FormControlLabel
+          inputRef={register}
+          value="all"
+          control={
+            <Radio
+              checked={selectedSituacao === 'all'}
+              onChange={handleChangeRadioSituacao}
+              name="situacaoFilter"
+              inputProps={{ 'aria-label': 'Todos' }}
+            />
+          }
+          label="Todos"
+        />
+      </FormGroup>
+      <FormGroup row style={{ marginTop: 15 }}>
         <Typography id="range-slider" gutterBottom>
           Valor do DAM
         </Typography>
         <Slider
-          value={value}
+          value={valueSlide}
           onChange={handleChangeSlide}
           id="valorTotal"
-          name="valorTotal"
           valueLabelDisplay="auto"
           aria-labelledby="range-slider"
           min={0}
           max={1000}
         />
-      </div>
-    </form>
+        <TextField
+          name="valorTotalFilter"
+          type="hidden"
+          inputRef={register}
+          control={control}
+        />
+      </FormGroup>
+    </div>
   );
 }
 

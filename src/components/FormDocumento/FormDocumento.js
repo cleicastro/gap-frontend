@@ -2,46 +2,47 @@ import React from 'react';
 import { Typography, Grid, TextField, InputAdornment } from '@material-ui/core';
 
 import { useForm } from 'react-hook-form';
-
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-
-import { handleDocument } from '../../store/formReducer';
 import ButtonStep from '../ButtonStep';
+import { useInitialDocument, useStep } from '../../hooks';
 
-function FormDocumento({
-  valueFormDataDocumento,
-  handleDocument: setDocument,
-  steps,
-  activeStep,
-  setActiveStep
-}) {
-  const { control, register, handleSubmit, getValues, setValue } = useForm({
-    defaultValues: valueFormDataDocumento
+import { documentSchema, mascaraReal } from '../../util';
+
+function FormDocumento() {
+  const [document, setDocument] = useInitialDocument();
+  const [stepActivity, setStepActivity] = useStep();
+
+  const {
+    control,
+    register,
+    handleSubmit,
+    getValues,
+    setValue,
+    errors
+  } = useForm({
+    defaultValues: document,
+    validationSchema: documentSchema
   });
 
-  const calcTotal = () => {
+  const calcTotal = (event) => {
+    const { name, value } = event.target;
+    const values = mascaraReal(value);
+    setValue(name, values);
     const result =
       Number(getValues('valorPrincipal')) +
       Number(getValues('juros')) +
       Number(getValues('taxaExp'));
-    setValue('valorTotal', result);
+    setValue('valorTotal', result.toFixed(2));
   };
 
-  function handleNext() {
-    setActiveStep(activeStep + 1);
-    setDocument(getValues());
-  }
+  const handlePrevStep = () => setStepActivity(stepActivity - 1);
 
-  function handleBack() {
-    setActiveStep(activeStep - 1);
-    setDocument(getValues());
-  }
-
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = (data) => {
+    setDocument(data);
+    setStepActivity(stepActivity + 1);
+  };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} noValidate autoComplete="off">
       <Typography variant="h6" gutterBottom>
         * Obrigatórios
       </Typography>
@@ -53,7 +54,7 @@ function FormDocumento({
             id="referencia"
             name="referencia"
             type="month"
-            required
+            error={!!errors.referencia}
             label="Referência"
             fullWidth
           />
@@ -62,10 +63,10 @@ function FormDocumento({
           <TextField
             inputRef={register}
             control={control}
-            id="emissao"
-            name="emissao"
+            id="emissaoConvertPT"
+            name="emissaoConvertPT"
             disabled
-            required
+            error={!!errors.emissaoConvertPT}
             label="Data de emissão"
             fullWidth
           />
@@ -77,7 +78,7 @@ function FormDocumento({
             id="vencimento"
             name="vencimento"
             type="date"
-            required
+            error={!!errors.vencimento}
             label="Data de vencimento"
             fullWidth
             InputLabelProps={{
@@ -87,12 +88,14 @@ function FormDocumento({
         </Grid>
         <Grid item xs={12} md={12}>
           <TextField
+            autoFocus
             inputRef={register}
             control={control}
             multiline
             label="Descrição"
             name="infoAdicionais"
             fullWidth
+            helperText={errors.infoAdicionais && errors.infoAdicionais.message}
           />
         </Grid>
         <Grid item xs={6} md={4}>
@@ -102,9 +105,10 @@ function FormDocumento({
             id="receita"
             name="receita"
             disabled
-            required
+            error={!!errors.receita}
             label="Receita"
             fullWidth
+            helperText={errors.receita && errors.receita.message}
           />
         </Grid>
         <Grid item xs={6} md={4}>
@@ -116,9 +120,9 @@ function FormDocumento({
             label="Documento de origem"
             fullWidth
             InputLabelProps={{
-              shrink: valueFormDataDocumento.receita === '1113050101'
+              shrink: true
             }}
-            disabled={valueFormDataDocumento.receita === '1113050101'}
+            disabled={document.cod === '1113050101'}
           />
         </Grid>
         <Grid item xs={6} md={4}>
@@ -130,14 +134,15 @@ function FormDocumento({
                 <InputAdornment position="start">R$</InputAdornment>
               )
             }}
+            type="number"
             id="valorPrincipal"
             name="valorPrincipal"
-            type="number"
-            required
+            error={!!errors.valorPrincipal}
             label="Valor principal"
             fullWidth
             onChange={calcTotal}
-            disabled={valueFormDataDocumento.receita === '1113050101'}
+            disabled={document.cod === '1113050101'}
+            helperText={errors.valorPrincipal && errors.valorPrincipal.message}
           />
         </Grid>
         <Grid item xs={6} md={4}>
@@ -152,11 +157,13 @@ function FormDocumento({
             id="juros"
             name="juros"
             type="number"
+            step={0.5}
             label="Juros"
-            required
+            error={!!errors.juros}
             fullWidth
             onChange={calcTotal}
-            disabled={valueFormDataDocumento.receita === '1113050101'}
+            disabled={document.cod === '1113050101'}
+            helperText={errors.juros && errors.juros.message}
           />
         </Grid>
         <Grid item xs={6} md={4}>
@@ -171,11 +178,13 @@ function FormDocumento({
             id="taxaExp"
             name="taxaExp"
             type="number"
+            step={0.5}
             label="Taxa de expedição"
-            required
+            error={!!errors.taxaExp}
             fullWidth
             onChange={calcTotal}
-            disabled={valueFormDataDocumento.receita === '1113050101'}
+            disabled={document.receita === '1113050101'}
+            helperText={errors.taxaExp && errors.taxaExp.message}
           />
         </Grid>
         <Grid item xs={6} md={4}>
@@ -189,36 +198,21 @@ function FormDocumento({
             }}
             name="valorTotal"
             type="number"
+            step={0.5}
             disabled
             label="Valor total"
-            required
+            error={!!errors.valorTotal}
             fullWidth
             InputLabelProps={{
               shrink: true
             }}
+            helperText={errors.valorTotal && errors.valorTotal.message}
           />
         </Grid>
       </Grid>
-      <ButtonStep
-        steps={steps}
-        activeStep={activeStep}
-        handleNext={handleNext}
-        handleBack={handleBack}
-      />
+      <ButtonStep handlePrevStep={handlePrevStep} />
     </form>
   );
 }
 
-const mapStateToProps = (state) => ({
-  valueFormDataDocumento: state.form.documento
-});
-
-const mapDispatchToProps = (dispatch) =>
-  bindActionCreators(
-    {
-      handleDocument
-    },
-    dispatch
-  );
-
-export default connect(mapStateToProps, mapDispatchToProps)(FormDocumento);
+export default FormDocumento;

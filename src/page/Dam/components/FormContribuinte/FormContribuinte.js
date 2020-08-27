@@ -1,69 +1,56 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { Typography, Grid, TextField } from '@material-ui/core';
+import React, { useContext } from 'react';
+import {
+  Typography,
+  Grid,
+  TextField
+  // IconButton,
+  // InputAdornment
+} from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
 
 import { useForm } from 'react-hook-form';
+// import { Edit, Add } from '@material-ui/icons';
+import { DamContext, ACTIONS } from '../../../../contexts';
+import { useContribuinte, useStep } from '../../../../hooks';
+import { ButtonStep } from '../../../../components';
 
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-import Axios from 'axios';
-import { requestContribuinte } from '../../store/contribuinteReducer';
-import { DamContext } from '../../contexts';
-
-function FormContribuinte({
-  requestContribuinte: handleRequestContribuinte,
-  listContribuinte
-}) {
+function FormContribuinte() {
   const {
-    selectedContribuinte,
-    dataInitContribuinte,
-    handleSelectContribuinte
+    state: { taxpayerSeleted },
+    dispatch
   } = useContext(DamContext);
+  const [stepActivity, setStepActivity] = useStep();
 
-  const { register, setValue } = useForm({
-    defaultValues: selectedContribuinte || dataInitContribuinte
+  const { register, handleSubmit, setValue } = useForm({
+    defaultValues: taxpayerSeleted
   });
+  const [listTaxpayer, setTaxpayer] = useContribuinte();
 
-  const [params, setParams] = useState({});
-
-  useEffect(() => {
-    const tokenContribuinte = Axios.CancelToken.source();
-    function requestContribuinteSelect(paramsBusca, tokenRequest) {
-      handleRequestContribuinte(
-        {
-          contribuinte: paramsBusca,
-          limit: 1000,
-          order: 'nome',
-          sort: true
-        },
-        tokenRequest.token
-      );
+  function handleParams(params) {
+    if (params.length > 5 && params.length > 0) {
+      setTaxpayer(params);
     }
-    if (params.length === 6 && params.length > 0) {
-      requestContribuinteSelect(params, tokenContribuinte);
-    }
-
-    return () => {
-      tokenContribuinte.cancel('Request cancell');
-    };
-  }, [handleRequestContribuinte, params]);
+  }
 
   const handleInputContribuinte = (values) => {
-    const { doc, nome, endereco, cidade, uf, cep, bairro } = values;
-    setValue([
-      { doc },
-      { nome },
-      { endereco },
-      { cidade },
-      { uf },
-      { cep },
-      { bairro }
-    ]);
-    handleSelectContribuinte(values);
+    dispatch({ type: ACTIONS.SELECT_TAXPAYER, payload: values });
+    setValue('doc', values.doc);
+    setValue('nome', values.nome);
+    setValue('endereco', values.endereco);
+    setValue('cidade', values.cidade);
+    setValue('uf', values.uf);
+    setValue('cep', values.cep);
+    setValue('bairro', values.bairro);
+  };
+
+  const handlePrevStep = () => setStepActivity(stepActivity - 1);
+
+  const handleSelectContribuinte = () => {
+    setStepActivity(stepActivity + 1);
   };
 
   return (
-    <>
+    <form onSubmit={handleSubmit(handleSelectContribuinte)}>
       <Typography variant="h6" gutterBottom>
         Preecha o Nome, CPF ou CNPJ para buscar o contribuinte.
       </Typography>
@@ -73,22 +60,44 @@ function FormContribuinte({
             onChange={(event, value) =>
               value !== null && handleInputContribuinte(value)
             }
-            options={listContribuinte}
+            options={listTaxpayer}
             getOptionLabel={(option) => `${option.doc}-${option.nome}`}
             autoComplete
             includeInputInList
             id="contribuinte"
-            loading={listContribuinte.length > 1}
+            loading={listTaxpayer.length > 1}
             renderInput={(param) => (
               <TextField
                 {...param}
-                onChange={(event) => setParams(event.target.value)}
+                onChange={(event) => handleParams(event.target.value)}
+                placeholder="Buscar Nome, CPF ou CNPJ"
                 label={
-                  listContribuinte > 1
-                    ? `${listContribuinte.length} Contribuintes, selecione um.`
+                  listTaxpayer > 1
+                    ? `${listTaxpayer.length} Contribuintes, selecione um.`
                     : 'Contribuinte'
                 }
                 margin="normal"
+                InputLabelProps={{
+                  shrink: true
+                }}
+              /* InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="adicionar um novo contribuinte"
+                  onClick={() => console.log('he')}
+                  edge="end">
+                  <Add />
+                </IconButton>
+                <IconButton
+                  aria-label="Editar o contribuinte"
+                  onClick={() => console.log('he')}
+                  edge="end">
+                  <Edit />
+                </IconButton>
+              </InputAdornment>
+            )
+          }} */
               />
             )}
           />
@@ -193,16 +202,11 @@ function FormContribuinte({
           />
         </Grid>
       </Grid>
-    </>
+      <ButtonStep
+        handlePrevStep={handlePrevStep}
+        disabledNext={!taxpayerSeleted.id}
+      />
+    </form>
   );
 }
-
-const mapStateToProps = (state) => ({
-  listContribuinte: state.contribuinte.listContribuinte,
-  pagination: state.contribuinte.pagination
-});
-
-const mapDispatchToProps = (dispatch) =>
-  bindActionCreators({ requestContribuinte }, dispatch);
-
-export default connect(mapStateToProps, mapDispatchToProps)(FormContribuinte);
+export default FormContribuinte;

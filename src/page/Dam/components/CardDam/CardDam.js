@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import {
   Card,
@@ -9,8 +9,7 @@ import {
   CardHeader,
   CardActionArea
 } from '@material-ui/core';
-
-import { DamContext } from '../../../../contexts';
+import InfiniteScroll from 'react-infinite-scroller';
 
 import {
   useStyles,
@@ -18,6 +17,13 @@ import {
   useStylesCancelado,
   useStylesVencido
 } from './styles';
+import {
+  useDam,
+  useStoreDam,
+  useRequestReceita,
+  usePaginationDam
+} from '../../../../hooks';
+import { CardSkeletron } from '../../../../components';
 
 const classValueTotal = (
   status,
@@ -89,91 +95,126 @@ const classCaption = (status, emissao, vencimento, days) => {
 };
 
 function CardDam({ className, handleDamDetail, ...rest }) {
-  const { dams: listDam } = useContext(DamContext);
+  useRequestReceita();
+  useDam();
+  // eslint-disable-next-line no-unused-vars
+  const [listDam, valueTotal, setSelecetDam] = useStoreDam();
+  const [pagination, setPagination] = usePaginationDam();
+
   const classes = useStyles();
   const classesPago = useStylesPago();
   const classesCancelado = useStylesCancelado();
   const classesVencido = useStylesVencido();
 
-  return (
-    <Grid container justify="space-between" spacing={3}>
-      {listDam.map((dam) => (
-        <Grid item xl={4} lg={6} sm={6} xs={12} key={dam.id}>
-          <Card
-            {...rest}
-            className={
-              dam.status === 'Cancelado'
-                ? classesCancelado.root
-                : clsx(classes.root, className)
-            }>
-            <CardActionArea onClick={() => handleDamDetail(dam)}>
-              <CardHeader
-                avatar={
-                  <Avatar
-                    aria-label="recipe"
-                    className={classAvatar(
-                      dam.status,
-                      classesPago,
-                      classesCancelado,
-                      classesVencido,
-                      classes
-                    )}>
-                    {dam.id}
-                  </Avatar>
-                }
-                title={dam.receita.descricao}
-                subheader={`Emitido em ${Intl.DateTimeFormat('pt-BR', {
-                  year: 'numeric',
-                  month: 'numeric',
-                  day: 'numeric',
-                  hour: 'numeric',
-                  minute: 'numeric',
-                  second: 'numeric',
-                  hour12: false
-                }).format(new Date(dam.emissao))}`}
-              />
-              <CardContent>
-                <Grid container justify="space-between">
-                  <Grid item>
-                    <Typography
-                      className={classes.title}
-                      color="textSecondary"
-                      gutterBottom
-                      variant="body2">
-                      {dam.contribuinte.doc} | {dam.contribuinte.nome}
-                    </Typography>
+  function handlePagination(currentPage) {
+    setPagination({
+      page: currentPage + 1
+    });
+  }
+
+  const DamList = () => {
+    return (
+      <>
+        {listDam.map((dam) => (
+          <Grid item xl={4} lg={6} sm={6} xs={12} key={dam.id}>
+            <Card
+              {...rest}
+              className={
+                dam.status === 'Cancelado'
+                  ? classesCancelado.root
+                  : clsx(classes.root, className)
+              }>
+              <CardActionArea onClick={() => setSelecetDam(dam)}>
+                <CardHeader
+                  avatar={
+                    <Avatar
+                      aria-label="recipe"
+                      className={classAvatar(
+                        dam.status,
+                        classesPago,
+                        classesCancelado,
+                        classesVencido,
+                        classes
+                      )}>
+                      {dam.id}
+                    </Avatar>
+                  }
+                  title={dam.receita.descricao}
+                  subheader={`Emitido em ${Intl.DateTimeFormat('pt-BR', {
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    second: 'numeric',
+                    hour12: false
+                  }).format(new Date(dam.emissao))}`}
+                />
+                <CardContent>
+                  <Grid container justify="space-between">
+                    <Grid item>
+                      <Typography
+                        className={classes.title}
+                        color="textSecondary"
+                        gutterBottom
+                        variant="body2">
+                        {dam.contribuinte.doc} | {dam.contribuinte.nome}
+                      </Typography>
+                    </Grid>
                   </Grid>
-                </Grid>
-                <div className={classes.difference}>
-                  <Typography className={classes.caption} variant="caption">
-                    {classCaption(
-                      dam.status,
-                      dam.emissao,
-                      dam.vencimento,
-                      dam.dias_vencimento
-                    )}
-                  </Typography>
-                  <Typography
-                    variant="h3"
-                    className={classValueTotal(
-                      dam.status,
-                      classesPago,
-                      classesCancelado,
-                      classesVencido,
-                      classes
-                    )}>
-                    {new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL'
-                    }).format(dam.valor_total)}
-                  </Typography>
-                </div>
-              </CardContent>
-            </CardActionArea>
-          </Card>
+                  <div className={classes.difference}>
+                    <Typography className={classes.caption} variant="caption">
+                      {classCaption(
+                        dam.status,
+                        dam.emissao,
+                        dam.vencimento,
+                        dam.dias_vencimento
+                      )}
+                    </Typography>
+                    <Typography
+                      variant="h3"
+                      className={classValueTotal(
+                        dam.status,
+                        classesPago,
+                        classesCancelado,
+                        classesVencido,
+                        classes
+                      )}>
+                      {new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      }).format(dam.valor_total)}
+                    </Typography>
+                  </div>
+                </CardContent>
+              </CardActionArea>
+            </Card>
+          </Grid>
+        ))}
+      </>
+    );
+  };
+
+  return (
+    <InfiniteScroll
+      useWindow
+      pageStart={0}
+      hasMore={pagination.current_page < pagination.last_page}
+      loadMore={handlePagination}
+      loader={
+        <Grid
+          container
+          justify="space-between"
+          spacing={3}
+          key={0}
+          style={{ marginTop: 13 }}>
+          <CardSkeletron length={4} />
         </Grid>
-      ))}
-    </Grid>
+      }>
+      <Grid container justify="space-between" spacing={3}>
+        {listDam.length > 0 ? <DamList /> : <CardSkeletron length={10} />}
+      </Grid>
+    </InfiniteScroll>
   );
 }
 export default CardDam;

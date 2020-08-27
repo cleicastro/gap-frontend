@@ -4,12 +4,15 @@ import { Skeleton } from '@material-ui/lab';
 
 import { useStyles } from './styles';
 
-function CardSkeletron({ quantSkeletron }) {
+function CardSkeletron({ length }) {
   const classes = useStyles();
-
+  const itensSkeletron = [];
+  for (let i = 0; i < length; i++) {
+    itensSkeletron.push(i);
+  }
   return (
     <>
-      {quantSkeletron.map((skeletron) => (
+      {itensSkeletron.map((skeletron) => (
         <Grid item xl={4} lg={6} sm={6} xs={12} key={skeletron}>
           <Card className={classes.card}>
             <CardHeader
