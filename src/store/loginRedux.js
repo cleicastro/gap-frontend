@@ -61,7 +61,6 @@ export function register(data) {
         message: response
       });
     } catch (error) {
-      console.log(error);
       dispath({
         type: ACTIONS.ERROR,
         error: {
@@ -82,7 +81,6 @@ export function logar(data) {
         user: response
       });
     } catch (error) {
-      console.log(error);
       dispath({
         type: ACTIONS.ERROR,
         error: {
@@ -103,7 +101,6 @@ export function logout() {
         message: response
       });
     } catch (error) {
-      console.log(error);
       dispath({
         type: ACTIONS.ERROR,
         error: {

@@ -11,7 +11,7 @@ import { Autocomplete } from '@material-ui/lab';
 import { useForm } from 'react-hook-form';
 // import { Edit, Add } from '@material-ui/icons';
 import { DamContext, ACTIONS } from '../../../../contexts';
-import { useContribuinte, useStep } from '../../../../hooks';
+import { useContribuinte, useStepDam } from '../../../../hooks';
 import { ButtonStep } from '../../../../components';
 
 function FormContribuinte() {
@@ -19,7 +19,7 @@ function FormContribuinte() {
     state: { taxpayerSeleted },
     dispatch
   } = useContext(DamContext);
-  const [stepActivity, setStepActivity] = useStep();
+  const [stepActivity, setStepActivity] = useStepDam();
 
   const { register, handleSubmit, setValue } = useForm({
     defaultValues: taxpayerSeleted
@@ -80,24 +80,6 @@ function FormContribuinte() {
                 InputLabelProps={{
                   shrink: true
                 }}
-              /* InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="adicionar um novo contribuinte"
-                  onClick={() => console.log('he')}
-                  edge="end">
-                  <Add />
-                </IconButton>
-                <IconButton
-                  aria-label="Editar o contribuinte"
-                  onClick={() => console.log('he')}
-                  edge="end">
-                  <Edit />
-                </IconButton>
-              </InputAdornment>
-            )
-          }} */
               />
             )}
           />

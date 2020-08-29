@@ -1,3 +1,11 @@
+# PENDÊNCIAS NO GERAL
+Pendências:
+    ☐ Melhorar o campo de autocomplete do contribuinte
+    ☐ Atalho para adicionar um novo contribuinte carregando o dado digitado do autocomplete
+    ☐ Atalho para editar o contribuinte selecionado
+    ☐ Manter os dados no input do filtro
+
+
 # DAM
 Funcionalidades:
     ✔ Exibir o valor total no header @done(20-08-26 15:19)
@@ -7,9 +15,9 @@ Funcionalidades:
     ✔ Visualização em tabela @done(20-08-26 22:21)
     ✔ Aplicar filtros dos DAMs @done(20-08-27 10:08)
     ✔ Filtro por range do valor do DAM @done(20-08-27 10:46)
-    ☐ Melhorar o campo de autocomplete do contribuinte
-    ☐ Atalho para adicionar um novo contribuinte carregando o dado digitado do autocomplete
-    ☐ Atalho para editar o contribuinte selecionado
-    ☐ Manter os dados no input do filtro
 
-
+# ALVARÁ FUNCIONAMENTO
+Funcionalidades:
+    ✔ Header com busca rápida do contribuinte(Nome, CPF e CNPJ) e filtros @done(20-08-27 17:32)
+    ✔ Card como view padrão @done(20-08-27 16:53)
+    ☐ Tabela como view secundária

@@ -66,9 +66,6 @@ function FormItems(props) {
     if (removeItem) {
       setItems((values) => values.filter((item) => item.id !== removeItem.id));
     }
-    if (error) {
-      console.log(error);
-    }
     setLoad(false);
     setKeySelect(null);
   }, [removeItem, error]);

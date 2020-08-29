@@ -44,7 +44,6 @@ class Contribuinte {
       doc,
       nome,
       docEstadual,
-      inscricaoMunicipal,
       docEmissao,
       docOrgao,
       telefone,
@@ -60,7 +59,12 @@ class Contribuinte {
       agencia,
       conta,
       variacao,
-      tipoConta
+      tipoConta,
+      inscricaoMunicipal,
+      nomeFantasia,
+      atividadePrincipal,
+      atividadeSecundariaI,
+      atividadeSecundariaII
     },
     cancelToken
   ) {
@@ -72,7 +76,6 @@ class Contribuinte {
         doc,
         nome,
         docEstadual,
-        inscricaoMunicipal,
         docEmissao,
         docOrgao,
         telefone,
@@ -88,7 +91,12 @@ class Contribuinte {
         agencia,
         conta,
         variacao,
-        tipoConta
+        tipoConta,
+        inscricaoMunicipal,
+        nomeFantasia,
+        atividadePrincipal,
+        atividadeSecundariaI,
+        atividadeSecundariaII
       },
       {
         cancelToken

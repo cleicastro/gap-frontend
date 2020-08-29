@@ -11,7 +11,7 @@ import {
 import { ButtonStep, MenuDocumentEvents } from '../../../../components';
 import useStyles from './styles';
 import {
-  useStep,
+  useStepDam,
   useSaveDam,
   usePreviewDam,
   useOpenNewDam
@@ -29,7 +29,7 @@ export default function PreviewDam() {
   const setWindowNewDam = useOpenNewDam();
 
   const { items, valorTotal, contribuinte, dam } = usePreviewDam();
-  const [stepActivity, setStepActivity] = useStep();
+  const [stepActivity, setStepActivity] = useStepDam();
 
   const [
     statusServer,

@@ -21,7 +21,6 @@ import { DamContext } from '../../../../contexts';
 function Header({ handleViewTable, handleViewFilter }) {
   const classes = useStyles();
   const timerToClearSomewhere = useRef(false);
-  const [listDam, valueTotal] = useStoreDam();
   const [statusServer, setFilter] = useFilterDam();
   const [params, setParams] = useState('');
 
@@ -50,7 +49,7 @@ function Header({ handleViewTable, handleViewFilter }) {
           {new Intl.NumberFormat('pt-BR', {
             style: 'currency',
             currency: 'BRL'
-          }).format(valueTotal)}
+          }).format(0)}
         </Typography>
         <Grid item>
           <div className={classes.search}>

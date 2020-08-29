@@ -7,3 +7,4 @@ export { default as PreviewDam } from './PreviewDam';
 export { default as FormContribuinte } from './FormContribuinte';
 export { default as FormReceita } from './FormReceita';
 export { default as Header } from './Header';
+export { default as FormDocumento } from './FormDocumento';

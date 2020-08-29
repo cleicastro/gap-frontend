@@ -3,17 +3,16 @@ import PropTypes from 'prop-types';
 
 import { Button } from '@material-ui/core';
 import useStyles from './styles';
-import { useStep } from '../../hooks';
 
 function ButtonStep({
   disabledNext,
   disabledBack,
   disableSave,
   handlePrevStep,
-  handleSave
+  handleSave,
+  activeStep
 }) {
   const classes = useStyles();
-  const [activeStep] = useStep();
   return (
     <div className={classes.buttons}>
       {activeStep !== 0 && (

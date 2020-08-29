@@ -7,6 +7,7 @@ import useStyles from './styles';
 import FormEndereco from './FormEndereco';
 import FormBancario from './FormBancario';
 import FormInfoPessoais from './FormInfoPessoais';
+import FormAlvara from './FormAlvara';
 
 import { ContribuinteContext } from '../../../contexts';
 
@@ -31,8 +32,10 @@ function FormCadContribuinte() {
       case 0:
         return <FormInfoPessoais />;
       case 1:
-        return <FormEndereco />;
+        return <FormAlvara />;
       case 2:
+        return <FormEndereco />;
+      case 3:
         return <FormBancario />;
       default:
         return <div>Not Found</div>;

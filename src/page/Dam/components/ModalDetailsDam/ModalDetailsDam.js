@@ -81,10 +81,11 @@ function ModalDetailsDam() {
           handleClose={handleClosedModalDetails}
           visibleOptions={{
             imprimir: true,
-            pagar: !dataDam.pago && dataDam.status !== 'Cancelado',
+            pagar: dataDam && !dataDam.pago && dataDam.status !== 'Cancelado',
             copiar: showModalDetails,
-            editar: showModalDetails && dataDam.status !== 'Cancelado',
-            cancelar: dataDam.status !== 'Cancelado',
+            editar:
+              dataDam && showModalDetails && dataDam.status !== 'Cancelado',
+            cancelar: dataDam && dataDam.status !== 'Cancelado',
             nfsa: false,
             alvara: false,
             recibo: false,

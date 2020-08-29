@@ -10,7 +10,8 @@ import {
   Contribuinte as ContribuinteView,
   PdfDam as PDFDAM,
   PdfNfsa as PDFNFSA,
-  User as UserView
+  User as UserView,
+  AlvaraFuncionamento as AlvaraFuncionamentoView
 } from './page';
 import { Main as MainLayout } from './layouts';
 
@@ -35,7 +36,7 @@ const Routes = () => (
         path="/nfsa"
       />
       <PrivateRoute
-        component={() => <h1>ALVARÁ</h1>}
+        component={AlvaraFuncionamentoView}
         exact
         layout={MainLayout}
         path="/alvara"

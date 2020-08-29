@@ -160,7 +160,6 @@ export function saveContribuinte(contribuinte) {
         status: response.status
       });
     } catch (error) {
-      console.log(error);
       dispatch({
         type: ACTIONS.ERROR,
         error: {
@@ -187,7 +186,6 @@ export function updateContribuinte(id, params) {
         }
       });
     } catch (error) {
-      console.log('erro', error);
       dispatch({
         type: ACTIONS.ERROR,
         error: {

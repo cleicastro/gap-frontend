@@ -43,7 +43,6 @@ function Teste({ nfsa }) {
     confins_percente: confisPercente,
     confins_valor: confisValor
   } = nfsa;
-  console.log(nfsa);
   return (
     <View style={styles.section}>
       {/* header */}

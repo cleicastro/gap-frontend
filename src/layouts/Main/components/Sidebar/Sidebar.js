@@ -36,7 +36,7 @@ export default function Sidebar({
       icon: <ApartmentIcon />
     },
     {
-      title: 'Alvará',
+      title: 'Alvará de funcionamento',
       href: '/alvara',
       icon: <Alvara />
     },

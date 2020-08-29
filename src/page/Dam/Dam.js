@@ -8,12 +8,14 @@ import {
   NewDam,
   ModalDetailsDam,
   Header,
-  Filtros
+  Filtros,
+  CardDam
 } from './components';
 import useStyles from './styles';
-import CardDam from './components/CardDam/CardDam';
+import { useRequestReceita } from '../../hooks';
 
 const Dam = () => {
+  useRequestReceita();
   const classes = useStyles();
   const [viewTable, setViewTable] = useState(false);
   const [openFilter, setOpenFilter] = useState(false);

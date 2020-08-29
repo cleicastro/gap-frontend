@@ -12,7 +12,6 @@ import useStyles from './styles';
 import {
   FormParticipantes,
   FormItems,
-  FormDocumento,
   FormTributos
 } from '../../../../../components';
 import PreviewNfsa from '../../PreviewNfsa';
@@ -57,7 +56,7 @@ function StepComponent() {
         );
       case 3:
         return (
-          <FormDocumento
+          <FormTributos
             steps={steps}
             activeStep={activeStep}
             setActiveStep={setActiveStep}

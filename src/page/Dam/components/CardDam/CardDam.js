@@ -11,18 +11,14 @@ import {
 } from '@material-ui/core';
 import InfiniteScroll from 'react-infinite-scroller';
 
+import { useSelector } from 'react-redux';
 import {
   useStyles,
   useStylesPago,
   useStylesCancelado,
   useStylesVencido
 } from './styles';
-import {
-  useDam,
-  useStoreDam,
-  useRequestReceita,
-  usePaginationDam
-} from '../../../../hooks';
+import { useStoreDam, usePaginationDam, useDam } from '../../../../hooks';
 import { CardSkeletron } from '../../../../components';
 
 const classValueTotal = (
@@ -95,10 +91,11 @@ const classCaption = (status, emissao, vencimento, days) => {
 };
 
 function CardDam({ className, handleDamDetail, ...rest }) {
-  useRequestReceita();
-  useDam();
   // eslint-disable-next-line no-unused-vars
-  const [listDam, valueTotal, setSelecetDam] = useStoreDam();
+  const statusServer = useDam();
+  console.log(statusServer);
+
+  const setSelecetDam = useStoreDam();
   const [pagination, setPagination] = usePaginationDam();
 
   const classes = useStyles();
@@ -111,6 +108,10 @@ function CardDam({ className, handleDamDetail, ...rest }) {
       page: currentPage + 1
     });
   }
+  const listDam = useSelector((state) => {
+    console.log(state);
+    return state.dam.listDam;
+  });
 
   const DamList = () => {
     return (
@@ -194,7 +195,6 @@ function CardDam({ className, handleDamDetail, ...rest }) {
       </>
     );
   };
-
   return (
     <InfiniteScroll
       useWindow
@@ -212,7 +212,11 @@ function CardDam({ className, handleDamDetail, ...rest }) {
         </Grid>
       }>
       <Grid container justify="space-between" spacing={3}>
-        {listDam.length > 0 ? <DamList /> : <CardSkeletron length={10} />}
+        {Object.keys(listDam).length > 0 ? (
+          <DamList />
+        ) : (
+            <CardSkeletron length={10} />
+          )}
       </Grid>
     </InfiniteScroll>
   );

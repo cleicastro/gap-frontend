@@ -17,7 +17,7 @@ import { Search as SearchIcon } from '@material-ui/icons';
 import { useForm } from 'react-hook-form';
 import { ButtonStep } from '../../../../components';
 import useStyles from './styles';
-import { useStoreReceita, useStep } from '../../../../hooks';
+import { useStoreReceita, useStepDam } from '../../../../hooks';
 import { DamContext, ACTIONS } from '../../../../contexts';
 
 function filterReceita(valueFormated, receitas) {
@@ -33,7 +33,7 @@ function FormReceita() {
   const classes = useStyles();
   const [receitas, receitaSeleted] = useStoreReceita();
   const [listReceita, setListReceita] = useState(receitas);
-  const [stepActivity, setStepActivity] = useStep();
+  const [stepActivity, setStepActivity] = useStepDam();
 
   const { handleSubmit } = useForm();
 
@@ -117,7 +117,10 @@ function FormReceita() {
           ))}
         </List>
       </Grid>
-      <ButtonStep disabledNext={!receitaSeleted.cod} />
+      <ButtonStep
+        disabledNext={!receitaSeleted.cod}
+        activeStep={stepActivity}
+      />
     </form>
   );
 }

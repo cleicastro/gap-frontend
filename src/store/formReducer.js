@@ -200,7 +200,7 @@ export function calcTributsNFSA(data, isFirstCalc) {
         }
       });
     } catch (error) {
-      console.log(error);
+
       dispatch({
         type: ACTIONS.ERROR,
         error: {

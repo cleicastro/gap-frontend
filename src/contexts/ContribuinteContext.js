@@ -66,7 +66,12 @@ const ContribuinteProvier = ({
   const [isProgress, setIsProgress] = useState(false);
   const timerToClearSomewhere = useRef(false);
 
-  const steps = ['Informações Pessoais', 'Endereço', 'Dados Bancários'];
+  const steps = [
+    'Informações Pessoais',
+    'Cadastro de Alvará',
+    'Endereço',
+    'Dados Bancários'
+  ];
   const [activeStep, setActiveStep] = useState(0);
   const isLastStep = activeStep === steps.length - 1;
 
@@ -204,6 +209,7 @@ const ContribuinteProvier = ({
   }
 
   function onSubmit(values) {
+    console.log(values);
     salvarContribuinte({ ...contribuinte, ...values });
   }
 

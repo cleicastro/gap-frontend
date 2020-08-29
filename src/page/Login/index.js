@@ -65,7 +65,7 @@ const Login = ({
     }
     setLoad(false);
   }, [history, user, error]);
-  console.log(error);
+
   return (
     <Grid container component="main" className={classes.root}>
       <CssBaseline />

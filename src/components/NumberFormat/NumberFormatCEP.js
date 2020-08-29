@@ -7,7 +7,7 @@ function NumberFormatCEP(props) {
     <NumberFormat
       {...other}
       getInputRef={inputRef}
-      format="##.###.###"
+      format="##.###-###"
       mask="_"
     />
   );

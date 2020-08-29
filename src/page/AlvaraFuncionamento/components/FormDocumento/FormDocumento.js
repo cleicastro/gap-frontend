@@ -2,14 +2,14 @@ import React from 'react';
 import { Typography, Grid, TextField, InputAdornment } from '@material-ui/core';
 
 import { useForm } from 'react-hook-form';
-import ButtonStep from '../ButtonStep';
-import { useInitialDocument, useStep } from '../../hooks';
+import { ButtonStep } from '../../../../components';
+import { useInitialDocumentAlvara, useStepAlvara } from '../../../../hooks';
 
-import { documentSchema, mascaraReal } from '../../util';
+import { documentSchema, mascaraReal } from '../../../../util';
 
 function FormDocumento() {
-  const [document, setDocument] = useInitialDocument();
-  const [stepActivity, setStepActivity] = useStep();
+  const [document, setDocument] = useInitialDocumentAlvara();
+  const [stepActivity, setStepActivity] = useStepAlvara();
 
   const {
     control,
@@ -37,8 +37,8 @@ function FormDocumento() {
   const handlePrevStep = () => setStepActivity(stepActivity - 1);
 
   const onSubmit = (data) => {
-    setDocument(data);
     setStepActivity(stepActivity + 1);
+    setDocument(data);
   };
 
   return (
@@ -95,6 +95,7 @@ function FormDocumento() {
             label="Descrição"
             name="infoAdicionais"
             fullWidth
+            // error={!!errors.infoAdicionais}
             helperText={errors.infoAdicionais && errors.infoAdicionais.message}
           />
         </Grid>
@@ -105,9 +106,9 @@ function FormDocumento() {
             id="receita"
             name="receita"
             disabled
-            error={!!errors.receita}
             label="Receita"
             fullWidth
+            error={!!errors.receita}
             helperText={errors.receita && errors.receita.message}
           />
         </Grid>

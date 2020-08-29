@@ -8,6 +8,7 @@ import {
 } from '@material-ui/core';
 
 import { ContribuinteContext } from '../../../../contexts';
+import { NumberFormatCNPJ, NumberFormatCPF } from '../../../NumberFormat';
 
 function FormInfoPessoais() {
   const {
@@ -38,12 +39,8 @@ function FormInfoPessoais() {
 
   function onChangeHandler(e) {
     const { name, value } = e.target;
-    if (
-      (name === 'doc' || name === 'tipo') &&
-      data.tipo === 'PJ' &&
-      value.length === 14
-    ) {
-      searchCNPJ(value);
+    if (data.tipo === 'PJ' && value.length === 14) {
+      searchCNPJ(value.replace(/[^\d]+/g, ''));
     }
     setData((prev) => ({ ...prev, [name]: value }));
   }
@@ -87,6 +84,10 @@ function FormInfoPessoais() {
           label={data.tipo === 'PF' ? 'CPF' : 'CNPJ'}
           name="doc"
           required
+          InputProps={{
+            inputComponent:
+              data.tipo === 'PF' ? NumberFormatCPF : NumberFormatCNPJ
+          }}
         />
       </Grid>
       <Grid item xs={12} sm={6}>

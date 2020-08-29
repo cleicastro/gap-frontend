@@ -6,3 +6,4 @@ export { default as Contribuinte } from './Contribuinte';
 export { default as PdfDam } from './pdf/PdfDam';
 export { default as PdfNfsa } from './pdf/PdfNfsa';
 export { default as User } from './User';
+export { default as AlvaraFuncionamento } from './AlvaraFuncionamento';

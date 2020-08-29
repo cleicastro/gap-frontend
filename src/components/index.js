@@ -1,6 +1,5 @@
 export { default as Copyright } from './Copyright';
 export { default as FormCadContribuinte } from './Contribuintes';
-export { default as FormDocumento } from './FormDocumento';
 export { default as Contribuintes } from './Contribuintes';
 export { default as CardSkeletron } from './CardSkeletron';
 export { default as FormItems } from './FormItems';

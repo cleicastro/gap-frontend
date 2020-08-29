@@ -5,9 +5,22 @@ export {
   useStoreDam,
   useOpenNewDam,
   usePaginationDam,
-  useFilterDam
+  useFilterDam,
+  useInitialDocument,
+  useStepDam
 } from './dam';
+export {
+  useAlvara,
+  useStoreAlvara,
+  usePaginationAlvara,
+  useFilterAlvara,
+  useSaveAlvara,
+  useOpenNewAlvara,
+  usePreviewAlvara,
+  useStepAlvara,
+  useInitialDocumentAlvara
+} from './alvaraFuncionamento';
+
 export { useStoreReceita, useRequestReceita } from './receita';
-export { useStep } from './step';
+
 export { useContribuinte } from './contribuinte';
-export { useInitialDocument } from './document';

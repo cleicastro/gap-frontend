@@ -9,6 +9,69 @@ import { dateFormatPTBR } from '../util';
 
 const tokenDam = Axios.CancelToken.source();
 
+function dateSetting(dateVencimento) {
+  const toDay = new Date();
+  const weekDay = toDay.getDay();
+  let diasVencer = 5;
+
+  if (weekDay === 1) {
+    diasVencer = 7;
+  } else if (weekDay === 2) {
+    diasVencer = 6;
+  }
+
+  const referencia = Intl.DateTimeFormat('fr-CA', {
+    year: 'numeric',
+    month: '2-digit'
+  }).format(toDay);
+
+  const emissaoConvertPT = Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }).format(toDay);
+
+  const vencimento = Intl.DateTimeFormat('fr-CA', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }).format(dateVencimento.setDate(dateVencimento.getDate() + diasVencer));
+
+  const emissao = new Date(`${new Date().toString().split('GMT')[0]} UTC`)
+    .toISOString()
+    .split('.')[0]
+    .replace('T', ' ');
+
+  return {
+    referencia,
+    emissaoConvertPT,
+    emissao,
+    vencimento
+  };
+}
+
+function initialValues(receitaSeleted) {
+  const { referencia, emissao, emissaoConvertPT, vencimento } = dateSetting(
+    new Date()
+  );
+  return {
+    referencia,
+    emissao,
+    emissaoConvertPT,
+    vencimento,
+    receita: receitaSeleted.cod,
+    docOrigem: '',
+    infoAdicionais: '',
+    juros: 0.0,
+    valorMulta: 0,
+    valorPrincipal:
+      Number(receitaSeleted.valor_fixo) > 0 ? receitaSeleted.valor_fixo : 0,
+    taxaExp: 5,
+    valorTotal:
+      Number(receitaSeleted.valor_fixo) > 0 ? receitaSeleted.valor_fixo : 5
+  };
+}
+
 async function requestDam(params) {
   const response = await Dam.getDam({ ...params }, tokenDam.token);
   return response;
@@ -48,17 +111,14 @@ function editDamAction(dam) {
 }
 
 export const useDam = () => {
-  let statusServer = null;
+  const [statusServer, setStatusServer] = useState(null);
   const dispatch = useDispatch();
 
-  statusServer = useEffect(() => {
+  useEffect(() => {
     const params = { page: 1 };
     requestDam(params).then((response) => {
       dispatch(initialDamsAction(response.data));
-      if (response.status !== 201) {
-        return response.status;
-      }
-      return null;
+      setStatusServer(response.status);
     });
   }, [dispatch]);
 
@@ -236,13 +296,7 @@ export const useOpenNewDam = () => {
 };
 
 export const useStoreDam = () => {
-  const listDam = useSelector((state) => state.dam.listDam);
-  const valueTotal = listDam.reduce(
-    (acc, dam) => acc + Number(dam.valor_total),
-    0
-  );
   const { dispatch } = useContext(DamContext);
-
   function setSelecetDam(dam) {
     const {
       id,
@@ -299,5 +353,36 @@ export const useStoreDam = () => {
       payload: { ...dam }
     });
   }
-  return [listDam, valueTotal, setSelecetDam];
+  return setSelecetDam;
+};
+export const useInitialDocument = () => {
+  const {
+    state: { receitaSeleted, document },
+    dispatch
+  } = useContext(DamContext);
+
+  const values = document.valorPrincipal
+    ? document
+    : initialValues(receitaSeleted);
+
+  function setDocument(data) {
+    const { vencimento } = dateSetting(data.vencimento);
+    dispatch({
+      type: ACTIONS_DAM_CONTEXT.DOCUMENT,
+      payload: { ...values, ...data, vencimento }
+    });
+  }
+  return [values, setDocument];
+};
+
+export const useStepDam = () => {
+  const {
+    state: { activeStep },
+    dispatch
+  } = useContext(DamContext);
+
+  const navigate = (valor) => {
+    dispatch({ type: ACTIONS_DAM_CONTEXT.ACTIVE_STEP, payload: valor });
+  };
+  return [activeStep, navigate];
 };

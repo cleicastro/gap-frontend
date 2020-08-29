@@ -24,7 +24,7 @@ const PrinterNFSA = () => {
         setLoad(false);
       } catch (error) {
         setLoad(false);
-        console.log(error);
+
       }
     }
     requestNFSA();

@@ -6,6 +6,7 @@ import { webServiceReducer } from './webServices';
 import { copyAndEditReducer } from './copyAndEditReducer';
 import { authReducer } from './loginRedux';
 import { nfsaReducer } from './nfsaReducer';
+import { alvaraReducer } from './alvaraFuncionamentoReducer';
 import { formReducer } from './formReducer';
 
 const mainReducer = combineReducers({
@@ -16,6 +17,7 @@ const mainReducer = combineReducers({
   copyAndEdit: copyAndEditReducer,
   auth: authReducer,
   nfsa: nfsaReducer,
+  alvaraFuncionamento: alvaraReducer,
   form: formReducer
 });
 

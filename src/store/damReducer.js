@@ -1,9 +1,9 @@
 /* eslint-disable no-case-declarations */
 export const ACTIONS = {
-  LIST: 'DAM_LIST',
+  LIST: 'DALVARA_LIST',
   LIST_INITIAL: 'LIST_INITIAL',
-  ADD: 'DAM_ADD',
-  UPDATE_DAM: 'DAM_UPDATE'
+  ADD: 'DALVARA_ADD',
+  UPDATE_ALVARA: 'DALVARA_UPDATE'
 };
 
 const INITIAL_STATE = {
@@ -31,7 +31,7 @@ export const damReducer = (state = INITIAL_STATE, action) => {
         ...state,
         listDam: [action.payload.data, ...state.listDam]
       };
-    case ACTIONS.UPDATE_DAM:
+    case ACTIONS.UPDATE_ALVARA:
       const { payload } = action;
       const { listDam } = state;
 

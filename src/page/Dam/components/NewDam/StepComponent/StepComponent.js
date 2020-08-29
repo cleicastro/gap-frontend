@@ -9,9 +9,13 @@ import {
 } from '@material-ui/core';
 
 import useStyles from './styles';
-import { FormDocumento } from '../../../../../components';
-import { FormContribuinte, FormReceita, PreviewDam } from '../..';
-import { useStep } from '../../../../../hooks';
+import {
+  FormContribuinte,
+  FormReceita,
+  PreviewDam,
+  FormDocumento
+} from '../..';
+import { useStepDam } from '../../../../../hooks';
 
 const steps = ['Receita', 'Contribuinte', 'Documento', 'Confirmar dados'];
 
@@ -32,7 +36,7 @@ function getStepContent(step) {
 
 function StepComponent() {
   const classes = useStyles();
-  const [activeStep] = useStep();
+  const [activeStep] = useStepDam();
   return (
     <>
       <CssBaseline />

@@ -52,7 +52,7 @@ export function requestReceitaWS(cnpj, token) {
         empresa: response.data
       });
     } catch (error) {
-      console.log(error);
+
       dispatch({
         type: ACTIONS.ERROR,
         error: {
@@ -73,7 +73,7 @@ export function requestCorreiosCEP(cep, token) {
         endereco: response.data
       });
     } catch (error) {
-      console.log(error);
+
       dispatch({
         type: ACTIONS.ERROR,
         error: {

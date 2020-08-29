@@ -30,7 +30,7 @@ export function requestReceita(token) {
         listReceita: response.data
       });
     } catch (error) {
-      console.log(error);
+
     }
   };
 }

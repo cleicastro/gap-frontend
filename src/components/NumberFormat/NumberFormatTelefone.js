@@ -6,6 +6,14 @@ function NumberFormatTelefone(props) {
   return (
     <NumberFormat
       {...other}
+      onValueChange={(values) => {
+        onChange({
+          target: {
+            name: props.name,
+            value: values.value
+          }
+        });
+      }}
       getInputRef={inputRef}
       format="(##)# ########"
       mask="_"

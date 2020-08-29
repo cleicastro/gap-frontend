@@ -125,7 +125,6 @@ function Filtros({ className, handleSair, showFiltro, ...rest }) {
     reset();
   };
   const setParams = (data) => {
-    console.log(data);
     const filter = { ...data, receitaFilter: right.join(',') };
     setFilter(filter);
   };

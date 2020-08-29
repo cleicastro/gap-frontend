@@ -60,8 +60,6 @@ const FormNewUser = () => {
     event.preventDefault();
   };
 
-  console.log(messageBackend);
-
   return (
     <form
       className={classes.form}

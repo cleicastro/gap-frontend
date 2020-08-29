@@ -112,7 +112,7 @@ export function saveNFSA(items, nfsa, dam) {
         listNfsa: response
       });
     } catch (error) {
-      console.log(error);
+
       dispatch({
         type: ACTIONS.ERROR,
         error: {
@@ -134,7 +134,7 @@ export function editNFSA(items, nfsa, dam, id) {
         id
       });
     } catch (error) {
-      console.log(error);
+
       dispatch({
         type: ACTIONS.ERROR,
         error: {
@@ -156,7 +156,7 @@ export function deleteItemNFSA(id) {
         id
       });
     } catch (error) {
-      console.log(error);
+
       dispatch({
         type: ACTIONS.ERROR,
         error: {
