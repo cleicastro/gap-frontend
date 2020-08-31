@@ -9,15 +9,17 @@ function ButtonStep({
   disabledBack,
   disableSave,
   handlePrevStep,
+  handleNextStep,
   handleSave,
-  activeStep
+  activeStep,
+  type
 }) {
   const classes = useStyles();
   return (
     <div className={classes.buttons}>
       {activeStep !== 0 && (
         <Button
-          type="submit"
+          type={type}
           onClick={handlePrevStep}
           disabled={disabledBack}
           className={classes.button}>
@@ -27,7 +29,8 @@ function ButtonStep({
       {disableSave ? (
         <Button
           disabled={disabledNext}
-          type="submit"
+          type={type}
+          onClick={handleNextStep}
           variant="contained"
           color="primary"
           className={classes.button}>
@@ -50,7 +53,8 @@ function ButtonStep({
 ButtonStep.defaultProps = {
   disableSave: true,
   disabledNext: false,
-  disabledBack: false
+  disabledBack: false,
+  type: 'submit'
 };
 
 ButtonStep.propTypes = {
@@ -58,7 +62,9 @@ ButtonStep.propTypes = {
   disabledBack: PropTypes.bool,
   disableSave: PropTypes.bool,
   handlePrevStep: PropTypes.func,
-  handleSave: PropTypes.func
+  handleNextStep: PropTypes.func,
+  handleSave: PropTypes.func,
+  type: PropTypes.string
 };
 
 export default ButtonStep;

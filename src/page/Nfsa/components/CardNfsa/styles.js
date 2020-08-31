@@ -30,6 +30,20 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+const useStylesPago = makeStyles((theme) => ({
+  avatar: {
+    backgroundColor: theme.palette.success.main,
+    color: theme.palette.success.contrastText,
+    height: 36,
+    width: 36,
+    fontSize: 14
+  },
+  differenceValue: {
+    color: theme.palette.success.dark,
+    marginRight: theme.spacing(1)
+  }
+}));
+
 const useStylesCancelado = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -48,4 +62,18 @@ const useStylesCancelado = makeStyles((theme) => ({
   }
 }));
 
-export { useStyles, useStylesCancelado };
+const useStylesVencido = makeStyles((theme) => ({
+  avatar: {
+    backgroundColor: theme.palette.error.main,
+    color: theme.palette.error.contrastText,
+    height: 36,
+    width: 36,
+    fontSize: 14
+  },
+  differenceValue: {
+    color: theme.palette.error.main,
+    marginRight: theme.spacing(1)
+  }
+}));
+
+export { useStyles, useStylesPago, useStylesCancelado, useStylesVencido };

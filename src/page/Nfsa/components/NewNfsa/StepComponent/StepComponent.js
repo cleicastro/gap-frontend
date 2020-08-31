@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   CssBaseline,
   Typography,
@@ -12,76 +12,41 @@ import useStyles from './styles';
 import {
   FormParticipantes,
   FormItems,
-  FormTributos
-} from '../../../../../components';
-import PreviewNfsa from '../../PreviewNfsa';
+  FormTributos,
+  FormDocumento,
+  PreviewNfsa
+} from '../..';
+import { useStepNfsa } from '../../../../../hooks';
 
-const steps = [
-  'Participantes',
-  'Itens',
-  'Tributos',
-  'Documento',
-  'Confirmar dados'
-];
+const steps = ['Participantes', 'Itens', 'Tributos', 'DAM', 'Confirmar dados'];
+
+function getStepContent(step) {
+  switch (step) {
+    case 0:
+      return <FormParticipantes />;
+    case 1:
+      return <FormItems />;
+    case 2:
+      return <FormTributos />;
+    case 3:
+      return <FormDocumento />;
+    case 4:
+      return <PreviewNfsa />;
+    default:
+      throw new Error('Unknown step');
+  }
+}
 
 function StepComponent() {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = useState(0);
-
-  function getStepContent(step) {
-    switch (step) {
-      case 0:
-        return (
-          <FormParticipantes
-            steps={steps}
-            activeStep={activeStep}
-            setActiveStep={setActiveStep}
-          />
-        );
-      case 1:
-        return (
-          <FormItems
-            steps={steps}
-            activeStep={activeStep}
-            setActiveStep={setActiveStep}
-          />
-        );
-      case 2:
-        return (
-          <FormTributos
-            steps={steps}
-            activeStep={activeStep}
-            setActiveStep={setActiveStep}
-          />
-        );
-      case 3:
-        return (
-          <FormTributos
-            steps={steps}
-            activeStep={activeStep}
-            setActiveStep={setActiveStep}
-          />
-        );
-      case 4:
-        return (
-          <PreviewNfsa
-            steps={steps}
-            activeStep={activeStep}
-            setActiveStep={setActiveStep}
-          />
-        );
-      default:
-        throw new Error('Unknown step');
-    }
-  }
-
+  const [activeStep] = useStepNfsa();
   return (
     <>
       <CssBaseline />
       <main className={classes.layout}>
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
-            Emissão de Nota Fiscal Avulsa de Serviço
+            Emissão de Nota Viscal de Serviço Avulsa
           </Typography>
 
           <Stepper activeStep={activeStep} className={classes.stepper}>

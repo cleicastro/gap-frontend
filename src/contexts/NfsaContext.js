@@ -1,294 +1,113 @@
-import React, { createContext, useEffect, useState } from 'react';
-
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-
-import { requestNfsa, saveNFSA, editNFSA } from '../store/nfsaReducer';
-
-import {
-  requestContribuinte,
-  cleanDataContribuinte
-} from '../store/contribuinteReducer';
-import { calcTributsNFSA, liquidToGrossNFSA } from '../store/formReducer';
+import React, { createContext, useReducer } from 'react';
 
 export const NfsaContext = createContext();
 
-function NfsaProvider(props) {
-  const {
-    children,
-    requestNfsa: handleRequestNfsa,
-    saveNFSA: serviceSaveNFSA,
-    editNFSA: serviceEditNFSA,
-    calcTributsNFSA: handleCalcTributs,
-    liquidToGrossNFSA: handleLiquidToGross,
-    handleOpenNewNfsa,
-    openNewNfsa,
-    listNfsa,
-    insertedNFSA,
-    updateNFSA,
-    calculatedTaxes,
-    valuesFormDocumento,
-    responseStatusDam,
-    valueTotal
-  } = props;
-  const [showReview, setReviewShow] = useState(false);
-  const [showNewNfsa, setShowNewNfsa] = useState(openNewNfsa);
-  const [participantes, setParticipantes] = useState({});
-  const [valueFormTributos, setValuesFormTributos] = useState({
-    ...calculatedTaxes,
-    taxaExp: valuesFormDocumento.taxaExp
-  });
-  const [valueFormItems, setValuesFormItems] = useState([]);
-  const [valueFormOriginTributos, setValueFormOriginTributos] = useState(null);
-  const [dataLoadNFSA, setDataLoadNFSA] = useState(null);
-  const [actionFormNFSA, setActionFormNFSA] = useState('new');
+export const ACTIONS = {
+  MODAL_NEW: 'MODAL_NEW_NFSA',
+  MODAL_DETAILS: 'MODAL_DETAILS',
+  ACTIVE_STEP: 'ACTIVE_STEP',
+  EDIT_OPERATION: 'EDIT_NFSA_OPERATION',
+  SELECT_NFSA: 'SELECT_NFSA',
+  SET_ITEMS_NFSA: 'SET_ITEMS_NFSA',
+  SELECT_TAXPAYER: 'SELECT_TAXPAYER',
+  DOCUMENT: 'DOCUMENT',
+  PARAMS_QUERY: 'PARAMS_QUERY_NFSA'
+};
 
-  const itensSkeletron = [];
-  for (let i = 0; i < 10; i++) {
-    itensSkeletron.push(i);
-  }
+export const STATE_INITIAL = {
+  receitaSeleted: {
+    cod: '1121250000',
+    descricao: 'ALVARÁ DE LOCALIZAÇÃO',
+    icon: 'store',
+    sigla: 'ALVARA',
+    valor_fixo: 0
+  },
+  dataNfsa: {},
+  dataItemNfsa: [],
+  taxpayerSeleted: {},
+  dataDam: {},
+  activeStep: 0,
+  document: {},
+  editNfsa: false,
+  showModalNewNfsa: false,
+  showModalDetails: false,
+  paramsQuery: {}
+};
 
-  useEffect(() => {
-    handleRequestNfsa({ page: 1 });
-  }, [handleRequestNfsa]);
+export const nfsaContextReducer = (state, action) => {
+  switch (action.type) {
+    case ACTIONS.SELECT_TAXPAYER:
+      return {
+        ...state,
+        taxpayerSeleted: { ...action.payload, ...state.taxpayerSeleted }
+      };
+    case ACTIONS.DOCUMENT:
+      return {
+        ...state,
+        document: action.payload
+      };
 
-  useEffect(() => {
-    const baseCalculo = Number(calculatedTaxes.baseCalculo || 0);
+    case ACTIONS.SELECT_NFSA:
+      return {
+        ...state,
+        dataDam: action.payload.dam,
+        dataNfsa: action.payload
+      };
+    case ACTIONS.SET_ITEMS_NFSA:
+      return {
+        ...state,
+        dataItemNfsa: action.payload
+      };
+    case ACTIONS.EDIT_OPERATION:
+      return {
+        ...state,
+        editNfsa: true
+      };
+    case ACTIONS.ACTIVE_STEP:
+      return {
+        ...state,
+        activeStep: action.payload
+      };
 
-    function updateValueItems(items, total) {
-      const { quantidade } = items[0];
+    case ACTIONS.MODAL_DETAILS:
+      return {
+        ...state,
+        showModalDetails: action.payload
+      };
 
-      const result = baseCalculo / Number(quantidade);
-      const newBaseCalc = result.toFixed(2) * 3;
-
-      // recalcula caso haja dizima períodica
-      if (total !== newBaseCalc) {
-        const { aliquotaIss, taxaExp } = calculatedTaxes;
-        handleCalcTributs(
-          {
-            baseCalculo: newBaseCalc,
-            aliquotaIss,
-            valorISS: (newBaseCalc * aliquotaIss) / 100,
-            irPercente: 0,
-            irValor: 0,
-            taxaExp
-          },
-          true
-        );
-      }
-      return [{ ...items[0], valor: result.toFixed(2) }];
-    }
-
-    if (baseCalculo > 0) {
-      setValuesFormItems((items) => {
-        const total = items.reduce(
-          (acc, act) => acc + Number(act.quantidade) * Number(act.valor),
-          0
-        );
-        return total !== baseCalculo ? updateValueItems(items, total) : items;
-      });
-
-      setValuesFormTributos(calculatedTaxes);
-    }
-  }, [calculatedTaxes, handleCalcTributs]);
-
-  useEffect(() => setShowNewNfsa(openNewNfsa), [openNewNfsa]);
-
-  const handleCloseNewNfsa = () => {
-    handleOpenNewNfsa(false);
-    setReviewShow(false);
-    setValuesFormItems([]);
-    setParticipantes({});
-    setValuesFormTributos({});
-    setActionFormNFSA('new');
-  };
-
-  const handleSelecetedNfsa = (data) => {
-    setReviewShow(true);
-    setDataLoadNFSA(data);
-    setValuesFormItems(data.items_nfsa);
-    setParticipantes({
-      idPrestador: data.prestador.id,
-      nomePrestador: data.prestador.nome,
-      docPrestador: data.prestador.doc,
-      enderecoPrestador: data.prestador.endereco,
-      cidadePrestador: data.prestador.cidade,
-      ufPrestador: data.prestador.uf,
-      cepPrestador: data.prestador.cep,
-      bairroPrestador: data.prestador.bairro,
-
-      idTomador: data.tomador.id,
-      nomeTomador: data.tomador.doc,
-      docTomador: data.tomador.doc,
-      enderecoTomador: data.tomador.endereco,
-      cidadeTomador: data.tomador.cidade,
-      ufTomador: data.tomador.uf,
-      cepTomador: data.tomador.cep,
-      bairroTomador: data.tomador.bairro
-    });
-    setValuesFormTributos({
-      aliquotaIss: Number(data.aliquota_iss),
-      irValor: Number(data.ir_valor),
-      taxaExp: Number(data.dam.taxa_expedicao),
-      valorISS: Number(data.valor_iss),
-      valorNF: Number(data.valor_calculo),
-      valorTotal: Number(data.dam.valor_total)
-    });
-  };
-
-  const handleAddItem = (data) => {
-    setValuesFormItems(data);
-    const baseCalculo = data.reduce(
-      (accumator, currentValue) =>
-        accumator + currentValue.quantidade * currentValue.valor,
-      0
-    );
-    const { aliquotaIss } = valueFormTributos;
-    const { taxaExp } = valuesFormDocumento;
-    if (baseCalculo > 0) {
-      handleCalcTributs(
-        {
-          baseCalculo,
-          aliquotaIss,
-          valorISS: (baseCalculo * aliquotaIss) / 100,
-          irPercente: 0,
-          irValor: 0,
-          taxaExp
-        },
-        true
-      );
-    }
-  };
-
-  const handleCalculationBasis = (data, selectedConverter) => {
-    if (selectedConverter) {
-      setValueFormOriginTributos((value) => value || valueFormTributos);
-      const { baseCalculo, irPercente, irValor, valorISS, aliquotaIss } = data;
-      const { taxaExp } = valueFormTributos;
-
-      handleCalcTributs(
-        {
-          baseCalculo: Number(baseCalculo),
-          irPercente: Number(irPercente),
-          irValor: Number(irValor),
-          valorISS: Number(valorISS),
-          aliquotaIss: Number(aliquotaIss),
-          taxaExp: Number(taxaExp)
-        },
-        false
-      );
-    } else {
-      handleLiquidToGross(valueFormOriginTributos);
-    }
-  };
-
-  const handleSaveNFSA = () => {
-    const { idPrestador, idTomador } = participantes;
-    if (actionFormNFSA !== 'edit') {
-      serviceSaveNFSA(
-        valueFormItems,
-        { ...valueFormTributos, idPrestador, idTomador },
-        valuesFormDocumento
-      );
-    } else {
-      serviceEditNFSA(
-        valueFormItems,
-        { ...valueFormTributos, idPrestador, idTomador },
-        { ...valuesFormDocumento, id: dataLoadNFSA.dam.id },
-        dataLoadNFSA.id
-      );
-    }
-  };
-
-  const handleEditNFSA = () => {
-    handleOpenNewNfsa(true);
-    setReviewShow(false);
-    setActionFormNFSA('edit');
-  };
-
-  const handleCopyNFSA = () => {
-    handleOpenNewNfsa(true);
-    setReviewShow(false);
-    setActionFormNFSA('copy');
-
-    // remove o id da lista dos itens para serem adicionados como novo item.
-    setValuesFormItems((item) => {
-      const newItem = item.map((value) => {
-        const { descricao, quantidade, valor } = value;
+    case ACTIONS.MODAL_NEW:
+      // executes when the modal closes to clear data
+      if (state.showModalNewNfsa) {
         return {
-          descricao,
-          quantidade,
-          valor
+          taxpayerSeleted: {},
+          dataNfsa: {},
+          activeStep: 0,
+          document: {},
+          editNfsa: false,
+          showModalDetails: false,
+          showModalNewNfsa: false
         };
-      });
-      return newItem;
-    });
-  };
+      }
+      return {
+        ...state,
+        showModalNewNfsa: true
+      };
+    case ACTIONS.PARAMS_QUERY:
+      return {
+        ...state,
+        paramsQuery: action.payload
+      };
+    default:
+      return state;
+  }
+};
 
-  const { convertLiquid } = valueFormTributos;
+export default function NfsaProvider({ children }) {
+  const [state, dispatch] = useReducer(nfsaContextReducer, STATE_INITIAL);
+
   return (
-    <NfsaContext.Provider
-      value={{
-        handleSelecetedNfsa,
-        setReviewShow,
-        handleCloseNewNfsa,
-        setParticipantes,
-        handleAddItem,
-        handleCalculationBasis,
-        handleSaveNFSA,
-        setValueFormOriginTributos,
-        handleEditNFSA,
-        handleCopyNFSA,
-        actionFormNFSA,
-        handleAlterStatusDAM: false,
-        responseStatusDam,
-        participantes,
-        convertLiquid,
-        valueFormItems,
-        valueFormTributos,
-        valuesFormDocumento,
-        listNfsa,
-        showNewNfsa,
-        itensSkeletron,
-        valueTotal,
-        showReview,
-        insertedNFSA,
-        updateNFSA,
-        dataLoadNFSA
-      }}>
+    <NfsaContext.Provider value={{ state, dispatch }}>
       {children}
     </NfsaContext.Provider>
   );
 }
-
-const mapStateToProps = (state) => ({
-  listNfsa: state.nfsa.listNfsa,
-  insertedNFSA: state.nfsa.newNFSA,
-  updateNFSA: state.nfsa.updateNFSA,
-
-  valueTotal: state.nfsa.listNfsa.reduce(
-    (acc, act) => acc + Number(act.valor_nota),
-    0
-  ),
-  errorNFSA: state.nfsa.error,
-  listContribuinte: state.contribuinte.listContribuinte,
-
-  valuesFormDocumento: state.form.documento,
-  calculatedTaxes: state.form.tributos
-});
-
-const mapDispatchToProps = (dispatch) =>
-  bindActionCreators(
-    {
-      requestNfsa,
-      saveNFSA,
-      editNFSA,
-      requestContribuinte,
-      cleanDataContribuinte,
-      calcTributsNFSA,
-      liquidToGrossNFSA
-    },
-    dispatch
-  );
-
-export default connect(mapStateToProps, mapDispatchToProps)(NfsaProvider);

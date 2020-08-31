@@ -68,7 +68,7 @@ function NewAlvara() {
             </Button>
           </Toolbar>
         </AppBar>
-        {/* component new DAM */}
+        {/* component new Alvara */}
         <StepComponent />
       </Dialog>
       {/* Cadastro do contribuinte */}

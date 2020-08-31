@@ -1,58 +1,56 @@
 import React, { useState } from 'react';
-import { Grid, Fab, Box } from '@material-ui/core';
-import { Add as AddIcon } from '@material-ui/icons';
+import { Grid, Box } from '@material-ui/core';
 
 import { NfsaProvider } from '../../contexts';
-import { TableNfsa, ModalDetailsNfsa } from './components';
-import { HeaderContainerReceita } from '../../components';
+import {
+  TableNfsa,
+  ModalDetailsNfsa,
+  Header,
+  Filtros,
+  NewNfsa
+} from './components';
 import useStyles from './styles';
 import CardNfsa from './components/CardNfsa/CardNfsa';
-import NewNfsa from './components/NewNfsa/NewNfsa';
+import { useNfsa } from '../../hooks';
 
 const Nfsa = () => {
+  useNfsa();
   const classes = useStyles();
   const [viewTable, setViewTable] = useState(false);
-  const [showNewNfsa, setNewNfsa] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [openFilter, setOpenFilter] = useState(false);
 
   // ctrl+espaço => nova nfsa
-  document.addEventListener('keydown', (event) => {
+  /* document.addEventListener('keydown', (event) => {
     if (event.ctrlKey && event.keyCode === 32) {
       setNewNfsa(true);
     }
-  });
+  }); */
 
   return (
-    <div className={classes.root}>
-      <NfsaProvider handleOpenNewNfsa={setNewNfsa} openNewNfsa={showNewNfsa}>
+    <NfsaProvider>
+      <div className={classes.root}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Box displayPrint="none">
-              <HeaderContainerReceita
-                handleVielTable={() => setViewTable((prev) => !prev)}
-                handleViewFilter={() => console.log('OK')}
-                ValueTotal={345}
-                setParams={() => console.log('OK')}
+              <Header
+                handleViewTable={() => setViewTable((prev) => !prev)}
+                handleViewFilter={() => setOpenFilter((prev) => !prev)}
               />
             </Box>
           </Grid>
           <Grid item xs={12}>
-            {!viewTable && <CardNfsa />}
-            {viewTable && <TableNfsa />}
+            {!viewTable ? <CardNfsa /> : <TableNfsa />}
           </Grid>
         </Grid>
         <ModalDetailsNfsa />
         <NewNfsa />
-      </NfsaProvider>
-      <Box displayPrint="none" className={classes.fab}>
-        <Fab
-          color="primary"
-          size="medium"
-          aria-label="add"
-          onClick={() => setNewNfsa((show) => !show)}>
-          <AddIcon />
-        </Fab>
-      </Box>
-    </div>
+        <Filtros
+          showFiltro={openFilter}
+          handleSair={() => setOpenFilter(false)}
+        />
+      </div>
+    </NfsaProvider>
   );
 };
 

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import {
   Card,
@@ -9,18 +9,101 @@ import {
   CardHeader,
   CardActionArea
 } from '@material-ui/core';
+import InfiniteScroll from 'react-infinite-scroller';
 
-import { NfsaContext } from '../../../../contexts';
-import { useStyles, useStylesCancelado } from './styles';
+import {
+  useStyles,
+  useStylesCancelado,
+  useStylesPago,
+  useStylesVencido
+} from './styles';
 import { CardSkeletron } from '../../../../components';
+import { useStoreNfsa, usePaginationNfsa } from '../../../../hooks';
+
+const classValueTotal = (
+  status,
+  classesPago,
+  classesCancelado,
+  classesVencido,
+  classes
+) => {
+  switch (status) {
+    case 'Pago':
+      return classesPago.differenceValue;
+    case 'Cancelado':
+      return classesCancelado.differenceValue;
+    case 'Inadimplente':
+      return classesVencido.differenceValue;
+    default:
+      return classes.differenceValue;
+  }
+};
+
+const classAvatar = (
+  status,
+  classesPago,
+  classesCancelado,
+  classesVencido,
+  classes
+) => {
+  switch (status) {
+    case 'Pago':
+      return classesPago.avatar;
+    case 'Cancelado':
+      return classesCancelado.avatar;
+    case 'Inadimplente':
+      return classesVencido.avatar;
+    default:
+      return classes.avatar;
+  }
+};
+
+const classCaption = (status, emissao, vencimento, days) => {
+  switch (status) {
+    case 'Pago':
+      return `Pago em ${Intl.DateTimeFormat('pt-BR').format(
+        new Date(emissao)
+      )}`;
+    case 'Cancelado':
+      return `Cancelado`;
+    case 'Inadimplente':
+      return `${days} dia(s) de atraso ${Intl.DateTimeFormat('pt-BR', {
+        timeZone: 'UTC'
+      }).format(new Date(vencimento))}`;
+    default:
+      // eslint-disable-next-line no-case-declarations
+      let msgVencimento = '';
+      if (days > 0) {
+        msgVencimento = `${days} dia(s) para vencer ${Intl.DateTimeFormat(
+          'pt-BR',
+          {
+            timeZone: 'UTC'
+          }
+        ).format(new Date(vencimento))}`;
+      } else {
+        msgVencimento = `Vence hoje ${Intl.DateTimeFormat('pt-BR', {
+          timeZone: 'UTC'
+        }).format(new Date(vencimento))}`;
+      }
+      return msgVencimento;
+  }
+};
 
 function CardNfsa() {
-  const { listNfsa, itensSkeletron, handleSelecetedNfsa } = useContext(
-    NfsaContext
-  );
+  // eslint-disable-next-line no-unused-vars
+  const [listNfsa, valueTotal, setSelecetNfsa] = useStoreNfsa();
+  const [pagination, setPagination] = usePaginationNfsa();
+
   const classes = useStyles();
+  const classesPago = useStylesPago();
   const classesCancelado = useStylesCancelado();
-  console.count('card');
+  const classesVencido = useStylesVencido();
+
+  function handlePagination(currentPage) {
+    setPagination({
+      page: currentPage + 1
+    });
+  }
 
   const CardView = () => {
     return (
@@ -31,16 +114,18 @@ function CardNfsa() {
               className={
                 nfsa.status ? classesCancelado.root : clsx(classes.root)
               }>
-              <CardActionArea onClick={() => handleSelecetedNfsa(nfsa)}>
+              <CardActionArea onClick={() => setSelecetNfsa(nfsa)}>
                 <CardHeader
                   avatar={
                     <Avatar
                       aria-label="recipe"
-                      className={
-                        nfsa.dam.status
-                          ? classes.avatar
-                          : classesCancelado.avatar
-                      }>
+                      className={classAvatar(
+                        nfsa.dam.status,
+                        classesPago,
+                        classesCancelado,
+                        classesVencido,
+                        classes
+                      )}>
                       {nfsa.id}
                     </Avatar>
                   }
@@ -77,11 +162,12 @@ function CardNfsa() {
                   <div className={classes.difference}>
                     <Typography className={classes.caption} variant="caption">
                       {'DAM '}
-                      {nfsa.dam.pago && nfsa.dam.status
-                        ? 'Pago'
-                        : nfsa.dam.status
-                          ? 'Ativo'
-                          : 'Cancelado'}
+                      {classCaption(
+                        nfsa.dam.status,
+                        nfsa.dam.emissao,
+                        nfsa.dam.vencimento,
+                        nfsa.dam.dias_vencimento
+                      )}
                     </Typography>
                     <Typography
                       variant="h5"
@@ -98,11 +184,13 @@ function CardNfsa() {
                     </Typography>
                     <Typography
                       variant="h5"
-                      className={
-                        nfsa.dam.status
-                          ? classes.differenceValue
-                          : classesCancelado.differenceValue
-                      }>
+                      className={classValueTotal(
+                        nfsa.dam.status,
+                        classesPago,
+                        classesCancelado,
+                        classesVencido,
+                        classes
+                      )}>
                       {`Valor líquido: `}
                       {new Intl.NumberFormat('pt-BR', {
                         style: 'currency',
@@ -120,13 +208,25 @@ function CardNfsa() {
   };
 
   return (
-    <Grid container justify="space-between" spacing={3}>
-      {listNfsa.length > 0 ? (
-        <CardView />
-      ) : (
-          <CardSkeletron quantSkeletron={itensSkeletron} />
-        )}
-    </Grid>
+    <InfiniteScroll
+      useWindow
+      pageStart={0}
+      hasMore={pagination.current_page < pagination.last_page}
+      loadMore={handlePagination}
+      loader={
+        <Grid
+          container
+          justify="space-between"
+          spacing={3}
+          key={0}
+          style={{ marginTop: 13 }}>
+          <CardSkeletron length={4} />
+        </Grid>
+      }>
+      <Grid container justify="space-between" spacing={3}>
+        {listNfsa.length > 0 ? <CardView /> : <CardSkeletron length={10} />}
+      </Grid>
+    </InfiniteScroll>
   );
 }
 

@@ -8,7 +8,11 @@ import {
   Grid
 } from '@material-ui/core';
 
-import { ButtonStep, MenuDocumentEvents } from '../../../../components';
+import {
+  ButtonStep,
+  MenuDocumentEvents,
+  ModalSave
+} from '../../../../components';
 import useStyles from './styles';
 import {
   useSaveAlvara,
@@ -17,7 +21,6 @@ import {
   useStepAlvara
 } from '../../../../hooks';
 import { AlvaraFuncionamentoContext } from '../../../../contexts';
-import ModalSave from '../../../../components/ModalSave/ModalSave';
 
 export default function Preview() {
   const {
@@ -27,7 +30,6 @@ export default function Preview() {
       editAlvaraFuncionamento
     }
   } = useContext(AlvaraFuncionamentoContext);
-  console.table([idDam, dam]);
 
   const classes = useStyles();
   const [openModalMenu, setOpenModalMenu] = useState(false);

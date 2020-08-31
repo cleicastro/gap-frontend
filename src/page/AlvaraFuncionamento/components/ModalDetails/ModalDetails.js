@@ -17,8 +17,7 @@ import {
   ACTIONS_ALVARA,
   AlvaraFuncionamentoContext
 } from '../../../../contexts';
-import { MenuDocumentEvents } from '../../../../components';
-import ModalSave from '../../../../components/ModalSave/ModalSave';
+import { MenuDocumentEvents, ModalSave } from '../../../../components';
 import { useSaveAlvara, useOpenNewAlvara } from '../../../../hooks';
 
 function ModalDetails() {

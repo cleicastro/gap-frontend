@@ -1,3 +1,10 @@
 export { default as TableNfsa } from './TableNfsa';
 export { default as PreviewNfsa } from './PreviewNfsa';
 export { default as ModalDetailsNfsa } from './ModalDetailsNfsa';
+export { default as Filtros } from './Filtros';
+export { default as Header } from './Header';
+export { default as NewNfsa } from './NewNfsa';
+export { default as FormParticipantes } from './FormParticipantes';
+export { default as FormDocumento } from './FormDocumento';
+export { default as FormTributos } from './FormTributos';
+export { default as FormItems } from './FormItems';

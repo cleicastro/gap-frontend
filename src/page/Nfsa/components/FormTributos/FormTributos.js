@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React from 'react';
 import {
   Typography,
   Grid,
@@ -11,97 +11,68 @@ import {
   InputAdornment
 } from '@material-ui/core';
 
-import CircularProgress from '@material-ui/core/CircularProgress';
 import { useForm } from 'react-hook-form';
-import { NfsaContext } from '../../contexts';
 
-import ButtonStep from '../ButtonStep';
+import { ButtonStep } from '../../../../components';
+import { useStepNfsa, useInitialTributosNfsa } from '../../../../hooks';
 
-function FormTributos({ steps, activeStep, setActiveStep }) {
-  const {
-    handleCalculationBasis,
-    valueFormTributos,
-    convertLiquid
-  } = useContext(NfsaContext);
-
-  const [selectConvertIRRF, setSelectConvertIRRF] = useState(
-    convertLiquid || false
-  );
-  const [selectIrrfRetido, setSelectIrrfRetido] = useState(
-    valueFormTributos.irRetido || true
-  );
-  const [isLoading, setIsLoading] = useState(true);
-
-  const { control, register, handleSubmit, setValue, getValues } = useForm({
-    defaultValues: valueFormTributos
+function FormTributos() {
+  const [stepActivity, setStepActivity] = useStepNfsa();
+  const [tributos, setTributos, setConvertToLiquid] = useInitialTributosNfsa();
+  const { control, register, handleSubmit, setValue, watch } = useForm({
+    defaultValues: tributos
   });
 
-  useEffect(() => {
-    Object.keys(valueFormTributos).map((key) =>
-      setValue(`${key}`, valueFormTributos[key])
-    );
-    if (valueFormTributos.baseCalculo > 0) {
-      setIsLoading(false);
-    }
-  }, [valueFormTributos, setValue]);
-
-  const handleConvertIRRF = (event) => {
-    setIsLoading(true);
-    const selectedConverter = event.target.checked;
-    const {
-      aliquotaIss,
-      irPercente,
-      baseCalculo,
-      irValor,
-      valorISS
-    } = valueFormTributos;
-    handleCalculationBasis(
-      {
-        baseCalculo,
-        aliquotaIss,
-        valorISS,
-        irPercente,
-        irValor,
-        irRetido: selectIrrfRetido,
-        convertLiquid: selectConvertIRRF
-      },
-      selectedConverter
-    );
-    setSelectConvertIRRF(selectedConverter);
+  const setValueProcessed = (baseValue) => {
+    setValue('baseCalculo', baseValue.baseCalculo);
+    setValue('irAliquota', baseValue.irAliquota);
+    setValue('irValor', baseValue.irValor);
+    setValue('valorDeducao', baseValue.valorDeducao);
+    setValue('irPercente', baseValue.irPercente);
+    setValue('valorISS', baseValue.valorISS);
+    setValue('taxaExp', baseValue.taxaExp);
+    setValue('valorNF', baseValue.valorNF);
+    setValue('pisPercente', baseValue.pisPercente);
+    setValue('pisValor', baseValue.pisValor);
+    setValue('inssPercente', baseValue.inssPercente);
+    setValue('inssValor', baseValue.inssValor);
+    setValue('confinsPercente', baseValue.confinsPercente);
+    setValue('confisValor', baseValue.confisValor);
+    setValue('csllPercente', baseValue.csllPercente);
+    setValue('csllValor', baseValue.csllValor);
+    setValue('irValorView', baseValue.irValor);
   };
 
-  const handleIrrfRetido = (event) => {
-    const selectedIRRFRetido = event.target.checked;
-    if (!selectedIRRFRetido) {
-      const resultCalcutedIRRF =
-        Number(getValues('valorNF')) + Number(getValues('irValor'));
-      setValue('valorNF', resultCalcutedIRRF.toFixed(2));
-      setValue('irValor', 0.0);
-      setValue('irPercente', 0.0);
-      setValue('valorDeducao', 0.0);
+  const handlePrevStep = () => setStepActivity(stepActivity - 1);
+
+  const handleConvertToLiquid = (event) => {
+    const { checked } = event.target;
+    if (checked) {
+      const convertToLiquid = setConvertToLiquid();
+      setValueProcessed(convertToLiquid);
     } else {
-      const { valorNF, irValor, irPercente, valorDeducao } = valueFormTributos;
-
-      setValue('valorNF', valorNF);
-      setValue('irValor', irValor);
-      setValue('irPercente', irPercente);
-      setValue('valorDeducao', valorDeducao);
+      setValueProcessed(tributos);
     }
-    setSelectIrrfRetido(selectedIRRFRetido);
+  };
+  const handleIrrRetido = (event) => {
+    const { checked } = event.target;
+    if (!checked) {
+      const nothingIr = setTributos({ ...tributos, irRetido: false });
+      setValueProcessed(nothingIr);
+    } else if (watch('converterIRRF')) {
+      const convertToLiquid = setConvertToLiquid();
+      setValueProcessed(convertToLiquid);
+    } else {
+      setValueProcessed(tributos);
+    }
   };
 
-  const handleNext = () => {
-    setActiveStep(activeStep + 1);
+  const onSubmit = (data) => {
+    setStepActivity(stepActivity + 1);
+    console.log(data);
   };
-
-  const handleBack = () => {
-    setActiveStep(activeStep - 1);
-  };
-
-  const onSubmit = (data) => console.log(data);
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} noValidate autoComplete="off">
       <Grid container direction="column" spacing={4}>
         <Grid item xs={12} sm={12}>
           <Paper elevation={3} style={{ padding: 20 }}>
@@ -109,7 +80,7 @@ function FormTributos({ steps, activeStep, setActiveStep }) {
               Incidência do Imposto
             </Typography>
             <Grid container spacing={3}>
-              <Grid item xs={6} sm={4}>
+              <Grid item xs={6} sm={3}>
                 <TextField
                   inputRef={register}
                   control={control}
@@ -158,11 +129,12 @@ function FormTributos({ steps, activeStep, setActiveStep }) {
         <Grid item xs={12} sm={12}>
           <Paper elevation={3} style={{ padding: 20 }}>
             <FormControlLabel
-              disabled={!valueFormTributos.baseCalculo > 0}
+              disabled={!watch('irRetido')}
               control={
                 <Switch
-                  checked={selectConvertIRRF}
-                  onChange={handleConvertIRRF}
+                  defaultChecked={tributos && tributos.converterIRRF}
+                  onChange={handleConvertToLiquid}
+                  inputRef={register}
                   name="converterIRRF"
                   color="primary"
                 />
@@ -180,12 +152,7 @@ function FormTributos({ steps, activeStep, setActiveStep }) {
                   }}
                   InputProps={{
                     startAdornment: (
-                      <InputAdornment position="start">
-                        {isLoading && (
-                          <CircularProgress disableShrink size={16} />
-                        )}
-                        {!isLoading && 'R$'}
-                      </InputAdornment>
+                      <InputAdornment position="start">R$</InputAdornment>
                     )
                   }}
                   required
@@ -205,12 +172,7 @@ function FormTributos({ steps, activeStep, setActiveStep }) {
                   }}
                   InputProps={{
                     startAdornment: (
-                      <InputAdornment position="start">
-                        {isLoading && (
-                          <CircularProgress disableShrink size={16} />
-                        )}
-                        {!isLoading && 'R$'}
-                      </InputAdornment>
+                      <InputAdornment position="start">R$</InputAdornment>
                     )
                   }}
                   required
@@ -230,12 +192,7 @@ function FormTributos({ steps, activeStep, setActiveStep }) {
                   }}
                   InputProps={{
                     startAdornment: (
-                      <InputAdornment position="start">
-                        {isLoading && (
-                          <CircularProgress disableShrink size={16} />
-                        )}
-                        {!isLoading && 'R$'}
-                      </InputAdornment>
+                      <InputAdornment position="start">R$</InputAdornment>
                     )
                   }}
                   required
@@ -255,12 +212,7 @@ function FormTributos({ steps, activeStep, setActiveStep }) {
                   }}
                   InputProps={{
                     startAdornment: (
-                      <InputAdornment position="start">
-                        {isLoading && (
-                          <CircularProgress disableShrink size={16} />
-                        )}
-                        {!isLoading && 'R$'}
-                      </InputAdornment>
+                      <InputAdornment position="start">R$</InputAdornment>
                     )
                   }}
                   required
@@ -280,12 +232,7 @@ function FormTributos({ steps, activeStep, setActiveStep }) {
                   }}
                   InputProps={{
                     startAdornment: (
-                      <InputAdornment position="start">
-                        {isLoading && (
-                          <CircularProgress disableShrink size={16} />
-                        )}
-                        {!isLoading && 'R$'}
-                      </InputAdornment>
+                      <InputAdornment position="start">R$</InputAdornment>
                     )
                   }}
                   required
@@ -302,11 +249,11 @@ function FormTributos({ steps, activeStep, setActiveStep }) {
         <Grid item xs={12} sm={12}>
           <Paper elevation={3} style={{ padding: 20 }}>
             <FormControlLabel
-              disabled={!valueFormTributos.baseCalculo > 0}
               control={
                 <Switch
-                  checked={selectIrrfRetido}
-                  onChange={handleIrrfRetido}
+                  defaultChecked={tributos && tributos.irRetido}
+                  onChange={handleIrrRetido}
+                  inputRef={register}
                   name="irRetido"
                   color="primary"
                 />
@@ -314,52 +261,85 @@ function FormTributos({ steps, activeStep, setActiveStep }) {
               label="IRRF Retido?"
             />
             <Grid container spacing={3} direction="row">
-              <Grid item xs={6} sm={4}>
-                <Grid item xs={12} sm={12}>
-                  <Typography variant="h6" gutterBottom align="center">
-                    IR
-                  </Typography>
-                </Grid>
+              <Grid item sm={12}>
                 <Grid
                   container
                   justify="space-between"
                   direction="row"
                   spacing={1}>
-                  <Grid item xs={6} sm={6}>
-                    <FormControl>
-                      <Input
-                        name="irPercente"
-                        type="number"
-                        inputRef={register}
-                        disabled
-                        endAdornment={
-                          <InputAdornment position="start">
-                            {isLoading && (
-                              <CircularProgress disableShrink size={16} />
-                            )}
-                            {!isLoading && '%'}
-                          </InputAdornment>
-                        }
-                      />
-                    </FormControl>
+                  <Grid item xs={6} sm={3}>
+                    <TextField
+                      fullWidth
+                      label="Alíquota do ISS: (%)"
+                      name="irPercente"
+                      type="number"
+                      inputRef={register}
+                      disabled
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="start">%</InputAdornment>
+                        )
+                      }}
+                    />
                   </Grid>
-                  <Grid item xs={6} sm={6}>
-                    <FormControl>
-                      <Input
-                        name="valorDeducao"
-                        type="number"
-                        inputRef={register}
-                        disabled
-                        startAdornment={
+                  <Grid item xs={6} sm={3}>
+                    <TextField
+                      fullWidth
+                      label="IR"
+                      name="irAliquota"
+                      type="number"
+                      inputRef={register}
+                      disabled
+                      InputProps={{
+                        startAdornment: (
                           <InputAdornment position="start">R$</InputAdornment>
-                        }
-                      />
-                    </FormControl>
+                        )
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={6} sm={3}>
+                    <TextField
+                      fullWidth
+                      label="Dedução"
+                      name="valorDeducao"
+                      type="number"
+                      inputRef={register}
+                      disabled
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">R$</InputAdornment>
+                        )
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={6} sm={3}>
+                    <TextField
+                      fullWidth
+                      label="Valor do IR"
+                      type="number"
+                      inputRef={register}
+                      disabled
+                      name="irValorView"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">R$</InputAdornment>
+                        )
+                      }}
+                    />
                   </Grid>
                 </Grid>
               </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
 
-              <Grid item xs={6} sm={4}>
+        <Grid item xs={12} sm={12}>
+          <Paper elevation={3} style={{ padding: 20 }}>
+            <Typography variant="h6" gutterBottom>
+              Tributos
+            </Typography>
+            <Grid container spacing={3} direction="row">
+              <Grid item xs={6} sm={3}>
                 <Grid item xs={12} sm={12}>
                   <Typography variant="h6" gutterBottom align="center">
                     PIS
@@ -378,12 +358,7 @@ function FormTributos({ steps, activeStep, setActiveStep }) {
                         inputRef={register}
                         disabled
                         endAdornment={
-                          <InputAdornment position="start">
-                            {isLoading && (
-                              <CircularProgress disableShrink size={16} />
-                            )}
-                            {!isLoading && '%'}
-                          </InputAdornment>
+                          <InputAdornment position="start">%</InputAdornment>
                         }
                       />
                     </FormControl>
@@ -404,7 +379,7 @@ function FormTributos({ steps, activeStep, setActiveStep }) {
                 </Grid>
               </Grid>
 
-              <Grid item xs={6} sm={4}>
+              <Grid item xs={6} sm={3}>
                 <Grid item xs={12} sm={12}>
                   <Typography variant="h6" gutterBottom align="center">
                     INSS
@@ -423,12 +398,7 @@ function FormTributos({ steps, activeStep, setActiveStep }) {
                         inputRef={register}
                         disabled
                         endAdornment={
-                          <InputAdornment position="start">
-                            {isLoading && (
-                              <CircularProgress disableShrink size={16} />
-                            )}
-                            {!isLoading && '%'}
-                          </InputAdornment>
+                          <InputAdornment position="start">%</InputAdornment>
                         }
                       />
                     </FormControl>
@@ -449,7 +419,7 @@ function FormTributos({ steps, activeStep, setActiveStep }) {
                 </Grid>
               </Grid>
 
-              <Grid item xs={6} sm={4}>
+              <Grid item xs={6} sm={3}>
                 <Grid item xs={12} sm={12}>
                   <Typography variant="h6" gutterBottom align="center">
                     CONFINS
@@ -468,12 +438,7 @@ function FormTributos({ steps, activeStep, setActiveStep }) {
                         inputRef={register}
                         disabled
                         endAdornment={
-                          <InputAdornment position="start">
-                            {isLoading && (
-                              <CircularProgress disableShrink size={16} />
-                            )}
-                            {!isLoading && '%'}
-                          </InputAdornment>
+                          <InputAdornment position="start">%</InputAdornment>
                         }
                       />
                     </FormControl>
@@ -494,7 +459,7 @@ function FormTributos({ steps, activeStep, setActiveStep }) {
                 </Grid>
               </Grid>
 
-              <Grid item xs={6} sm={4}>
+              <Grid item xs={6} sm={3}>
                 <Grid item xs={12} sm={12}>
                   <Typography variant="h6" gutterBottom align="center">
                     CSLL
@@ -513,12 +478,7 @@ function FormTributos({ steps, activeStep, setActiveStep }) {
                         inputRef={register}
                         disabled
                         endAdornment={
-                          <InputAdornment position="start">
-                            {isLoading && (
-                              <CircularProgress disableShrink size={16} />
-                            )}
-                            {!isLoading && '%'}
-                          </InputAdornment>
+                          <InputAdornment position="start">%</InputAdornment>
                         }
                       />
                     </FormControl>
@@ -542,14 +502,7 @@ function FormTributos({ steps, activeStep, setActiveStep }) {
           </Paper>
         </Grid>
       </Grid>
-      <ButtonStep
-        steps={steps}
-        activeStep={activeStep}
-        handleNext={handleNext}
-        handleBack={handleBack}
-        disabledNext={isLoading}
-        disabledBack={isLoading}
-      />
+      <ButtonStep handlePrevStep={handlePrevStep} />
     </form>
   );
 }

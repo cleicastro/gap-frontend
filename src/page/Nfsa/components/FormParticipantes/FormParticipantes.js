@@ -1,128 +1,83 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useContext } from 'react';
 import { Typography, Grid, TextField } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
 import { useForm } from 'react-hook-form';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 
-import Axios from 'axios';
-import {
-  requestContribuinte,
-  cleanDataContribuinte
-} from '../../store/contribuinteReducer';
-import { NfsaContext } from '../../contexts';
-import ButtonStep from '../ButtonStep';
+import ButtonStep from '../../../../components/ButtonStep';
+import { useStepNfsa, useContribuinte } from '../../../../hooks';
+import { NfsaContext, ACTIONS_NFSA } from '../../../../contexts';
 
-function FormParticipantes(props) {
+function FormParticipantes() {
   const {
-    requestContribuinte: handleRequestContribuinte,
-    cleanDataContribuinte: handleCleanContribuinte,
-    listContribuinte,
-    steps,
-    activeStep,
-    setActiveStep
-  } = props;
-  const { participantes, setParticipantes } = useContext(NfsaContext);
+    state: { taxpayerSeleted },
+    dispatch
+  } = useContext(NfsaContext);
+  const [stepActivity, setStepActivity] = useStepNfsa();
 
-  const { control, register, handleSubmit, setValue, getValues } = useForm({
-    defaultValues: { ...participantes }
-  });
-
-  const [paramsPrestador, setParamsPrestador] = useState({});
-  const [paramsTomador, setParamsTomador] = useState({});
-  const [idPrestador, setIdPrestador] = useState(
-    participantes.idPrestador || null
-  );
-  const [idTomador, setIdTomador] = useState(participantes.idTomador || null);
-
-  const [listAutoCompletePrestador, setListAutoCompletePrestador] = useState(
-    []
-  );
-  const [listAutoCompleteTomador, setListAutoCompleteTomador] = useState([]);
-
-  useEffect(() => {
-    const tokenPrestador = Axios.CancelToken.source();
-    function requestContribuinteSelect(paramsBusca, tokenRequest) {
-      handleRequestContribuinte(
-        {
-          contribuinte: paramsBusca,
-          limit: 1000,
-          order: 'nome',
-          sort: true
-        },
-        tokenRequest.token
-      );
-    }
-    if (paramsPrestador.length === 6 && paramsPrestador.length > 0) {
-      requestContribuinteSelect(paramsPrestador, tokenPrestador);
-    }
-
-    return () => {
-      tokenPrestador.cancel('Request cancell');
-    };
-  }, [handleRequestContribuinte, paramsPrestador]);
-
-  useEffect(() => {
-    const tokenTomador = Axios.CancelToken.source();
-    function requestContribuinteSelect(paramsBusca, tokenRequest) {
-      handleRequestContribuinte(
-        {
-          contribuinte: paramsBusca,
-          limit: 1000,
-          order: 'nome',
-          sort: true
-        },
-        tokenRequest.token
-      );
-    }
-    if (paramsTomador.length === 6 && paramsTomador.length > 0) {
-      requestContribuinteSelect(paramsTomador, tokenTomador);
-    }
-
-    return () => {
-      tokenTomador.cancel('Request cancell');
-    };
-  }, [handleRequestContribuinte, paramsTomador]);
-
-  useEffect(() => {
-    setListAutoCompletePrestador(listContribuinte);
-    setListAutoCompleteTomador(listContribuinte);
-  }, [listContribuinte]);
-
-  const handlePrestador = (data) => {
-    Object.keys(data).map((key) => setValue(`${key}Prestador`, data[key]));
-    setIdPrestador(data.id);
-    setListAutoCompletePrestador([]);
-  };
-  const handleTomador = (data) => {
-    Object.keys(data).map((key) => setValue(`${key}Tomador`, data[key]));
-    setIdTomador(data.id);
-    setListAutoCompleteTomador([]);
-  };
-
-  const handleNext = () => {
-    setActiveStep(activeStep + 1);
-    setParticipantes({ ...getValues(), idPrestador, idTomador });
-    handleCleanContribuinte();
-  };
-
-  const handleBack = () => {
-    setActiveStep(activeStep - 1);
-    setParticipantes({ ...getValues(), idPrestador, idTomador });
-    handleCleanContribuinte();
-  };
-
-  document.addEventListener('keydown', (event) => {
-    if (event.ctrlKey && event.keyCode === 39 && (idPrestador || idTomador)) {
-      setParticipantes({ ...getValues(), idPrestador, idTomador });
-      setActiveStep(activeStep + 1);
+  const { register, handleSubmit, setValue } = useForm({
+    defaultValues: taxpayerSeleted.length > 0 && {
+      docPrestador: taxpayerSeleted?.prestador.docPrestador,
+      nomePrestador: taxpayerSeleted?.prestador.nomePrestador,
+      enderecoPrestador: taxpayerSeleted?.prestador.enderecoPrestador,
+      cidadePrestador: taxpayerSeleted?.prestador.cidadePrestador,
+      ufPrestador: taxpayerSeleted?.prestador.ufPrestador,
+      cepPrestador: taxpayerSeleted?.prestador.cepPrestador,
+      bairroPrestador: taxpayerSeleted?.prestador.bairroPrestador,
+      docTomador: taxpayerSeleted?.tomador.docTomador,
+      nomeTomador: taxpayerSeleted?.tomador.nomeTomador,
+      enderecoTomador: taxpayerSeleted?.tomador.enderecoTomador,
+      cidadeTomador: taxpayerSeleted?.tomador.cidadeTomador,
+      ufTomador: taxpayerSeleted?.tomador.ufTomador,
+      cepTomador: taxpayerSeleted?.tomador.cepTomador,
+      bairroTomador: taxpayerSeleted?.tomador.cepTomador
     }
   });
+  const [listPrestador, setPrestador] = useContribuinte();
+  const [listTomador, setTomador] = useContribuinte();
 
-  const onSubmit = (data) => console.log(data);
+  function handleParamsPrestador(params) {
+    if (params.length > 5 && params.length > 0) {
+      setPrestador(params);
+    }
+  }
+  function handleParamsTomador(params) {
+    if (params.length > 5 && params.length > 0) {
+      setTomador(params);
+    }
+  }
+  const handleInputPrestador = (values) => {
+    dispatch({
+      type: ACTIONS_NFSA.SELECT_TAXPAYER,
+      payload: { prestador: values }
+    });
+    setValue('docPrestador', values.doc);
+    setValue('nomePrestador', values.nome);
+    setValue('enderecoPrestador', values.endereco);
+    setValue('cidadePrestador', values.cidade);
+    setValue('ufPrestador', values.uf);
+    setValue('cepPrestador', values.cep);
+    setValue('bairroPrestador', values.bairro);
+  };
+  const handleInputTomador = (values) => {
+    dispatch({
+      type: ACTIONS_NFSA.SELECT_TAXPAYER,
+      payload: { tomador: values }
+    });
+    setValue('docTomador', values.doc);
+    setValue('nomeTomador', values.nome);
+    setValue('enderecoTomador', values.endereco);
+    setValue('cidadeTomador', values.cidade);
+    setValue('ufTomador', values.uf);
+    setValue('cepTomador', values.cep);
+    setValue('bairroTomador', values.bairro);
+  };
+
+  const handleSelectContribuinte = () => {
+    setStepActivity(stepActivity + 1);
+  };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(handleSelectContribuinte)}>
       <Grid container justify="space-between" direction="row" spacing={4}>
         <Grid item xs={6} sm={6}>
           <Typography variant="h6" gutterBottom>
@@ -132,23 +87,25 @@ function FormParticipantes(props) {
             <Grid item xs={12} sm={12}>
               <Autocomplete
                 onChange={(event, value) =>
-                  value !== null && handlePrestador(value)
+                  value !== null && handleInputPrestador(value)
                 }
                 name="prestador"
-                options={listAutoCompletePrestador}
+                options={listPrestador}
                 getOptionLabel={(option) => `${option.doc}-${option.nome}`}
                 includeInputInList
-                loading={listContribuinte.length > 0}
+                loading={listPrestador.length > 0}
                 renderInput={(param) => (
                   <TextField
                     {...param}
                     autoFocus
-                    onChange={(event) => setParamsPrestador(event.target.value)}
+                    onChange={(event) =>
+                      handleParamsPrestador(event.target.value)
+                    }
                     id="prestador"
                     name="prestador"
                     label={
-                      listAutoCompletePrestador.length > 1
-                        ? `${listAutoCompletePrestador.length} Prestador, selecione um.`
+                      listPrestador.length > 1
+                        ? `${listPrestador.length} Prestador, selecione um.`
                         : 'Prestador'
                     }
                     margin="normal"
@@ -161,7 +118,6 @@ function FormParticipantes(props) {
             <Grid item xs={12} sm={4}>
               <TextField
                 inputRef={register}
-                control={control}
                 InputLabelProps={{
                   shrink: true
                 }}
@@ -175,7 +131,6 @@ function FormParticipantes(props) {
             <Grid item xs={12} sm={8}>
               <TextField
                 inputRef={register}
-                control={control}
                 InputLabelProps={{
                   shrink: true
                 }}
@@ -189,7 +144,6 @@ function FormParticipantes(props) {
             <Grid item xs={12}>
               <TextField
                 inputRef={register}
-                control={control}
                 InputLabelProps={{
                   shrink: true
                 }}
@@ -203,7 +157,6 @@ function FormParticipantes(props) {
             <Grid item xs={12} sm={6}>
               <TextField
                 inputRef={register}
-                control={control}
                 InputLabelProps={{
                   shrink: true
                 }}
@@ -217,7 +170,6 @@ function FormParticipantes(props) {
             <Grid item xs={6} sm={6}>
               <TextField
                 inputRef={register}
-                control={control}
                 InputLabelProps={{
                   shrink: true
                 }}
@@ -230,7 +182,6 @@ function FormParticipantes(props) {
             <Grid item xs={6} sm={6}>
               <TextField
                 inputRef={register}
-                control={control}
                 InputLabelProps={{
                   shrink: true
                 }}
@@ -244,7 +195,6 @@ function FormParticipantes(props) {
             <Grid item xs={12} sm={6}>
               <TextField
                 inputRef={register}
-                control={control}
                 InputLabelProps={{
                   shrink: true
                 }}
@@ -266,22 +216,24 @@ function FormParticipantes(props) {
             <Grid item xs={12} sm={12}>
               <Autocomplete
                 onChange={(event, value) =>
-                  value !== null && handleTomador(value)
+                  value !== null && handleInputTomador(value)
                 }
                 name="tomador"
-                options={listAutoCompleteTomador}
+                options={listTomador}
                 getOptionLabel={(option) => `${option.doc}-${option.nome}`}
                 includeInputInList
-                loading={listContribuinte.length > 0}
+                loading={listTomador.length > 0}
                 renderInput={(param) => (
                   <TextField
                     {...param}
-                    onChange={(event) => setParamsTomador(event.target.value)}
+                    onChange={(event) =>
+                      handleParamsTomador(event.target.value)
+                    }
                     id="tomador"
                     name="tomador"
                     label={
-                      listAutoCompleteTomador.length > 1
-                        ? `${listAutoCompleteTomador.length} Tomador, selecione um.`
+                      listTomador.length > 1
+                        ? `${listTomador.length} Tomador, selecione um.`
                         : 'Tomador'
                     }
                     margin="normal"
@@ -294,7 +246,6 @@ function FormParticipantes(props) {
             <Grid item xs={12} sm={4}>
               <TextField
                 inputRef={register}
-                control={control}
                 InputLabelProps={{
                   shrink: true
                 }}
@@ -308,7 +259,6 @@ function FormParticipantes(props) {
             <Grid item xs={12} sm={8}>
               <TextField
                 inputRef={register}
-                control={control}
                 InputLabelProps={{
                   shrink: true
                 }}
@@ -322,7 +272,6 @@ function FormParticipantes(props) {
             <Grid item xs={12}>
               <TextField
                 inputRef={register}
-                control={control}
                 InputLabelProps={{
                   shrink: true
                 }}
@@ -336,7 +285,6 @@ function FormParticipantes(props) {
             <Grid item xs={12} sm={6}>
               <TextField
                 inputRef={register}
-                control={control}
                 InputLabelProps={{
                   shrink: true
                 }}
@@ -350,7 +298,6 @@ function FormParticipantes(props) {
             <Grid item xs={6} sm={6}>
               <TextField
                 inputRef={register}
-                control={control}
                 InputLabelProps={{
                   shrink: true
                 }}
@@ -363,7 +310,6 @@ function FormParticipantes(props) {
             <Grid item xs={6} sm={6}>
               <TextField
                 inputRef={register}
-                control={control}
                 InputLabelProps={{
                   shrink: true
                 }}
@@ -377,7 +323,6 @@ function FormParticipantes(props) {
             <Grid item xs={12} sm={6}>
               <TextField
                 inputRef={register}
-                control={control}
                 InputLabelProps={{
                   shrink: true
                 }}
@@ -392,26 +337,10 @@ function FormParticipantes(props) {
         </Grid>
       </Grid>
       <ButtonStep
-        steps={steps}
-        activeStep={activeStep}
-        handleNext={handleNext}
-        handleBack={handleBack}
-        disabledNext={!idPrestador || !idTomador}
+        disabledNext={!taxpayerSeleted.prestador && !taxpayerSeleted.tomador}
+        activeStep={stepActivity}
       />
     </form>
   );
 }
-const mapStateToProps = (state) => ({
-  listContribuinte: state.contribuinte.listContribuinte
-});
-
-const mapDispatchToProps = (dispatch) =>
-  bindActionCreators(
-    {
-      requestContribuinte,
-      cleanDataContribuinte
-    },
-    dispatch
-  );
-
-export default connect(mapStateToProps, mapDispatchToProps)(FormParticipantes);
+export default FormParticipantes;

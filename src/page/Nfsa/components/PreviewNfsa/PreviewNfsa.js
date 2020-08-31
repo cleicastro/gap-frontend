@@ -1,147 +1,74 @@
 /* eslint-disable react/no-unused-prop-types */
-import React, { useContext, useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import React, { useContext, useState } from 'react';
 import {
   Typography,
   List,
   ListItem,
   ListItemText,
   Grid,
-  Divider,
-  CircularProgress,
-  Modal,
-  Fab
+  Divider
 } from '@material-ui/core';
 
-import CheckIcon from '@material-ui/icons/Check';
-import SaveIcon from '@material-ui/icons/Save';
-
-import clsx from 'clsx';
 import { NfsaContext } from '../../../../contexts';
 import useStyles from './styles';
-import { ButtonStep, MenuDocumentEvents } from '../../../../components';
+import {
+  ButtonStep,
+  MenuDocumentEvents,
+  ModalSave
+} from '../../../../components';
 
-function PreviewNfsa({ steps, activeStep, setActiveStep, isOpenModalMenu }) {
+import {
+  useOpenNewNfsa,
+  usePreviewNfsa,
+  useStepNfsa,
+  useSaveNfsa
+} from '../../../../hooks';
+
+function PreviewNfsa() {
   const classes = useStyles();
   const {
-    valueFormItems,
-    participantes,
-    valueFormTributos,
-    valuesFormDocumento,
-    dataLoadNFSA,
-    insertedNFSA,
-    updateNFSA,
-    responseStatusDam,
-    handleAlterStatusDAM,
-    handleCloseNewNfsa,
-    handleSaveNFSA,
-    handleEditNFSA,
-    handleCopyNFSA
+    state: {
+      showModalDetails,
+      dataNfsa: { id_dam: idDam, dam },
+      editNfsa
+    }
   } = useContext(NfsaContext);
-  const { irValor, taxaExp, valorISS, valorNF } = valueFormTributos;
-  const [dataNFSA, setDataNFSA] = useState(dataLoadNFSA);
-  const [posResponseStatusDam, setPosResponseStatusDAM] = useState(null);
-  const [isProgressSave, setIsProgressSave] = useState(false);
+
   const [openModalMenu, setOpenModalMenu] = useState(false);
-  const [statusCancelar, setStatusCancelar] = useState(false);
-  const [statusPagar, setStatusPagar] = useState(false);
-  const [success, setSucess] = useState(false);
-  const timer = React.useRef();
-  const tributes = [
-    { descricao: 'ISS', valor: valorISS },
-    { descricao: 'Imposto de renda', valor: irValor },
-    { descricao: 'Taxa de expedição', valor: taxaExp }
-  ];
-  const buttonClassname = clsx({
-    [classes.buttonSuccess]: isProgressSave
-  });
+  const setWindowNewNfsa = useOpenNewNfsa();
 
-  useEffect(() => {
-    if (insertedNFSA) {
-      setDataNFSA(insertedNFSA);
-      setSucess(true);
-    }
-    if (updateNFSA) {
-      setSucess(true);
-    }
-    if (responseStatusDam) {
-      setStatusPagar(responseStatusDam.tipo === 'pago');
-      setStatusCancelar(responseStatusDam.tipo === 'cancelado');
-      setPosResponseStatusDAM(responseStatusDam);
-      setSucess(true);
-    }
-    timer.current = setTimeout(() => {
-      setIsProgressSave(false);
-      if (isOpenModalMenu) setOpenModalMenu(false);
-    }, 300);
-    return () => {
-      clearTimeout(timer.current);
-    };
-  }, [insertedNFSA, isOpenModalMenu, responseStatusDam, updateNFSA]);
+  const {
+    participantes,
+    items,
+    tributes,
+    valorNF,
+    valorDam
+  } = usePreviewNfsa();
+  const [stepActivity, setStepActivity] = useStepNfsa();
 
-  const saveNFSA = () => {
-    setSucess(false);
+  const [
+    statusServer,
+    successRequest,
+    setSave,
+    setEditStatus,
+    setEdit
+  ] = useSaveNfsa();
+
+  const handlePrevStep = () => setStepActivity(stepActivity - 1);
+  const handleSaveDAM = () => {
     setOpenModalMenu(true);
-    setIsProgressSave(true);
-    handleSaveNFSA();
+    if (!editNfsa) {
+      setSave();
+    } else {
+      setEdit();
+    }
   };
 
-  const handleAlterStatus = (tipo, params) => {
-    setSucess(false);
-    setIsProgressSave(true);
-    handleAlterStatusDAM(dataNFSA.dam.id, tipo, params);
-  };
-
-  const MenuAction = () => {
-    return (
-      <MenuDocumentEvents
-        idPrint={{ idDAM: dataNFSA.dam.id, idNFSA: dataNFSA.id }}
-        handleEdit={handleEditNFSA}
-        handleCopy={handleCopyNFSA}
-        handleAlterStatusDAM={(tipo, params) => {
-          handleAlterStatus(tipo, params);
-          if (isOpenModalMenu) setOpenModalMenu(true);
-        }}
-        responseStatus={posResponseStatusDam}
-        statusPagar={statusPagar}
-        statusCancelar={statusCancelar}
-        handleClose={() => handleCloseNewNfsa(false)}
-        visibleOptions={{
-          imprimir: true,
-          pagar: !dataNFSA.dam.pago && dataNFSA.dam.status,
-          copiar: isOpenModalMenu,
-          editar: isOpenModalMenu && dataNFSA.dam.status,
-          cancelar: dataNFSA.dam.status,
-          sair: true
-        }}
-      />
-    );
-  };
-  const MenuActionsNewNFSA = () => {
-    return (
-      <>
-        <Typography variant="h5" gutterBottom>
-          {posResponseStatusDam
-            ? `DAM ${posResponseStatusDam.tipo}!`
-            : `DAM ${dataLoadNFSA.dam.id}`}
-        </Typography>
-        <Typography variant="subtitle1">
-          {dataNFSA &&
-            `O Número da sua NFSA é #${dataNFSA.id}. Selecione um
-            envento para este documento.`}
-          {posResponseStatusDam && `${posResponseStatusDam.message}`}
-        </Typography>
-        {!isOpenModalMenu && <MenuAction />}
-      </>
-    );
-  };
-
-  const handleNext = () => setActiveStep(activeStep + 1);
-  const handleBack = () => setActiveStep(activeStep - 1);
+  const handleAlterStatusDAM = (type, param) =>
+    setEditStatus(idDam, type, param);
 
   return (
     <>
-      {isOpenModalMenu && <MenuAction />}
       <Grid container spacing={2} direction="column">
         <Grid item container direction="row">
           <Grid item xs={6} sm={7}>
@@ -189,7 +116,7 @@ function PreviewNfsa({ steps, activeStep, setActiveStep, isOpenModalMenu }) {
           </Grid>
           <Grid container justify="space-between">
             <Grid item xs={5}>
-              <Typography>{valuesFormDocumento.emissao}</Typography>
+              <Typography>{dam.emissao}</Typography>
             </Grid>
             <Grid item xs={4} align="center">
               <Typography>
@@ -197,7 +124,7 @@ function PreviewNfsa({ steps, activeStep, setActiveStep, isOpenModalMenu }) {
                   year: 'numeric',
                   month: 'numeric',
                   day: 'numeric'
-                }).format(new Date(valuesFormDocumento.vencimento))}
+                }).format(new Date(dam.vencimento))}
               </Typography>
             </Grid>
             <Grid item xs={3} align="right">
@@ -205,14 +132,14 @@ function PreviewNfsa({ steps, activeStep, setActiveStep, isOpenModalMenu }) {
                 {Intl.NumberFormat('pt-BR', {
                   style: 'currency',
                   currency: 'BRL'
-                }).format(Number(valuesFormDocumento.valorTotal))}
+                }).format(Number(valorDam))}
               </Typography>
             </Grid>
           </Grid>
         </Grid>
       </Grid>
       <List disablePadding>
-        {valueFormItems.map((item, key) => (
+        {items.map((item, key) => (
           <div key={key}>
             <Divider variant="middle" />
             <ListItem className={classes.listItem}>
@@ -255,66 +182,45 @@ function PreviewNfsa({ steps, activeStep, setActiveStep, isOpenModalMenu }) {
           </Typography>
         </ListItem>
       </List>
-      {activeStep === steps.length - 1 && (
+      {!showModalDetails && (
         <ButtonStep
-          steps={steps}
-          activeStep={activeStep}
-          handleNext={handleNext}
-          handleBack={handleBack}
-          handleSave={saveNFSA}
+          handlePrevStep={handlePrevStep}
+          disableSave={false}
+          handleSave={handleSaveDAM}
         />
       )}
-      <Modal
-        open={openModalMenu}
-        disablePortal
-        disableEnforceFocus
-        disableAutoFocus
-        disableBackdropClick
-        disableScrollLock
-        onClose={() => alert('saindo')}
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
-        className={classes.modal}>
-        <div className={classes.paper}>
-          <h2 id="modal-title">
-            {isProgressSave && 'Salvando Nota Fiscal de Serviço Avulsa'}
-          </h2>
-          <div id="modal-description">
-            {!isProgressSave && dataNFSA && <MenuActionsNewNFSA />}
-            {isProgressSave && (
-              <div className={classes.progress}>
-                <div className={classes.wrapper}>
-                  <Fab
-                    aria-label="save"
-                    color="primary"
-                    className={buttonClassname}>
-                    {success ? <CheckIcon /> : <SaveIcon />}
-                  </Fab>
-                  <CircularProgress size={68} className={classes.fabProgress} />
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </Modal>
+
+      <ModalSave
+        openModalMenu={openModalMenu}
+        statusServer={statusServer}
+        successRequest={successRequest}>
+        <>
+          {!editNfsa && (
+            <Typography variant="subtitle1">
+              {`O Número do seu DAM é #${idDam}.\n
+                  Selecione um envento para este documento.`}
+            </Typography>
+          )}
+          <MenuDocumentEvents
+            values={{ idDam }}
+            handleAlterStatusDAM={handleAlterStatusDAM}
+            handleClose={setWindowNewNfsa}
+            visibleOptions={{
+              imprimir: true,
+              pagar: dam && !dam.pago && dam.status !== 'Cancelado',
+              copiar: showModalDetails,
+              editar: showModalDetails,
+              cancelar: dam && dam.status !== 'Cancelado',
+              nfsa: true,
+              recibo: true,
+              alvara: false,
+              sair: true
+            }}
+          />
+        </>
+      </ModalSave>
     </>
   );
 }
-
-PreviewNfsa.defaultProps = {
-  isOpenModalMenu: false,
-  steps: [],
-  activeStep: 0,
-  handleNext: () => null,
-  handleBack: () => null
-};
-
-PreviewNfsa.propTypes = {
-  isOpenModalMenu: PropTypes.bool,
-  steps: PropTypes.array,
-  activeStep: PropTypes.number,
-  handleNext: PropTypes.func,
-  handleBack: PropTypes.func
-};
 
 export default PreviewNfsa;

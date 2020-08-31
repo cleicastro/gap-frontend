@@ -40,3 +40,9 @@ export const alvaraFuncionamento = yup.object().shape({
   endereco: yup.string().required().min(5),
   numero: yup.string().required()
 });
+
+export const itemNfsaSchema = yup.object().shape({
+  descricao: yup.string(),
+  quantidade: yup.number()
+  // valor: yup.number()
+});

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import {
   Grid,
   TableContainer,
@@ -13,17 +13,14 @@ import {
   makeStyles,
   Typography
 } from '@material-ui/core';
-import CircularProgress from '@material-ui/core/CircularProgress';
 
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Save';
 import { useForm } from 'react-hook-form';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-
-import { deleteItemNFSA } from '../../store/nfsaReducer';
-import { NfsaContext } from '../../contexts';
-import ButtonStep from '../ButtonStep';
+import { ButtonStep } from '../../../../components';
+import { useStepNfsa, useItemsNfsa } from '../../../../hooks';
+import { mascaraReal, itemNfsaSchema } from '../../../../util';
+import { NfsaContext, ACTIONS_NFSA } from '../../../../contexts';
 
 const useStyles = makeStyles((theme) => ({
   totalValueItems: {
@@ -38,70 +35,47 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function FormItems(props) {
-  const {
-    steps,
-    activeStep,
-    setActiveStep,
-    deleteItemNFSA: handleRemoveItemNFSA,
-    removeItem,
-    error
-  } = props;
-  const { valueFormItems, handleAddItem } = useContext(NfsaContext);
+function FormItems() {
   const classes = useStyles();
 
-  const { control, register, handleSubmit, reset } = useForm();
-  const [items, setItems] = useState(valueFormItems);
-  const [totalItems, setTotalItems] = useState(0);
-  const [load, setLoad] = useState(false);
-  const [keySelect, setKeySelect] = useState(null);
+  const { dispatch } = useContext(NfsaContext);
 
-  useEffect(() => {
-    setTotalItems(
-      items.reduce((acc, act) => acc + act.quantidade * act.valor, 0)
-    );
-  }, [items]);
+  const {
+    control,
+    errors,
+    register,
+    handleSubmit,
+    reset,
+    getValues,
+    setValue
+  } = useForm({
+    validationSchema: itemNfsaSchema
+  });
+  const [items, totalItems, setAddItem, setRemoveItem] = useItemsNfsa();
+  const [stepActivity, setStepActivity] = useStepNfsa();
 
-  useEffect(() => {
-    if (removeItem) {
-      setItems((values) => values.filter((item) => item.id !== removeItem.id));
-    }
-    setLoad(false);
-    setKeySelect(null);
-  }, [removeItem, error]);
+  const handleMaskValue = (event) => {
+    const { name, value } = event.target;
+    const values = mascaraReal(value);
+    setValue(name, values);
+  };
 
-  const onSubmit = (data) => {
-    setItems((values) => [...values, data]);
+  const handlePrevStep = () => setStepActivity(stepActivity - 1);
+  const handleNextStep = () => {
+    dispatch({
+      type: ACTIONS_NFSA.SET_ITEMS_NFSA,
+      payload: items
+    });
+    setStepActivity(stepActivity + 1);
+  };
+
+  const handleAdditem = () => {
+    setAddItem(getValues());
     reset();
   };
 
-  const handleRemoverItem = (keyItem) => {
-    setKeySelect(keyItem);
-    setLoad(true);
-    const { id } = items[keyItem];
-    if (id) {
-      handleRemoveItemNFSA(id);
-    } else {
-      const newItens = items.slice();
-      newItens.splice(keyItem, 1);
-      setItems(newItens);
-      setLoad(false);
-      setKeySelect(null);
-    }
-  };
-
-  const handleNext = () => {
-    handleAddItem(items);
-    setActiveStep(activeStep + 1);
-  };
-
-  const handleBack = () => {
-    handleAddItem(items);
-    setActiveStep(activeStep - 1);
-  };
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(handleAdditem)} noValidate autoComplete="off">
       <Grid container spacing={3} justify="flex-end" alignItems="flex-end">
         <Grid item xs={12} sm={7}>
           <TextField
@@ -116,6 +90,8 @@ function FormItems(props) {
             name="descricao"
             label="Descrição"
             fullWidth
+            error={!!errors.descricao}
+            helperText={errors.descricao && errors.descricao.message}
           />
         </Grid>
         <Grid item xs={6} sm={2}>
@@ -125,9 +101,12 @@ function FormItems(props) {
             InputLabelProps={{
               shrink: true
             }}
+            type="number"
             name="quantidade"
             label="Quantidade"
             fullWidth
+            error={!!errors.quantidade}
+            helperText={errors.quantidade && errors.quantidade.message}
           />
         </Grid>
         <Grid item xs={6} sm={3}>
@@ -152,6 +131,10 @@ function FormItems(props) {
             name="valor"
             label="Valor"
             fullWidth
+            type="number"
+            onChange={handleMaskValue}
+            error={!!errors.valor}
+            helperText={errors.valor && errors.valor.message}
           />
         </Grid>
       </Grid>
@@ -188,12 +171,8 @@ function FormItems(props) {
                       }).format(Number(item.valor * item.quantidade))}
                     </TableCell>
                     <TableCell>
-                      <Button onClick={() => handleRemoverItem(key)}>
-                        {load && keySelect === key ? (
-                          <CircularProgress size={24} />
-                        ) : (
-                            <DeleteIcon size={24} />
-                          )}
+                      <Button type="button" onClick={() => setRemoveItem(key)}>
+                        <DeleteIcon size={24} />
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -204,7 +183,8 @@ function FormItems(props) {
         </Grid>
       </Grid>
       <Grid container justify="space-around" direction="row">
-        <Grid item xs={6} md={6} styles={classes.gridTotal}>
+        <Grid item xs={6} styles={classes.gridTotal}>
+          <Typography>Total:</Typography>
           <Typography styles={classes.totalValueItems}>
             {Intl.NumberFormat('pt-BR', {
               style: 'currency',
@@ -212,30 +192,16 @@ function FormItems(props) {
             }).format(totalItems)}
           </Typography>
         </Grid>
-        <Grid item xs={6} md={6}>
+        <Grid item xs={6}>
           <ButtonStep
-            steps={steps}
-            activeStep={activeStep}
-            handleNext={handleNext}
-            handleBack={handleBack}
-            disabledNext={totalItems < 1}
+            type="button"
+            disabledNext={items.length === 0}
+            handlePrevStep={handlePrevStep}
+            handleNextStep={handleNextStep}
           />
         </Grid>
       </Grid>
     </form>
   );
 }
-const mapStateToProps = (state) => ({
-  removeItem: state.nfsa.removeItem,
-  error: state.nfsa.error
-});
-
-const mapDispatchToProps = (dispatch) =>
-  bindActionCreators(
-    {
-      deleteItemNFSA
-    },
-    dispatch
-  );
-
-export default connect(mapStateToProps, mapDispatchToProps)(FormItems);
+export default FormItems;

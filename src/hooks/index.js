@@ -21,6 +21,20 @@ export {
   useInitialDocumentAlvara
 } from './alvaraFuncionamento';
 
+export {
+  useNfsa,
+  useStoreNfsa,
+  usePaginationNfsa,
+  useFilterNfsa,
+  useSaveNfsa,
+  useOpenNewNfsa,
+  usePreviewNfsa,
+  useStepNfsa,
+  useInitialDocumentNfsa,
+  useItemsNfsa,
+  useInitialTributosNfsa
+} from './nfsa';
+
 export { useStoreReceita, useRequestReceita } from './receita';
 
 export { useContribuinte } from './contribuinte';
