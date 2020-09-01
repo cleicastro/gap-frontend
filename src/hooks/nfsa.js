@@ -2,11 +2,19 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import Axios from 'axios';
 import { useEffect, useContext, useState, useRef } from 'react';
-import { Nfsa, TabelaIR } from '../services';
+import { Nfsa, TabelaIR, Dam } from '../services';
 import { ACTIONS as ACTIONS_NFSA } from '../store/nfsaReducer';
 import { dateFormatPTBR } from '../util';
 
 import { NfsaContext, ACTIONS_NFSA as ACTIONS_NFSA_CONTEXT } from '../contexts';
+
+const receitaSeleted = {
+  cod: '1113050101',
+  descricao: 'NOTA FISCAL AVULSA',
+  icon: 'description',
+  sigla: 'ISSQN-PF',
+  valor_fixo: 0
+};
 
 const tokenNfsa = Axios.CancelToken.source();
 
@@ -51,7 +59,7 @@ function dateSetting(dateVencimento) {
   };
 }
 
-function initialValues(receitaSeleted) {
+function initialTributosNfsa() {
   const { referencia, emissao, emissaoConvertPT, vencimento } = dateSetting(
     new Date()
   );
@@ -66,10 +74,9 @@ function initialValues(receitaSeleted) {
     juros: 0.0,
     valorMulta: 0,
     valorPrincipal:
-      Number(receitaSeleted.valor_fixo) > 0 ? receitaSeleted.valor_fixo : 0,
+      receitaSeleted.valor_fixo > 0 ? receitaSeleted.valor_fixo : 0,
     taxaExp: 5,
-    valorTotal:
-      Number(receitaSeleted.valor_fixo) > 0 ? receitaSeleted.valor_fixo : 5
+    valorTotal: receitaSeleted.valor_fixo > 0 ? receitaSeleted.valor_fixo : 5
   };
 }
 
@@ -81,21 +88,23 @@ function initialValuesTributos() {
     converterIRRF: false,
     irRetido: true,
     baseCalculo: 0,
-    irAliquota: 0,
-    irValor: 0,
     valorDeducao: 0,
     irPercente: 0,
-    valorISS: 0,
-    taxaExp: 5,
-    valorNF: 0,
     pisPercente: 0,
-    pisValor: 0,
     inssPercente: 0,
-    inssValor: 0,
     confinsPercente: 0,
-    confisValor: 0,
     csllPercente: 0,
-    csllValor: 0
+
+    taxaExp: 5,
+    valorISS: 0,
+    irValorCalc: 0,
+    irValor: 0,
+    pisValor: 0,
+    inssValor: 0,
+    confinsValor: 0,
+    csllValor: 0,
+    descontoIncodicional: 0,
+    valorNF: 0
   };
 }
 
@@ -114,16 +123,16 @@ function calcTributsNfsa(baseCalc, data, tableIR) {
   const pisValor = ((baseCalc * Number(pisPercente)) / 100).toFixed(2);
   const inssValor = ((baseCalc * Number(inssPercente)) / 100).toFixed(2);
   const csllValor = ((baseCalc * Number(csllPercente)) / 100).toFixed(2);
-  const confisValor = (baseCalc * Number(confinsPercente)) / 100;
+  const confinsValor = (baseCalc * Number(confinsPercente)) / 100;
 
-  let irAliquota;
+  let irValorCalc;
   let irValor;
   let valorDeducao;
   let irPercente;
   if (irRetido) {
     const tableIRSelected = tableIR.find((faixa) => baseCalc <= faixa.ate);
     const auxTableIR = tableIRSelected || tableIR[tableIR.length - 1];
-    irAliquota = (baseCalc * (auxTableIR.aliquota / 100)).toFixed(2);
+    irValorCalc = (baseCalc * (auxTableIR.aliquota / 100)).toFixed(2);
     irValor = (
       baseCalc * (auxTableIR.aliquota / 100) -
       auxTableIR.deducao
@@ -131,7 +140,7 @@ function calcTributsNfsa(baseCalc, data, tableIR) {
     valorDeducao = auxTableIR.deducao;
     irPercente = auxTableIR.aliquota;
   } else {
-    irAliquota = 0;
+    irValorCalc = 0;
     irValor = 0;
     valorDeducao = 0;
     irPercente = 0;
@@ -143,7 +152,7 @@ function calcTributsNfsa(baseCalc, data, tableIR) {
     valorISS -
     pisValor -
     inssValor -
-    confisValor -
+    confinsValor -
     csllValor -
     taxaExp
   ).toFixed(2);
@@ -151,7 +160,7 @@ function calcTributsNfsa(baseCalc, data, tableIR) {
   return {
     ...data,
     baseCalculo: baseCalc,
-    irAliquota,
+    irValorCalc,
     irValor,
     irValorView: irValor,
     valorDeducao,
@@ -159,14 +168,13 @@ function calcTributsNfsa(baseCalc, data, tableIR) {
     valorISS,
     pisValor,
     inssValor,
-    confisValor,
+    confinsValor,
     csllValor,
     valorNF
   };
 }
 
 function convertNfsaToLiquid(tributs) {
-  console.log(tributs);
   const {
     aliquotaIss,
     irPercente,
@@ -181,7 +189,7 @@ function convertNfsaToLiquid(tributs) {
     baseCalculo,
     pisValor,
     inssValor,
-    confisValor,
+    confinsValor,
     csllValor
   } = tributs;
 
@@ -200,7 +208,7 @@ function convertNfsaToLiquid(tributs) {
     Number(irValor) +
     Number(pisValor) +
     Number(inssValor) +
-    Number(confisValor) +
+    Number(confinsValor) +
     Number(csllValor);
 
   const difTax = (totalTaxs / percentLiquid).toFixed(2);
@@ -210,15 +218,19 @@ function convertNfsaToLiquid(tributs) {
 }
 
 async function requestNfsa(params) {
-  const response = await Nfsa.getNfsa({ ...params }, tokenNfsa.token);
+  const response = await Nfsa.getNfsa(params, tokenNfsa.token);
   return response;
 }
-async function saveNfsa(nfsa) {
-  const response = await Nfsa.saveNFSA({ ...nfsa });
+async function saveNfsa(items, nfsa, dam) {
+  const response = await Nfsa.saveNFSA(items, nfsa, dam);
   return response;
 }
-async function editNfsa(id, params) {
-  const response = await Nfsa.editNFSA(id, params);
+async function editNfsa(items, nfsa, dam, id) {
+  const response = await Nfsa.editNFSA(items, nfsa, dam, id);
+  return response;
+}
+async function editStatusDAM(id, params) {
+  const response = await Dam.updateDam(id, params);
   return response;
 }
 async function requestTableIR() {
@@ -282,27 +294,48 @@ export const useNfsa = () => {
 export const useStoreNfsa = () => {
   const { dispatch } = useContext(NfsaContext);
   const listNfsa = useSelector((state) => state.nfsa.listNfsa);
-  const valueTotal = listNfsa.reduce(
-    (acc, nfsa) => (acc + nfsa.dam ? Number(nfsa.dam.valor_total) : 0),
-    0
-  );
+  const valueTotal = listNfsa.reduce((acc, nfsa) => {
+    return acc + Number(nfsa.valor_calculo);
+  }, 0);
 
   function setSelecetNfsa(nfsa) {
     const {
-      id,
-      receita,
-      contribuinte,
-      emissao,
-      info_adicionais: infoAdicionais,
-      n_ref: docOrigem,
-      referencia,
-      taxa_expedicao: taxaExp,
-      valor_juros: juros,
-      valor_multa: valorMulta,
-      valor_principal: valorPrincipal,
-      valor_total: valorTotal,
-      vencimento
-    } = nfsa.dam;
+      dam: {
+        id,
+        receita,
+        emissao,
+        info_adicionais: infoAdicionais,
+        n_ref: docOrigem,
+        referencia,
+        taxa_expedicao: taxaExp,
+        valor_juros: juros,
+        valor_multa: valorMulta,
+        valor_principal: valorPrincipal,
+        valor_total: valorTotal,
+        vencimento
+      },
+      items_nfsa: itemsNfsa,
+      prestador,
+      tomador,
+      uf,
+      municipio,
+      aliquota_iss: aliquotaIss,
+      valor_calculo: baseCalculo,
+      valor_deducao: valorDeducao,
+      valor_iss: valorISS,
+      ir_valor: irValor,
+      pis_valor: pisValor,
+      inss_valor: inssValor,
+      confins_valor: confinsValor,
+      csll_valor: csllValor,
+      valor_nota: valorNF,
+
+      ir_percente: irPercente,
+      pis_percente: pisPercente,
+      inss_percente: inssPercente,
+      confins_percente: confinsPercente,
+      csll_percente: csllPercente
+    } = nfsa;
 
     dispatch({
       type: ACTIONS_NFSA_CONTEXT.DOCUMENT,
@@ -324,9 +357,11 @@ export const useStoreNfsa = () => {
     });
     dispatch({
       type: ACTIONS_NFSA_CONTEXT.SELECT_TAXPAYER,
-      payload: {
-        ...contribuinte
-      }
+      payload: { prestador, tomador }
+    });
+    dispatch({
+      type: ACTIONS_NFSA_CONTEXT.SET_ITEMS_NFSA,
+      payload: itemsNfsa
     });
     dispatch({
       type: ACTIONS_NFSA_CONTEXT.MODAL_DETAILS,
@@ -334,7 +369,32 @@ export const useStoreNfsa = () => {
     });
     dispatch({
       type: ACTIONS_NFSA_CONTEXT.SELECT_NFSA,
-      payload: { ...nfsa }
+      payload: {
+        id: nfsa.id,
+        dam: nfsa.dam,
+        aliquotaIss,
+        uf,
+        municipio,
+        converterIRRF: false,
+        irRetido: true,
+        baseCalculo,
+        valorDeducao,
+        irPercente,
+        pisPercente,
+        inssPercente,
+        confinsPercente,
+        csllPercente,
+
+        taxaExp,
+        valorISS,
+        irValorCalc: 0,
+        irValor,
+        pisValor,
+        inssValor,
+        confinsValor,
+        csllValor,
+        valorNF
+      }
     });
   }
   return [listNfsa, valueTotal, setSelecetNfsa];
@@ -369,7 +429,7 @@ export const useFilterNfsa = () => {
   const dispatch = useDispatch();
   const { dispatch: dispatchNfsa } = useContext(NfsaContext);
 
-  function setParams(params) {
+  function setFilter(params) {
     setStatusServer(null);
     requestNfsa(params).then((response) => {
       dispatch(initialNfsaAction(response.data));
@@ -384,21 +444,17 @@ export const useFilterNfsa = () => {
       tokenNfsa.cancel('Request cancell');
     };
   }
-  return [statusServer, setParams];
+  return [statusServer, setFilter];
 };
 
 export const useSaveNfsa = () => {
   const {
-    state: {
-      receitaSeleted,
-      taxpayerSeleted,
-      document,
-      dataDam,
-      dataNfsaFunvionamento
-    },
+    state: { taxpayerSeleted, document, dataDam, dataNfsa, dataItemNfsa },
     dispatch: dispatchNfsa
   } = useContext(NfsaContext);
-  const idContribuinte = taxpayerSeleted.id;
+
+  const idPrestador = taxpayerSeleted.prestador && taxpayerSeleted.prestador.id;
+  const idTomador = taxpayerSeleted.tomador && taxpayerSeleted.tomador.id;
   const [statusServer, setStatusServer] = useState(null);
   const [successRequest, setSuccessRequest] = useState(false);
   const timer = useRef();
@@ -412,13 +468,10 @@ export const useSaveNfsa = () => {
       clearTimeout(timer.current);
     };
   }, [statusServer]);
+  const nfsa = { ...dataNfsa, idPrestador, idTomador };
 
   function setSave() {
-    saveNfsa({
-      ...document,
-      ...dataNfsaFunvionamento,
-      idContribuinte
-    }).then((response) => {
+    saveNfsa(dataItemNfsa, nfsa, document).then((response) => {
       dispatch(addNewNfsaAction(response));
       setStatusServer(response.status);
       dispatch({
@@ -431,17 +484,27 @@ export const useSaveNfsa = () => {
       });
     });
   }
+
   function setEditStatus(id, type, param) {
     setSuccessRequest(false);
     setStatusServer(null);
 
-    editNfsa(id, param).then((response) => {
-      let nfsa = dataNfsaFunvionamento;
-      const { dam } = nfsa;
+    editStatusDAM(id, param).then((response) => {
+      // eslint-disable-next-line no-shadow
+      let nfsa = dataNfsa;
+      const { dam } = dataNfsa;
       if (type === 'pay') {
-        nfsa = { ...nfsa, dam: { ...dam, pago: true, status: 'Pago' } };
+        nfsa = {
+          ...nfsa,
+          ...taxpayerSeleted,
+          dam: { ...dam, pago: true, status: 'Pago' }
+        };
       } else if (type === 'cancel') {
-        nfsa = { ...nfsa, dam: { ...dam, status: 'Cancelado' } };
+        nfsa = {
+          ...nfsa,
+          ...taxpayerSeleted,
+          dam: { ...dam, status: 'Cancelado' }
+        };
       }
       dispatchNfsa({
         type: ACTIONS_NFSA_CONTEXT.SELECT_NFSA,
@@ -451,29 +514,13 @@ export const useSaveNfsa = () => {
       setStatusServer(response.status);
     });
   }
-  function setEdit() {
-    const param = {
-      ...dataDam,
-      id: document.id,
-      receita: receitaSeleted,
-      contribuinte: taxpayerSeleted,
-      data_pagamento: document.dataPagamento,
-      info_adicionais: document.infoAdicionais,
-      n_ref: document.docOrigem,
-      referencia: document.referencia,
-      taxa_expedicao: document.taxaExp,
-      valor_juros: document.juros,
-      valor_multa: document.valorMulta,
-      valor_principal: document.valorPrincipal,
-      valor_total: document.valorTotal,
-      vencimento: document.vencimento
-    };
-    editNfsa(param.id, { ...document, idContribuinte }).then((response) => {
-      dispatch(editNfsaAction(param));
+  function setEdit(id) {
+    editNfsa(dataItemNfsa, nfsa, dataDam, id).then((response) => {
+      dispatch(editNfsaAction({ ...nfsa, ...taxpayerSeleted }));
       setStatusServer(response.status);
       dispatchNfsa({
         type: ACTIONS_NFSA_CONTEXT.SELECT_NFSA,
-        payload: param
+        payload: { ...nfsa, ...taxpayerSeleted }
       });
     });
   }
@@ -493,21 +540,35 @@ export const useOpenNewNfsa = () => {
 
 export const usePreviewNfsa = () => {
   const {
-    state: { document, taxpayerSeleted, dataNfsa }
+    state: { document, taxpayerSeleted, dataNfsa, dataItemNfsa }
   } = useContext(NfsaContext);
 
   const { juros, valorMulta, taxaExp, valorPrincipal: valorDam } = document;
   const { prestador, tomador } = taxpayerSeleted;
-  const { valor_nota: valorNF, items_nfsa: items } = dataNfsa;
+  const {
+    valorNF,
+    irValor,
+    valorISS,
+    pisValor,
+    inssValor,
+    confinsValor,
+    csllValor
+  } = dataNfsa;
   return {
     participantes: {
       nomePrestador: prestador && prestador.nome,
-      docPrestador: prestador && prestador.nome,
+      docPrestador: prestador && prestador.doc,
       nomeTomador: tomador && tomador.nome,
-      docTomador: tomador && tomador.nome
+      docTomador: tomador && tomador.doc
     },
-    items,
+    items: dataItemNfsa,
     tributes: [
+      { descricao: 'ISS', valor: valorISS },
+      { descricao: 'IR', valor: irValor },
+      { descricao: 'INSS', valor: inssValor },
+      { descricao: 'PIS', valor: pisValor },
+      { descricao: 'CONFINS', valor: confinsValor },
+      { descricao: 'CSLL', valor: csllValor },
       { descricao: 'Multa', valor: valorMulta },
       { descricao: 'Juros', valor: juros },
       { descricao: 'Taxa de Expediente', valor: taxaExp }
@@ -572,12 +633,16 @@ export const useInitialTributosNfsa = () => {
     let result = calcTributsNfsa(newBaseCalc, tributs, tableIR);
 
     if (result.irPercente !== tributs.irPercente) {
+      const irValor =
+        (Number(result.irPercente) * baseCalc) / 100 - result.valorDeducao;
+
       newBaseCalc = convertNfsaToLiquid({
-        ...result,
-        baseCalculo: tributs.baseCalculo
+        ...tributs,
+        irPercente: result.irPercente,
+        irValor
       });
 
-      result = calcTributsNfsa(newBaseCalc, result, tableIR);
+      result = calcTributsNfsa(newBaseCalc, tributs, tableIR);
     }
     return result;
   }
@@ -587,20 +652,77 @@ export const useInitialTributosNfsa = () => {
 
 export const useInitialDocumentNfsa = () => {
   const {
-    state: { receitaSeleted, document },
+    state: { document },
     dispatch
   } = useContext(NfsaContext);
-
-  const values = document.valorPrincipal
-    ? document
-    : initialValues(receitaSeleted);
 
   function setDocument(data) {
     const { vencimento } = dateSetting(data.vencimento);
     dispatch({
       type: ACTIONS_NFSA_CONTEXT.DOCUMENT,
-      payload: { ...values, ...data, vencimento }
+      payload: { ...document, ...data, vencimento }
     });
   }
-  return [values, setDocument];
+  return [document, setDocument];
+};
+
+export const useSetNfsa = () => {
+  const {
+    state: { dataItemNfsa, dataNfsa },
+    dispatch
+  } = useContext(NfsaContext);
+  function setDataNfsa(data) {
+    const {
+      baseCalculo,
+      taxaExp,
+      valorISS,
+      irValor,
+      pisValor,
+      inssValor,
+      confinsValor,
+      csllValor
+    } = data;
+
+    dispatch({
+      type: ACTIONS_NFSA_CONTEXT.SELECT_NFSA,
+      payload: { ...dataNfsa, ...data }
+    });
+
+    // verifica se houve alteração no valor na baseCalculo
+    const actualValueItems = dataItemNfsa.reduce((acc, item) => {
+      return acc + Number(item.valor) * Number(item.quantidade);
+    }, 0);
+
+    if (baseCalculo !== actualValueItems) {
+      dispatch({
+        type: ACTIONS_NFSA_CONTEXT.SET_ITEMS_NFSA,
+        payload: dataItemNfsa.map((item) => {
+          return {
+            ...item,
+            valor: (Number(baseCalculo) / Number(item.quantidade)).toFixed(2)
+          };
+        })
+      });
+    }
+
+    const valorPrincipal = (
+      Number(valorISS) +
+      Number(irValor) +
+      Number(pisValor) +
+      Number(inssValor) +
+      Number(confinsValor) +
+      Number(csllValor)
+    ).toFixed(2);
+
+    const document = initialTributosNfsa();
+    dispatch({
+      type: ACTIONS_NFSA_CONTEXT.DOCUMENT,
+      payload: {
+        ...document,
+        valorPrincipal,
+        valorTotal: (Number(valorPrincipal) + Number(taxaExp)).toFixed(2)
+      }
+    });
+  }
+  return setDataNfsa;
 };

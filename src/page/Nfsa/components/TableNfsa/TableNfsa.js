@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useState } from 'react';
 
 import {
   TableContainer,
@@ -10,35 +10,69 @@ import {
   TableBody,
   IconButton,
   TableFooter,
-  Paper
+  Paper,
+  CircularProgress
 } from '@material-ui/core';
 import InfoIcon from '@material-ui/icons/Info';
 
+import InfiniteScroll from 'react-infinite-scroller';
 import { StyledTableCell } from '../../../../components/Contribuintes/styles';
 import { StyledTableRow } from '../../../Dam/components/TableDam/styles';
 
-import { NfsaContext } from '../../../../contexts';
 import useStyles from './styles';
-import { CardSkeletron } from '../../../../components';
+import { usePaginationNfsa, useStoreNfsa } from '../../../../hooks';
 
 function TableNfsa() {
-  const {
-    ValueTotal,
-    listNfsa,
-    itensSkeletron,
-    handleSelecetedNfsa
-  } = useContext(NfsaContext);
+  // eslint-disable-next-line no-unused-vars
+  const [listNfsa, valueTotal, setSelecetNfsa] = useStoreNfsa();
+  const [pagination, setPagination] = usePaginationNfsa();
 
   const classes = useStyles();
 
-  function handleOrderSort(e) {
-    console.log(e);
+  const [order, setOrder] = useState('id');
+  const [sort, setSort] = useState(false);
+
+  const [params, setparams] = useState({
+    id: '',
+    prestador: '',
+    tomador: '',
+    emissao: '',
+    valorCalculo: '',
+    valorNota: 0
+  });
+
+  function handleChangeParams(event) {
+    const { name, value } = event.target;
+    setparams((values) => ({ ...values, [name]: value }));
+  }
+
+  function handleOrderSort(campo, isDefaultOrder) {
+    if (campo === order) {
+      setSort((isSort) => !isSort);
+    } else {
+      setSort((isSort) => (isDefaultOrder ? true : !isSort));
+      setOrder(campo);
+    }
+  }
+
+  function handlePagination(currentPage) {
+    setPagination({
+      order,
+      sort,
+      page: currentPage + 1
+    });
   }
   return (
-    <>
-      {listNfsa.length === 0 && (
-        <CardSkeletron quantSkeletron={itensSkeletron} />
-      )}
+    <InfiniteScroll
+      useWindow
+      pageStart={0}
+      hasMore={pagination.current_page < pagination.last_page}
+      loadMore={handlePagination}
+      loader={
+        <div className={classes.loader} key={0}>
+          <CircularProgress color="primary" />
+        </div>
+      }>
       <TableContainer component={Paper}>
         <Table
           className={classes.table}
@@ -84,50 +118,67 @@ function TableNfsa() {
             <TableRow>
               <TableCell>
                 <TextField
+                  onChange={handleChangeParams}
                   type="number"
                   className={classes.searchNDam}
                   size="small"
                   id="id"
+                  name="id"
+                  value={params.id}
                 />
               </TableCell>
               <TableCell>
                 <TextField
+                  onChange={handleChangeParams}
                   type="text"
                   className={classes.searchReceita}
                   size="small"
-                  receita="receita"
-                  id="receita"
+                  id="prestador"
+                  name="prestador"
+                  value={params.prestador}
                 />
               </TableCell>
               <TableCell>
                 <TextField
+                  onChange={handleChangeParams}
                   className={classes.searchEmitido}
                   size="small"
-                  id="emissao"
+                  id="tomador"
+                  name="tomador"
+                  value={params.tomador}
                 />
               </TableCell>
               <TableCell>
                 <TextField
+                  onChange={handleChangeParams}
                   type="date"
                   className={classes.searchContribuinte}
                   size="small"
-                  id="contribuinte"
+                  id="emissao"
+                  name="emissao"
+                  value={params.emissao}
                 />
               </TableCell>
               <TableCell />
               <TableCell>
                 <TextField
+                  onChange={handleChangeParams}
                   className={classes.searchVencimento}
                   size="small"
-                  id="vencimento"
+                  id="valorCalculo"
+                  name="valorCalculo"
+                  value={params.valorCalculo}
                 />
               </TableCell>
               <TableCell>
                 <TextField
+                  onChange={handleChangeParams}
                   type="number"
                   className={classes.searchValor}
                   size="small"
-                  id="valorTotal"
+                  id="valorNota"
+                  name="valorNota"
+                  value={params.valorNota}
                 />
               </TableCell>
               <TableCell />
@@ -147,7 +198,7 @@ function TableNfsa() {
                 </StyledTableCell>
                 <StyledTableCell align="center">
                   {Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' }).format(
-                    new Date(nfsa.dam.vencicmento)
+                    new Date(nfsa.dam.vencimento)
                   )}
                 </StyledTableCell>
                 <StyledTableCell align="right">
@@ -167,7 +218,7 @@ function TableNfsa() {
                 </StyledTableCell>
                 <StyledTableCell align="left">
                   <IconButton
-                    onClick={() => handleSelecetedNfsa(nfsa)}
+                    onClick={() => setSelecetNfsa(nfsa)}
                     className={
                       nfsa.dam.status
                         ? classes.btnPrimary
@@ -192,13 +243,13 @@ function TableNfsa() {
                 {new Intl.NumberFormat('pt-BR', {
                   style: 'currency',
                   currency: 'BRL'
-                }).format(ValueTotal)}
+                }).format(valueTotal)}
               </StyledTableCell>
             </TableRow>
           </TableFooter>
         </Table>
       </TableContainer>
-    </>
+    </InfiniteScroll>
   );
 }
 

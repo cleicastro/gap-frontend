@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import {
   Grid,
   Button,
@@ -44,13 +44,10 @@ function ModalDetailsNfsa() {
     });
   }
 
-  const handleAlterStatusDAM = useCallback(
-    (type, param) => {
-      setOpenModalMenu(true);
-      setEditStatus(dataNfsa.id_dam, type, param);
-    },
-    [dataNfsa.id_dam, setEditStatus]
-  );
+  const handleAlterStatusDAM = (type, param) => {
+    setOpenModalMenu(true);
+    setEditStatus(dataDam.id, type, param);
+  };
 
   const handleCopyDam = () => {
     handleClosedModalDetails();
@@ -70,10 +67,13 @@ function ModalDetailsNfsa() {
       fullScreen={fullScreenModal}
       open={showModalDetails}
       maxWidth="md"
-      aria-labelledby="customized-dialog-title">
-      <DialogTitle id="customized-dialog-title">
+      aria-labelledby="menu-actions">
+      <DialogTitle id="menu-actions">
         <MenuDocumentEvents
-          values={{ id_dam: dataNfsa.id_dam }}
+          values={{
+            id: dataNfsa && dataNfsa.id,
+            id_dam: dataDam && dataDam.id
+          }}
           handleAlterStatusDAM={handleAlterStatusDAM}
           handleCopy={handleCopyDam}
           handleEdit={handleEditDam}
@@ -85,8 +85,8 @@ function ModalDetailsNfsa() {
             editar:
               dataDam && showModalDetails && dataDam.status !== 'Cancelado',
             cancelar: dataDam && dataDam.status !== 'Cancelado',
-            alvara: true,
-            nfsa: false,
+            alvara: false,
+            nfsa: true,
             recibo: true,
             sair: true
           }}

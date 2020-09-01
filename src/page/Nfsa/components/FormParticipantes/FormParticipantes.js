@@ -15,21 +15,21 @@ function FormParticipantes() {
   const [stepActivity, setStepActivity] = useStepNfsa();
 
   const { register, handleSubmit, setValue } = useForm({
-    defaultValues: taxpayerSeleted.length > 0 && {
-      docPrestador: taxpayerSeleted?.prestador.docPrestador,
-      nomePrestador: taxpayerSeleted?.prestador.nomePrestador,
-      enderecoPrestador: taxpayerSeleted?.prestador.enderecoPrestador,
-      cidadePrestador: taxpayerSeleted?.prestador.cidadePrestador,
-      ufPrestador: taxpayerSeleted?.prestador.ufPrestador,
-      cepPrestador: taxpayerSeleted?.prestador.cepPrestador,
-      bairroPrestador: taxpayerSeleted?.prestador.bairroPrestador,
-      docTomador: taxpayerSeleted?.tomador.docTomador,
-      nomeTomador: taxpayerSeleted?.tomador.nomeTomador,
-      enderecoTomador: taxpayerSeleted?.tomador.enderecoTomador,
-      cidadeTomador: taxpayerSeleted?.tomador.cidadeTomador,
-      ufTomador: taxpayerSeleted?.tomador.ufTomador,
-      cepTomador: taxpayerSeleted?.tomador.cepTomador,
-      bairroTomador: taxpayerSeleted?.tomador.cepTomador
+    defaultValues: taxpayerSeleted.prestador && {
+      docPrestador: taxpayerSeleted.prestador.doc,
+      nomePrestador: taxpayerSeleted.prestador.nome,
+      enderecoPrestador: taxpayerSeleted.prestador.endereco,
+      cidadePrestador: taxpayerSeleted.prestador.cidade,
+      ufPrestador: taxpayerSeleted.prestador.uf,
+      cepPrestador: taxpayerSeleted.prestador.cep,
+      bairroPrestador: taxpayerSeleted.prestador.bairro,
+      docTomador: taxpayerSeleted.tomador.doc,
+      nomeTomador: taxpayerSeleted.tomador.nome,
+      enderecoTomador: taxpayerSeleted.tomador.endereco,
+      cidadeTomador: taxpayerSeleted.tomador.cidade,
+      ufTomador: taxpayerSeleted.tomador.uf,
+      cepTomador: taxpayerSeleted.tomador.cep,
+      bairroTomador: taxpayerSeleted.tomador.bairro
     }
   });
   const [listPrestador, setPrestador] = useContribuinte();
@@ -337,7 +337,7 @@ function FormParticipantes() {
         </Grid>
       </Grid>
       <ButtonStep
-        disabledNext={!taxpayerSeleted.prestador && !taxpayerSeleted.tomador}
+        disabledNext={!taxpayerSeleted.prestador || !taxpayerSeleted.tomador}
         activeStep={stepActivity}
       />
     </form>

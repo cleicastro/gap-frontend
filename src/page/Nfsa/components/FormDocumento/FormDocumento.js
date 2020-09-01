@@ -123,7 +123,7 @@ function FormDocumento() {
             InputLabelProps={{
               shrink: true
             }}
-            disabled={document.cod === '1113050101'}
+            disabled
           />
         </Grid>
         <Grid item xs={6} md={4}>
@@ -142,7 +142,7 @@ function FormDocumento() {
             label="Valor principal"
             fullWidth
             onChange={calcTotal}
-            disabled={document.cod === '1113050101'}
+            disabled
             helperText={errors.valorPrincipal && errors.valorPrincipal.message}
           />
         </Grid>
@@ -163,7 +163,7 @@ function FormDocumento() {
             error={!!errors.juros}
             fullWidth
             onChange={calcTotal}
-            disabled={document.cod === '1113050101'}
+            disabled
             helperText={errors.juros && errors.juros.message}
           />
         </Grid>
@@ -184,7 +184,7 @@ function FormDocumento() {
             error={!!errors.taxaExp}
             fullWidth
             onChange={calcTotal}
-            disabled={document.receita === '1113050101'}
+            disabled
             helperText={errors.taxaExp && errors.taxaExp.message}
           />
         </Grid>

@@ -5,10 +5,48 @@ class Nfsa {
     return api.get(`nfsa/${id}`, {}, { cancelToken });
   }
 
-  getNfsa(cancelToken) {
-    return api.get('nfsa', null, {
-      cancelToken
-    });
+  getNfsa(
+    {
+      id,
+      emissao,
+      vencimento,
+      contribuinte,
+      valorTotal,
+      dataFinalFilter,
+      dataInicialFilter,
+      docContribuinteFilter,
+      nameContribuinteFilter,
+      situacaoFilter,
+      valorTotalFilter,
+      order,
+      sort,
+      page
+    },
+    cancelToken
+  ) {
+    return api.get(
+      'nfsa',
+      {
+        params: {
+          id,
+          emissao,
+          vencimento,
+          contribuinte,
+          valorTotal,
+          dataFinalFilter,
+          dataInicialFilter,
+          docContribuinteFilter,
+          nameContribuinteFilter,
+          situacaoFilter,
+          valorTotalFilter,
+          sort: order ? `${order},${sort ? 'asc' : 'desc'}` : null,
+          page
+        }
+      },
+      {
+        cancelToken
+      }
+    );
   }
 
   saveNFSA(items, nfsa, dam, cancelToken) {

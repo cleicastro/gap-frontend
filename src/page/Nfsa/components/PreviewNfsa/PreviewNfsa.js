@@ -27,13 +27,11 @@ import {
 function PreviewNfsa() {
   const classes = useStyles();
   const {
-    state: {
-      showModalDetails,
-      dataNfsa: { id_dam: idDam, dam },
-      editNfsa
-    }
+    state: { showModalDetails, dataNfsa, editNfsa, document }
   } = useContext(NfsaContext);
 
+  const { id, dam } = dataNfsa;
+  const { emissao, vencimento } = document;
   const [openModalMenu, setOpenModalMenu] = useState(false);
   const setWindowNewNfsa = useOpenNewNfsa();
 
@@ -44,6 +42,7 @@ function PreviewNfsa() {
     valorNF,
     valorDam
   } = usePreviewNfsa();
+
   const [stepActivity, setStepActivity] = useStepNfsa();
 
   const [
@@ -53,20 +52,18 @@ function PreviewNfsa() {
     setEditStatus,
     setEdit
   ] = useSaveNfsa();
-
   const handlePrevStep = () => setStepActivity(stepActivity - 1);
   const handleSaveDAM = () => {
     setOpenModalMenu(true);
     if (!editNfsa) {
       setSave();
     } else {
-      setEdit();
+      setEdit(id);
     }
   };
 
   const handleAlterStatusDAM = (type, param) =>
-    setEditStatus(idDam, type, param);
-
+    setEditStatus(dam && dam.id, type, param);
   return (
     <>
       <Grid container spacing={2} direction="column">
@@ -116,7 +113,17 @@ function PreviewNfsa() {
           </Grid>
           <Grid container justify="space-between">
             <Grid item xs={5}>
-              <Typography>{dam.emissao}</Typography>
+              <Typography>
+                {Intl.DateTimeFormat('pt-BR', {
+                  year: 'numeric',
+                  month: 'numeric',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: 'numeric',
+                  second: 'numeric',
+                  hour12: false
+                }).format(new Date(dam ? dam.emissao : emissao))}
+              </Typography>
             </Grid>
             <Grid item xs={4} align="center">
               <Typography>
@@ -124,7 +131,7 @@ function PreviewNfsa() {
                   year: 'numeric',
                   month: 'numeric',
                   day: 'numeric'
-                }).format(new Date(dam.vencimento))}
+                }).format(new Date(dam ? dam.vencimento : vencimento))}
               </Typography>
             </Grid>
             <Grid item xs={3} align="right">
@@ -197,12 +204,12 @@ function PreviewNfsa() {
         <>
           {!editNfsa && (
             <Typography variant="subtitle1">
-              {`O Número do seu DAM é #${idDam}.\n
+              {`O Número da sua nota fiscal é #${id}.\n
                   Selecione um envento para este documento.`}
             </Typography>
           )}
           <MenuDocumentEvents
-            values={{ idDam }}
+            values={{ id_dam: dam && dam.id, id }}
             handleAlterStatusDAM={handleAlterStatusDAM}
             handleClose={setWindowNewNfsa}
             visibleOptions={{

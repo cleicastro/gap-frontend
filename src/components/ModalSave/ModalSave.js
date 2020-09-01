@@ -17,7 +17,6 @@ const ModalSave = ({
   const buttonClassname = clsx({
     [classes.buttonSuccess]: !statusServer
   });
-
   return (
     <Modal
       open={openModalMenu}

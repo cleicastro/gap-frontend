@@ -41,12 +41,11 @@ export const nfsaReducer = (state = INITIAL_STATE, action) => {
     case ACTIONS.UPDATE_NFSA:
       const { payload } = action;
       const { listNfsa } = state;
-
-      const newList = listNfsa.map((alvara) => {
-        if (alvara.id_dam === payload.id_dam) {
+      const newList = listNfsa.map((nfsa) => {
+        if (nfsa.dam.id === payload.dam.id) {
           return payload;
         }
-        return alvara;
+        return nfsa;
       });
       return {
         ...state,

@@ -115,7 +115,11 @@ function MenuDocumentEvents(props) {
             </MenuItem>
           )}
           {recibo && (
-            <MenuItem onClick={() => setAnchorElPrint(null)}>Recibo</MenuItem>
+            <MenuItem onClick={() => setAnchorElPrint(null)}>
+              <Link to={`pdf/recibo/${values.id}`} target="_blank">
+                Recibo
+              </Link>
+            </MenuItem>
           )}
           {alvara && (
             <MenuItem onClick={() => setAnchorElPrint(null)}>Alvará</MenuItem>

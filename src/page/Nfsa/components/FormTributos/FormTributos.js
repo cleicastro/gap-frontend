@@ -14,9 +14,14 @@ import {
 import { useForm } from 'react-hook-form';
 
 import { ButtonStep } from '../../../../components';
-import { useStepNfsa, useInitialTributosNfsa } from '../../../../hooks';
+import {
+  useStepNfsa,
+  useInitialTributosNfsa,
+  useSetNfsa
+} from '../../../../hooks';
 
 function FormTributos() {
+  const setDataNfsa = useSetNfsa();
   const [stepActivity, setStepActivity] = useStepNfsa();
   const [tributos, setTributos, setConvertToLiquid] = useInitialTributosNfsa();
   const { control, register, handleSubmit, setValue, watch } = useForm({
@@ -25,7 +30,7 @@ function FormTributos() {
 
   const setValueProcessed = (baseValue) => {
     setValue('baseCalculo', baseValue.baseCalculo);
-    setValue('irAliquota', baseValue.irAliquota);
+    setValue('irValorCalc', baseValue.irValorCalc);
     setValue('irValor', baseValue.irValor);
     setValue('valorDeducao', baseValue.valorDeducao);
     setValue('irPercente', baseValue.irPercente);
@@ -37,7 +42,7 @@ function FormTributos() {
     setValue('inssPercente', baseValue.inssPercente);
     setValue('inssValor', baseValue.inssValor);
     setValue('confinsPercente', baseValue.confinsPercente);
-    setValue('confisValor', baseValue.confisValor);
+    setValue('confinsValor', baseValue.confinsValor);
     setValue('csllPercente', baseValue.csllPercente);
     setValue('csllValor', baseValue.csllValor);
     setValue('irValorView', baseValue.irValor);
@@ -68,8 +73,8 @@ function FormTributos() {
   };
 
   const onSubmit = (data) => {
+    setDataNfsa({ ...tributos, ...data });
     setStepActivity(stepActivity + 1);
-    console.log(data);
   };
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate autoComplete="off">
@@ -286,7 +291,7 @@ function FormTributos() {
                     <TextField
                       fullWidth
                       label="IR"
-                      name="irAliquota"
+                      name="irValorCalc"
                       type="number"
                       inputRef={register}
                       disabled
@@ -446,7 +451,7 @@ function FormTributos() {
                   <Grid item xs={6} sm={6}>
                     <FormControl>
                       <Input
-                        name="confisValor"
+                        name="confinsValor"
                         type="number"
                         inputRef={register}
                         disabled

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 
 import {
   Grid,
@@ -14,13 +14,9 @@ import { useForm } from 'react-hook-form';
 import useStyles from './styles';
 import FormFilter from './FormFilter';
 import { useFilterNfsa } from '../../../../hooks';
-import { NfsaContext } from '../../../../contexts';
 
 function Filtros({ handleSair, showFiltro }) {
   const classes = useStyles();
-  const {
-    state: { receitaSeleted }
-  } = useContext(NfsaContext);
 
   // eslint-disable-next-line no-unused-vars
   const [statusServer, setFilter] = useFilterNfsa();
@@ -35,7 +31,7 @@ function Filtros({ handleSair, showFiltro }) {
     reset();
   };
   const setParams = (data) => {
-    const filter = { ...data, receitaFilter: receitaSeleted.cod };
+    const filter = { ...data };
     setFilter(filter);
   };
 

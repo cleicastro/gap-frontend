@@ -32,7 +32,8 @@ export {
   useStepNfsa,
   useInitialDocumentNfsa,
   useItemsNfsa,
-  useInitialTributosNfsa
+  useInitialTributosNfsa,
+  useSetNfsa
 } from './nfsa';
 
 export { useStoreReceita, useRequestReceita } from './receita';

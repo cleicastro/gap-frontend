@@ -15,13 +15,6 @@ export const ACTIONS = {
 };
 
 export const STATE_INITIAL = {
-  receitaSeleted: {
-    cod: '1121250000',
-    descricao: 'ALVARÁ DE LOCALIZAÇÃO',
-    icon: 'store',
-    sigla: 'ALVARA',
-    valor_fixo: 0
-  },
   dataNfsa: {},
   dataItemNfsa: [],
   taxpayerSeleted: {},
@@ -81,6 +74,7 @@ export const nfsaContextReducer = (state, action) => {
         return {
           taxpayerSeleted: {},
           dataNfsa: {},
+          dataItemNfsa: [],
           activeStep: 0,
           document: {},
           editNfsa: false,

@@ -19,7 +19,7 @@ import AddIcon from '@material-ui/icons/Save';
 import { useForm } from 'react-hook-form';
 import { ButtonStep } from '../../../../components';
 import { useStepNfsa, useItemsNfsa } from '../../../../hooks';
-import { mascaraReal, itemNfsaSchema } from '../../../../util';
+import { mascaraReal } from '../../../../util';
 import { NfsaContext, ACTIONS_NFSA } from '../../../../contexts';
 
 const useStyles = makeStyles((theme) => ({
@@ -48,9 +48,7 @@ function FormItems() {
     reset,
     getValues,
     setValue
-  } = useForm({
-    validationSchema: itemNfsaSchema
-  });
+  } = useForm();
   const [items, totalItems, setAddItem, setRemoveItem] = useItemsNfsa();
   const [stepActivity, setStepActivity] = useStepNfsa();
 
@@ -70,8 +68,11 @@ function FormItems() {
   };
 
   const handleAdditem = () => {
-    setAddItem(getValues());
-    reset();
+    const { valor, quantidade } = getValues();
+    if (Number(valor) > 0 && Number(quantidade) > 0) {
+      setAddItem(getValues());
+      reset();
+    }
   };
 
   return (
@@ -79,6 +80,7 @@ function FormItems() {
       <Grid container spacing={3} justify="flex-end" alignItems="flex-end">
         <Grid item xs={12} sm={7}>
           <TextField
+            disabled={items.length === 1}
             multiline
             rowsMax={4}
             inputRef={register}
@@ -96,6 +98,7 @@ function FormItems() {
         </Grid>
         <Grid item xs={6} sm={2}>
           <TextField
+            disabled={items.length === 1}
             inputRef={register}
             control={control}
             InputLabelProps={{
@@ -111,6 +114,7 @@ function FormItems() {
         </Grid>
         <Grid item xs={6} sm={3}>
           <TextField
+            disabled={items.length === 1}
             inputRef={register}
             control={control}
             InputLabelProps={{
@@ -122,7 +126,7 @@ function FormItems() {
               ),
               endAdornment: (
                 <InputAdornment position="end">
-                  <Button type="submit">
+                  <Button disabled={items.length === 1} type="submit">
                     <AddIcon size={16} />
                   </Button>
                 </InputAdornment>
