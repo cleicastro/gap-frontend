@@ -26,7 +26,6 @@ const PdfDam = () => {
         setLoad(false);
       } catch (error) {
         setLoad(false);
-
       }
     }
     requestDAM();

@@ -63,9 +63,8 @@ function SectionLeft({ contribuinte, infoAdicionais }) {
           <Text> OBSERVAÇÃO </Text>
         </View>
         <Observacao>
-          Pagável na SEFIN ou Banco do Brasil{' '}
-          <TextRed> AG: 2144-X C/C: 27015-6</TextRed> Sr. contribuinte, trazer
-          comprovante de pagamento na SEFIN.
+          Pagável na SEFIN ou Banco do Brasil AG: 2144-X C/C: 27015-6 Sr.
+          contribuinte, trazer comprovante de pagamento na SEFIN.
         </Observacao>
       </View>
       <View style={styles.rodape}>
