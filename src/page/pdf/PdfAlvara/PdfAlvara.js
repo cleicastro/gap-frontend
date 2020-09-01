@@ -4,30 +4,32 @@ import { PDFViewer, Page, Document } from '@react-pdf/renderer';
 import { CircularProgress, Grid, Typography } from '@material-ui/core';
 import Axios from 'axios';
 
-import { Nfsa } from '../../services';
+import { AlvaraFuncionamento } from '../../../services';
 import { styles, useStyles } from './styles';
 import { Section } from './components';
 
-const PrinterNFSA = () => {
+const PdfAlvara = () => {
   const classes = useStyles();
   const path = window.location.pathname.split('/');
   const id = Number(path[3]);
-  const [nfsa, setNfsa] = useState(null);
+  const [alvara, setAlvara] = useState(null);
   const [load, setLoad] = useState(true);
 
   useEffect(() => {
     const tokenNFSA = Axios.CancelToken.source();
-    async function requestNFSA() {
+    async function requestAlvara() {
       try {
-        const response = await Nfsa.getNFSAIndex(id, tokenNFSA.token);
-        setNfsa(response.data);
+        const response = await AlvaraFuncionamento.getAlvaraAlvaraIndex(
+          id,
+          tokenNFSA.token
+        );
+        setAlvara(response.data.data);
         setLoad(false);
       } catch (error) {
         setLoad(false);
-
       }
     }
-    requestNFSA();
+    requestAlvara();
     return () => {
       tokenNFSA.cancel('Request cancell');
     };
@@ -43,7 +45,7 @@ const PrinterNFSA = () => {
     );
   }
 
-  if (!nfsa && !load) {
+  if (!alvara && !load) {
     return (
       <Grid
         container
@@ -64,11 +66,11 @@ const PrinterNFSA = () => {
     <PDFViewer style={styles.container}>
       <Document>
         <Page size="A4" style={classes.page}>
-          <Section nfsa={nfsa} />
+          <Section alvara={alvara} />
         </Page>
       </Document>
     </PDFViewer>
   );
 };
 
-export default PrinterNFSA;
+export default PdfAlvara;

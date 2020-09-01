@@ -122,7 +122,13 @@ function MenuDocumentEvents(props) {
             </MenuItem>
           )}
           {alvara && (
-            <MenuItem onClick={() => setAnchorElPrint(null)}>Alvará</MenuItem>
+            <MenuItem onClick={() => setAnchorElPrint(null)}>
+              <Link
+                to={`pdf/alvara/${values.id_dam ? values.id_dam : values.id}`}
+                target="_blank">
+                Alvará
+              </Link>
+            </MenuItem>
           )}
         </Menu>
         <Menu

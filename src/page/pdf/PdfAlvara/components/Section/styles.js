@@ -6,16 +6,25 @@ const styles = StyleSheet.create({
   section: {
     display: 'flex',
     flexGrow: 1,
-    margin: 5
+    alignItems: 'center'
+  },
+  main: {
+    padding: 26,
+    border: '10px solid #A9A9A9',
+    borderStyle: 'outset',
+    borderLeftColor: 'grey',
+    borderRadius: 5,
+    width: '75%',
+    marginTop: 30
   },
   gridContainer: {
     flexDirection: 'row',
     justifyContent: 'center'
   },
   logo: {
-    height: 48,
-    width: 48,
-    marginRight: 20,
+    height: 64,
+    width: 55,
+    marginBottom: 10,
     alignContent: 'center'
   },
   qrCode: {
@@ -34,12 +43,12 @@ const styles = StyleSheet.create({
 });
 
 const TextValues = styled.Text`
-  font-size: 9px;
+  font-size: 11px;
   margin: 2px;
   font-family: Roboto;
 `;
 const TextTitle = styled.Text`
-  font-size: 10px;
+  font-size: 12px;
   margin: 2px;
 `;
 

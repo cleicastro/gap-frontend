@@ -11,6 +11,7 @@ import {
   PdfDam as PDFDAM,
   PdfNfsa as PDFNFSA,
   PdfRecibo as PDFRECIBO,
+  PdfAlvara as PDFALVARA,
   User as UserView,
   AlvaraFuncionamento as AlvaraFuncionamentoView
 } from './page';
@@ -24,6 +25,7 @@ const Routes = () => (
       <Route path="/pdf/dam" component={PDFDAM} />
       <Route path="/pdf/nfsa" component={PDFNFSA} />
       <Route path="/pdf/recibo" component={PDFRECIBO} />
+      <Route path="/pdf/alvara" component={PDFALVARA} />
       <PrivateRoute
         component={DashboardView}
         exact
