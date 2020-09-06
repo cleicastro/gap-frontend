@@ -9,8 +9,11 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 700
   },
   title: {
-    marginTop: theme.spacing(2)
+    display: 'flex',
+    marginTop: theme.spacing(2),
+    justifyContent: 'center'
   },
+
   progress: {
     display: 'flex',
     justifyContent: 'center'

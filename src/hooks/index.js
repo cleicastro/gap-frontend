@@ -1,16 +1,5 @@
+export { usePreviewDam, useFilterDam, useStepDam } from './dam';
 export {
-  useDam,
-  useSaveDam,
-  usePreviewDam,
-  useStoreDam,
-  useOpenNewDam,
-  usePaginationDam,
-  useFilterDam,
-  useInitialDocument,
-  useStepDam
-} from './dam';
-export {
-  useAlvara,
   useStoreAlvara,
   usePaginationAlvara,
   useFilterAlvara,
@@ -38,4 +27,8 @@ export {
 
 export { useStoreReceita, useRequestReceita } from './receita';
 
-export { useContribuinte } from './contribuinte';
+export {
+  useSearchCNPJ,
+  useSaveContribuinte,
+  useEditContribuinte
+} from './contribuinte';

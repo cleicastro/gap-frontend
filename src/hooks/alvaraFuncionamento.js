@@ -1,15 +1,9 @@
-import { useSelector, useDispatch } from 'react-redux';
-
 import Axios from 'axios';
 import { useEffect, useContext, useState, useRef } from 'react';
 import { AlvaraFuncionamento } from '../services';
-import { ACTIONS as ACTIONS_ALVARA } from '../store/alvaraFuncionamentoReducer';
 import { dateFormatPTBR } from '../util';
 
-import {
-  AlvaraFuncionamentoContext,
-  ACTIONS_ALVARA as ACTIONS_ALVARA_CONTEXT
-} from '../contexts';
+import { AlvaraFuncionamentoContext, ACTIONS_ALVARA } from '../contexts';
 
 const tokenAlvara = Axios.CancelToken.source();
 
@@ -35,16 +29,19 @@ function dateSetting(dateVencimento) {
     year: 'numeric'
   }).format(toDay);
 
+  const newdate = new Date(Date(dateVencimento));
+  const dateVencimentoAux = newdate.setDate(newdate.getDate() + diasVencer);
+
   const vencimento = Intl.DateTimeFormat('fr-CA', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric'
-  }).format(dateVencimento.setDate(dateVencimento.getDate() + diasVencer));
+  }).format(new Date(dateVencimentoAux));
 
   const emissao = new Date(`${new Date().toString().split('GMT')[0]} UTC`)
     .toISOString()
-    .split('.')[0]
-    .replace('T', ' ');
+    .split('.')[0];
+  // .replace('T', ' ');
 
   return {
     referencia,
@@ -117,29 +114,11 @@ function editAlvaraAction(alvara) {
   };
 }
 
-export const useAlvara = () => {
-  let statusServer = null;
-  const dispatch = useDispatch();
-
-  statusServer = useEffect(() => {
-    const params = { page: 1 };
-    requestAlvara(params).then((response) => {
-      dispatch(initialAlvaraAction(response.data));
-      if (response.status !== 201) {
-        return response.status;
-      }
-      return null;
-    });
-  }, [dispatch]);
-
-  return statusServer;
-};
-
 export const useStoreAlvara = () => {
-  const { dispatch } = useContext(AlvaraFuncionamentoContext);
-  const listAlvara = useSelector(
-    (state) => state.alvaraFuncionamento.listAlvara
-  );
+  const {
+    state: { listAlvara },
+    dispatch
+  } = useContext(AlvaraFuncionamentoContext);
   const valueTotal = listAlvara.reduce(
     (acc, alvara) => (acc + alvara.dam ? Number(alvara.dam.valor_total) : 0),
     0
@@ -163,7 +142,7 @@ export const useStoreAlvara = () => {
     } = alvara.dam;
 
     dispatch({
-      type: ACTIONS_ALVARA_CONTEXT.DOCUMENT,
+      type: ACTIONS_ALVARA.DOCUMENT,
       payload: {
         id,
         referencia,
@@ -181,17 +160,17 @@ export const useStoreAlvara = () => {
       }
     });
     dispatch({
-      type: ACTIONS_ALVARA_CONTEXT.SELECT_TAXPAYER,
+      type: ACTIONS_ALVARA.SELECT_TAXPAYER,
       payload: {
         ...contribuinte
       }
     });
     dispatch({
-      type: ACTIONS_ALVARA_CONTEXT.MODAL_DETAILS,
+      type: ACTIONS_ALVARA.MODAL_DETAILS,
       payload: true
     });
     dispatch({
-      type: ACTIONS_ALVARA_CONTEXT.SELECT_ALVARA_FUNCIONAMENTO,
+      type: ACTIONS_ALVARA.SELECT_ALVARA_FUNCIONAMENTO,
       payload: { ...alvara }
     });
   }
@@ -199,10 +178,9 @@ export const useStoreAlvara = () => {
 };
 
 export const usePaginationAlvara = () => {
-  const { pagination } = useSelector((state) => state.alvaraFuncionamento);
-  const dispatch = useDispatch();
   const {
-    state: { paramsQuery }
+    state: { paramsQuery, pagination },
+    dispatch
   } = useContext(AlvaraFuncionamentoContext);
 
   let statusServer = null;
@@ -224,8 +202,7 @@ export const usePaginationAlvara = () => {
 
 export const useFilterAlvara = () => {
   const [statusServer, setStatusServer] = useState(null);
-  const dispatch = useDispatch();
-  const { dispatch: dispatchAlvara } = useContext(AlvaraFuncionamentoContext);
+  const { dispatch } = useContext(AlvaraFuncionamentoContext);
 
   function setParams(params) {
     setStatusServer(null);
@@ -233,8 +210,8 @@ export const useFilterAlvara = () => {
       dispatch(initialAlvaraAction(response.data));
       setStatusServer(response.status);
     });
-    dispatchAlvara({
-      type: ACTIONS_ALVARA_CONTEXT.PARAMS_QUERY,
+    dispatch({
+      type: ACTIONS_ALVARA.PARAMS_QUERY,
       payload: params
     });
 
@@ -254,13 +231,12 @@ export const useSaveAlvara = () => {
       dataDam,
       dataAlvaraFunvionamento
     },
-    dispatch: dispatchAlvara
+    dispatch
   } = useContext(AlvaraFuncionamentoContext);
   const idContribuinte = taxpayerSeleted.id;
   const [statusServer, setStatusServer] = useState(null);
   const [successRequest, setSuccessRequest] = useState(false);
   const timer = useRef();
-  const dispatch = useDispatch();
 
   useEffect(() => {
     timer.current = setTimeout(() => {
@@ -280,11 +256,11 @@ export const useSaveAlvara = () => {
       dispatch(addNewAlvaraAction(response));
       setStatusServer(response.status);
       dispatch({
-        type: ACTIONS_ALVARA_CONTEXT.SELECT_ALVARA_FUNCIONAMENTO,
+        type: ACTIONS_ALVARA.SELECT_ALVARA_FUNCIONAMENTO,
         payload: response.data
       });
-      dispatchAlvara({
-        type: ACTIONS_ALVARA_CONTEXT.SELECT_ALVARA_FUNCIONAMENTO,
+      dispatch({
+        type: ACTIONS_ALVARA.SELECT_ALVARA_FUNCIONAMENTO,
         payload: response.data
       });
     });
@@ -301,8 +277,8 @@ export const useSaveAlvara = () => {
       } else if (type === 'cancel') {
         alvara = { ...alvara, dam: { ...dam, status: 'Cancelado' } };
       }
-      dispatchAlvara({
-        type: ACTIONS_ALVARA_CONTEXT.SELECT_ALVARA_FUNCIONAMENTO,
+      dispatch({
+        type: ACTIONS_ALVARA.SELECT_ALVARA_FUNCIONAMENTO,
         payload: alvara
       });
       dispatch(editAlvaraAction(alvara));
@@ -329,8 +305,8 @@ export const useSaveAlvara = () => {
     editAlvara(param.id, { ...document, idContribuinte }).then((response) => {
       dispatch(editAlvaraAction(param));
       setStatusServer(response.status);
-      dispatchAlvara({
-        type: ACTIONS_ALVARA_CONTEXT.SELECT_ALVARA_FUNCIONAMENTO,
+      dispatch({
+        type: ACTIONS_ALVARA.SELECT_ALVARA_FUNCIONAMENTO,
         payload: param
       });
     });
@@ -343,7 +319,7 @@ export const useOpenNewAlvara = () => {
 
   function setWindow() {
     dispatch({
-      type: ACTIONS_ALVARA_CONTEXT.MODAL_NEW
+      type: ACTIONS_ALVARA.MODAL_NEW_ALVARA
     });
   }
   return setWindow;
@@ -354,17 +330,10 @@ export const usePreviewAlvara = () => {
     state: { document, taxpayerSeleted, dataAlvaraFunvionamento }
   } = useContext(AlvaraFuncionamentoContext);
 
-  const {
-    juros,
-    valorMulta,
-    valorPrincipal,
-    taxaExp,
-    valorTotal,
-    vencimento,
-    infoAdicionais
-  } = document;
+  const { juros, valorMulta, valorPrincipal, taxaExp, valorTotal } = document;
   const { nome, doc } = taxpayerSeleted;
-  const descricao = dataAlvaraFunvionamento.atividade_principal;
+  const descricao =
+    dataAlvaraFunvionamento && dataAlvaraFunvionamento.atividade_principal;
 
   return {
     items: [
@@ -375,7 +344,7 @@ export const usePreviewAlvara = () => {
     ],
     valorTotal,
     contribuinte: { nome, doc },
-    dam: { vencimento, infoAdicionais }
+    dam: { ...document, idContribuinte: taxpayerSeleted.id }
   };
 };
 
@@ -386,7 +355,7 @@ export const useStepAlvara = () => {
   } = useContext(AlvaraFuncionamentoContext);
 
   const navigate = (valor) => {
-    dispatch({ type: ACTIONS_ALVARA_CONTEXT.ACTIVE_STEP, payload: valor });
+    dispatch({ type: ACTIONS_ALVARA.ACTIVE_STEP, payload: valor });
   };
   return [activeStep, navigate];
 };
@@ -402,10 +371,9 @@ export const useInitialDocumentAlvara = () => {
     : initialValues(receitaSeleted);
 
   function setDocument(data) {
-    const { vencimento } = dateSetting(data.vencimento);
     dispatch({
-      type: ACTIONS_ALVARA_CONTEXT.DOCUMENT,
-      payload: { ...values, ...data, vencimento }
+      type: ACTIONS_ALVARA.DOCUMENT,
+      payload: { ...values, ...data }
     });
   }
   return [values, setDocument];

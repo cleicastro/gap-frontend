@@ -16,7 +16,7 @@ import {
   useMediaQuery
 } from '@material-ui/core';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 
 import useStyles from './styles';
 import FormFilter from './FormFilter';
@@ -72,7 +72,7 @@ function Filtros({ className, handleSair, showFiltro, ...rest }) {
   const [statusServer, setFilter] = useFilterDam();
   const [receitas] = useStoreReceita();
 
-  const { handleSubmit, control, register, setValue, reset } = useForm();
+  const methods = useForm();
 
   useEffect(() => {
     const listReceitaMap = [];
@@ -122,11 +122,12 @@ function Filtros({ className, handleSair, showFiltro, ...rest }) {
     setLeft(left.concat(right));
     setRight([]);
     setFilter({});
-    reset();
+    methods.reset();
   };
   const setParams = (data) => {
     const filter = { ...data, receitaFilter: right.join(',') };
     setFilter(filter);
+    handleSair();
   };
 
   return (
@@ -135,14 +136,68 @@ function Filtros({ className, handleSair, showFiltro, ...rest }) {
       open={showFiltro}
       maxWidth="lg"
       aria-labelledby="customized-dialog-title">
-      {/* <DialogTitle id="customized-dialog-title">Filtro</DialogTitle> */}
-      <form
-        onSubmit={handleSubmit(setParams)}
-        noValidate
-        autoComplete="off"
-        id="formFiltro">
-        <DialogContent dividers>
-          <div {...rest} className={clsx(classes.root, className)}>
+      <FormProvider {...methods}>
+        <form
+          onSubmit={methods.handleSubmit(setParams)}
+          noValidate
+          autoComplete="off"
+          id="formFiltro">
+          <DialogContent dividers>
+            <div {...rest} className={clsx(classes.root, className)}>
+              <Grid
+                container
+                spacing={2}
+                justify="flex-start"
+                alignItems="flex-start"
+                className={classes.root}>
+                <Grid item>
+                  {customList(left, checked, classes, handleToggle)}
+                </Grid>
+                <Grid item>
+                  <Grid container direction="column" alignItems="center">
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      className={classes.button}
+                      onClick={handleAllRight}
+                      disabled={left.length === 0}
+                      aria-label="move all right">
+                      ≫
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      className={classes.button}
+                      onClick={handleCheckedRight}
+                      disabled={leftChecked.length === 0}
+                      aria-label="move selected right">
+                      &gt;
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      className={classes.button}
+                      onClick={handleCheckedLeft}
+                      disabled={rightChecked.length === 0}
+                      aria-label="move selected left">
+                      &lt;
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      className={classes.button}
+                      onClick={handleAllLeft}
+                      disabled={right.length === 0}
+                      aria-label="move all left">
+                      ≪
+                    </Button>
+                  </Grid>
+                </Grid>
+                <Grid item>
+                  {customList(right, checked, classes, handleToggle)}
+                </Grid>
+              </Grid>
+            </div>
             <Grid
               container
               spacing={2}
@@ -150,80 +205,23 @@ function Filtros({ className, handleSair, showFiltro, ...rest }) {
               alignItems="flex-start"
               className={classes.root}>
               <Grid item>
-                {customList(left, checked, classes, handleToggle)}
-              </Grid>
-              <Grid item>
-                <Grid container direction="column" alignItems="center">
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    className={classes.button}
-                    onClick={handleAllRight}
-                    disabled={left.length === 0}
-                    aria-label="move all right">
-                    ≫
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    className={classes.button}
-                    onClick={handleCheckedRight}
-                    disabled={leftChecked.length === 0}
-                    aria-label="move selected right">
-                    &gt;
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    className={classes.button}
-                    onClick={handleCheckedLeft}
-                    disabled={rightChecked.length === 0}
-                    aria-label="move selected left">
-                    &lt;
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    className={classes.button}
-                    onClick={handleAllLeft}
-                    disabled={right.length === 0}
-                    aria-label="move all left">
-                    ≪
-                  </Button>
-                </Grid>
-              </Grid>
-              <Grid item>
-                {customList(right, checked, classes, handleToggle)}
+                <FormFilter />
               </Grid>
             </Grid>
-          </div>
-          <Grid
-            container
-            spacing={2}
-            justify="flex-start"
-            alignItems="flex-start"
-            className={classes.root}>
-            <Grid item>
-              <FormFilter
-                register={register}
-                control={control}
-                setValue={setValue}
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button type="submit" color="primary">
-            Filtrar
-          </Button>
-          <Button onClick={handleClearFilter} color="primary">
-            Limpar
-          </Button>
-          <Button onClick={handleSair} color="primary">
-            Sair
-          </Button>
-        </DialogActions>
-      </form>
+          </DialogContent>
+          <DialogActions>
+            <Button type="submit" color="primary">
+              Filtrar
+            </Button>
+            <Button onClick={handleClearFilter} color="primary">
+              Limpar
+            </Button>
+            <Button onClick={handleSair} color="primary">
+              Sair
+            </Button>
+          </DialogActions>
+        </form>
+      </FormProvider>
     </Dialog>
   );
 }

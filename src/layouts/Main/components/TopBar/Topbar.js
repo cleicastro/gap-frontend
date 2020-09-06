@@ -11,7 +11,9 @@ import clsx from 'clsx';
 import {
   NotificationsOutlined as NotificarionIcon,
   Input as InputIcon,
-  Menu as MenuIcon
+  Menu as MenuIcon,
+  Brightness2 as IconDark,
+  Brightness7 as IconLight
 } from '@material-ui/icons';
 
 import { bindActionCreators } from 'redux';
@@ -33,7 +35,7 @@ function TopBar({
 }) {
   const classes = useStyles();
   const history = useHistory();
-
+  const theme = localStorage.getItem('theme');
   function logoutUser() {
     actionLogout();
   }
@@ -46,6 +48,15 @@ function TopBar({
     }
   }, [history, logoutMsg]);
 
+  const handleSelectTheme = () => {
+    if (theme === 'dark') {
+      localStorage.setItem('theme', 'light');
+    } else {
+      localStorage.setItem('theme', 'dark');
+    }
+    document.location.reload();
+  };
+
   return (
     <AppBar {...rest} className={clsx(classes.root, className)}>
       <Toolbar>
@@ -54,6 +65,11 @@ function TopBar({
           <Typography color="secondary">GAP Ryatec</Typography>
         </Link>
         <div className={classes.flexGrow} />
+        <IconButton color="inherit" onClick={handleSelectTheme}>
+          <Badge badgeContent={0} color="secondary">
+            {theme === 'dark' ? <IconLight /> : <IconDark />}
+          </Badge>
+        </IconButton>
         <Hidden mdDown>
           <IconButton color="inherit">
             <Badge badgeContent={0} color="secondary">

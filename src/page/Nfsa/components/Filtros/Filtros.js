@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
 import {
   Grid,
@@ -9,30 +9,30 @@ import {
   useTheme,
   useMediaQuery
 } from '@material-ui/core';
-import { useForm } from 'react-hook-form';
-
+import { useForm, FormProvider } from 'react-hook-form';
 import useStyles from './styles';
 import FormFilter from './FormFilter';
 import { useFilterNfsa } from '../../../../hooks';
 
 function Filtros({ handleSair, showFiltro }) {
   const classes = useStyles();
-
   // eslint-disable-next-line no-unused-vars
   const [statusServer, setFilter] = useFilterNfsa();
 
-  const { handleSubmit, control, register, setValue, reset } = useForm();
+  const methods = useForm();
 
   const theme = useTheme();
   const fullScreenModal = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const handleClearFilter = () => {
+  const handleClearFilter = useCallback(() => {
     setFilter({});
-    reset();
-  };
+    methods.reset();
+  }, [methods, setFilter]);
+
   const setParams = (data) => {
     const filter = { ...data };
     setFilter(filter);
+    handleSair();
   };
 
   return (
@@ -41,39 +41,37 @@ function Filtros({ handleSair, showFiltro }) {
       open={showFiltro}
       maxWidth="lg"
       aria-labelledby="customized-dialog-title">
-      <form
-        onSubmit={handleSubmit(setParams)}
-        noValidate
-        autoComplete="off"
-        id="formFiltro">
-        <DialogContent dividers>
-          <Grid
-            container
-            spacing={2}
-            justify="flex-start"
-            alignItems="flex-start"
-            className={classes.root}>
-            <Grid item>
-              <FormFilter
-                register={register}
-                control={control}
-                setValue={setValue}
-              />
+      <FormProvider {...methods}>
+        <form
+          onSubmit={methods.handleSubmit(setParams)}
+          noValidate
+          autoComplete="off"
+          id="formFiltro">
+          <DialogContent dividers>
+            <Grid
+              container
+              spacing={2}
+              justify="flex-start"
+              alignItems="flex-start"
+              className={classes.root}>
+              <Grid item>
+                <FormFilter />
+              </Grid>
             </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button type="submit" color="primary">
-            Filtrar
-          </Button>
-          <Button onClick={handleClearFilter} color="primary">
-            Limpar
-          </Button>
-          <Button onClick={handleSair} color="primary">
-            Sair
-          </Button>
-        </DialogActions>
-      </form>
+          </DialogContent>
+          <DialogActions>
+            <Button type="submit" color="primary">
+              Filtrar
+            </Button>
+            <Button onClick={handleClearFilter} color="primary">
+              Limpar
+            </Button>
+            <Button onClick={handleSair} color="primary">
+              Sair
+            </Button>
+          </DialogActions>
+        </form>
+      </FormProvider>
     </Dialog>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 
 import {
   FormControlLabel,
@@ -6,30 +6,75 @@ import {
   Typography,
   Slider,
   TextField,
-  Radio,
+  Checkbox,
   Grid
 } from '@material-ui/core';
 
+import { useFormContext } from 'react-hook-form';
 import useStyles from './styles';
+import { NfsaContext } from '../../../../../contexts';
 
-function FormFilter({ register, control, setValue }) {
+function FormFilter() {
+  const { register, setValue, control } = useFormContext();
+  const {
+    state: { paramsQuery }
+  } = useContext(NfsaContext);
   const classes = useStyles();
-  const [selectedSituacao, setSelectedSituacao] = useState('all');
-
+  const [selectedSituacao, setSelectedSituacao] = useState({
+    pago: true,
+    vencer: true,
+    inadimplente: true,
+    cancelado: true,
+    all: true
+  });
   const [valueSlide, setValueSlide] = useState([0, 1000]);
+
+  useEffect(() => {
+    setValue('dataInicialFilter', paramsQuery.dataInicialFilter);
+    setValue('dataFinalFilter', paramsQuery.dataFinalFilter);
+    setValue('id', paramsQuery.id);
+    setValue('namePrestadorFilter', paramsQuery.namePrestadorFilter);
+    setValue('docPrestadorFilter', paramsQuery.docPrestadorFilter);
+    setValue('nameTomadorFilter', paramsQuery.nameTomadorFilter);
+    setValue('docTomadorFilter', paramsQuery.docTomadorFilter);
+    setValue('valorTotalFilter', paramsQuery.valorTotalFilter);
+    setSelectedSituacao({
+      pago: paramsQuery.pago || true,
+      vencer: paramsQuery.vencer || true,
+      inadimplente: paramsQuery.inadimplente || true,
+      cancelado: paramsQuery.cancelado || true,
+      all: paramsQuery.all || true
+    });
+    setValueSlide(
+      paramsQuery.valorTotalFilter
+        ? paramsQuery.valorTotalFilter.split(',').map(Number)
+        : [0, 1000]
+    );
+  }, [paramsQuery, setValue]);
 
   const handleChangeSlide = (event, newValue) => {
     setValueSlide(newValue);
     setValue('valorTotalFilter', newValue);
   };
-  const handleChangeRadioSituacao = (event) => {
-    setSelectedSituacao(event.target.value);
+  const handleChangeCheckboxSituacao = (event) => {
+    const { name, checked } = event.target;
+    setSelectedSituacao(
+      name === 'all'
+        ? {
+          pago: checked,
+          vencer: checked,
+          inadimplente: checked,
+          cancelado: checked,
+          all: checked
+        }
+        : { ...selectedSituacao, all: false, [name]: checked }
+    );
   };
 
   return (
     <div className={classes.root}>
       <Grid container spacing={3}>
-        <Grid item xs={6}>
+        <Grid item xs={4}>
           <TextField
             fullWidth
             id="dataInicialFilter"
@@ -44,7 +89,7 @@ function FormFilter({ register, control, setValue }) {
             control={control}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={4}>
           <TextField
             fullWidth
             id="dataFinalFilter"
@@ -59,103 +104,118 @@ function FormFilter({ register, control, setValue }) {
             control={control}
           />
         </Grid>
-      </Grid>
-      <Grid container spacing={3}>
-        <Grid item xs={6}>
+        <Grid item xs={4}>
           <TextField
             fullWidth
-            id="docContribuinteFilter"
-            name="docContribuinteFilter"
+            id="id"
+            name="id"
+            label="N° NFSA"
+            className={classes.textField}
+            inputRef={register}
+            control={control}
+          />
+        </Grid>
+      </Grid>
+      <Grid container spacing={3}>
+        <Grid item xs={4}>
+          <TextField
+            fullWidth
+            id="docPrestadorFilter"
+            name="docPrestadorFilter"
             label="CNPJ/CPF:"
             className={classes.textField}
             inputRef={register}
             control={control}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={8}>
+          <TextField
+            className={classes.textField}
+            id="namePrestadorFilter"
+            name="namePrestadorFilter"
+            label="Prestador:"
+            fullWidth
+            inputRef={register}
+            control={control}
+          />
+        </Grid>
+      </Grid>
+      <Grid container spacing={3}>
+        <Grid item xs={4}>
           <TextField
             fullWidth
-            id="id"
-            name="id"
-            label="N° DAM"
+            id="docTomadorFilter"
+            name="docTomadorFilter"
+            label="CNPJ/CPF:"
             className={classes.textField}
+            inputRef={register}
+            control={control}
+          />
+        </Grid>
+        <Grid item xs={8}>
+          <TextField
+            className={classes.textField}
+            id="nameTomadorFilter"
+            name="nameTomadorFilter"
+            label="Tomador:"
+            fullWidth
             inputRef={register}
             control={control}
           />
         </Grid>
       </Grid>
       <FormGroup row>
-        <TextField
-          id="nameContribuinteFilter"
-          name="nameContribuinteFilter"
-          label="Contribuinte:"
-          fullWidth
-          inputRef={register}
-          control={control}
-        />
-      </FormGroup>
-      <FormGroup row>
         <FormControlLabel
           inputRef={register}
-          value="pago"
           control={
-            <Radio
-              checked={selectedSituacao === 'pago'}
-              onChange={handleChangeRadioSituacao}
-              name="situacaoFilter"
-              inputProps={{ 'aria-label': 'Pago' }}
+            <Checkbox
+              checked={selectedSituacao.pago}
+              onChange={handleChangeCheckboxSituacao}
+              name="pago"
             />
           }
           label="Pago"
         />
         <FormControlLabel
           inputRef={register}
-          value="vencer"
           control={
-            <Radio
-              checked={selectedSituacao === 'vencer'}
-              onChange={handleChangeRadioSituacao}
-              name="situacaoFilter"
-              inputProps={{ 'aria-label': 'Vencer' }}
+            <Checkbox
+              checked={selectedSituacao.vencer}
+              onChange={handleChangeCheckboxSituacao}
+              name="vencer"
             />
           }
           label="À Vencer"
         />
         <FormControlLabel
           inputRef={register}
-          value="inadimplente"
           control={
-            <Radio
-              checked={selectedSituacao === 'inadimplente'}
-              onChange={handleChangeRadioSituacao}
-              name="situacaoFilter"
-              inputProps={{ 'aria-label': 'Inadimplente' }}
+            <Checkbox
+              checked={selectedSituacao.inadimplente}
+              onChange={handleChangeCheckboxSituacao}
+              name="inadimplente"
             />
           }
           label="Inadimplente"
         />
         <FormControlLabel
           inputRef={register}
-          value="cancelado"
           control={
-            <Radio
-              checked={selectedSituacao === 'cancelado'}
-              onChange={handleChangeRadioSituacao}
-              name="situacaoFilter"
-              inputProps={{ 'aria-label': 'Cancelado' }}
+            <Checkbox
+              checked={selectedSituacao.cancelado}
+              onChange={handleChangeCheckboxSituacao}
+              name="cancelado"
             />
           }
           label="Cancelado"
         />
         <FormControlLabel
           inputRef={register}
-          value="all"
           control={
-            <Radio
-              checked={selectedSituacao === 'all'}
-              onChange={handleChangeRadioSituacao}
-              name="situacaoFilter"
-              inputProps={{ 'aria-label': 'Todos' }}
+            <Checkbox
+              checked={selectedSituacao.all}
+              onChange={handleChangeCheckboxSituacao}
+              name="all"
             />
           }
           label="Todos"
@@ -163,7 +223,7 @@ function FormFilter({ register, control, setValue }) {
       </FormGroup>
       <FormGroup row style={{ marginTop: 15 }}>
         <Typography id="range-slider" gutterBottom>
-          Valor do DAM
+          Valor bruto da nota fiscal
         </Typography>
         <Slider
           value={valueSlide}

@@ -12,8 +12,10 @@ import {
   Button
 } from '@material-ui/core';
 
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import useStyles from './styles';
+import { ACTION } from '../../store/datePayDam';
 
 function MenuDocumentEvents(props) {
   const {
@@ -40,6 +42,8 @@ function MenuDocumentEvents(props) {
   const [anchorElPrint, setAnchorElPrint] = useState(null);
   const [anchorElPagar, setAnchorElPagar] = useState(null);
   const [anchorElCancelar, setAnchorElCancelar] = useState(null);
+  const dispatch = useDispatch();
+  const vencimento = useSelector((state) => state.datePayment.datePayment);
 
   const handleOpenPrint = (event) => {
     setAnchorElPrint(event.currentTarget);
@@ -51,12 +55,20 @@ function MenuDocumentEvents(props) {
     setAnchorElCancelar(event.currentTarget);
   };
 
+  const handleVencimento = (event) => {
+    dispatch({
+      type: ACTION.DATE_PAY,
+      payload: event.target.value
+    });
+    return event.target.value;
+  };
+
   return (
     <Grid
       container
       spacing={2}
-      justify="flex-start"
-      alignItems="flex-start"
+      justify="space-between"
+      alignItems="center"
       className={classes.root}>
       <Grid item sm={6}>
         <ButtonGroup
@@ -100,13 +112,6 @@ function MenuDocumentEvents(props) {
           open={Boolean(anchorElPrint)}
           onClose={() => setAnchorElPrint(null)}
           TransitionComponent={Fade}>
-          <MenuItem onClick={() => setAnchorElPrint(null)}>
-            <Link
-              to={`pdf/dam/${values.id_dam ? values.id_dam : values.id}`}
-              target="_blank">
-              DAM
-            </Link>
-          </MenuItem>
           {nfsa && (
             <MenuItem onClick={() => setAnchorElPrint(null)}>
               <Link to={`pdf/nfsa/${values.id}`} target="_blank">
@@ -114,6 +119,13 @@ function MenuDocumentEvents(props) {
               </Link>
             </MenuItem>
           )}
+          <MenuItem onClick={() => setAnchorElPrint(null)}>
+            <Link
+              to={`pdf/dam/${values.id_dam ? values.id_dam : values.id}`}
+              target="_blank">
+              DAM
+            </Link>
+          </MenuItem>
           {recibo && (
             <MenuItem onClick={() => setAnchorElPrint(null)}>
               <Link to={`pdf/recibo/${values.id}`} target="_blank">
@@ -138,26 +150,35 @@ function MenuDocumentEvents(props) {
           open={Boolean(anchorElPagar)}
           onClose={() => setAnchorElPagar(null)}
           TransitionComponent={Fade}>
-          <Grid item>
-            <TextField
-              label="Data de pagamento"
-              id="pagamento"
-              type="datetime-local"
-              value="2017-05-24T10:30"
-              className={classes.textField}
-              InputLabelProps={{
-                shrink: true
-              }}
-            />
+          <Grid
+            container
+            alignItems="center"
+            justify="space-between"
+            direction="column">
+            <Grid item className={classes.containerVencimento}>
+              <TextField
+                fullWidth
+                label="Data de pagamento"
+                id="pagamento"
+                type="datetime-local"
+                defaultValue={vencimento}
+                onChange={handleVencimento}
+                InputLabelProps={{
+                  shrink: true
+                }}
+              />
+            </Grid>
+            <Grid>
+              <Button
+                onClick={() => {
+                  handleAlterStatusDAM('pay', { pago: 1 });
+                  setAnchorElPagar(null);
+                }}>
+                Sim
+              </Button>
+              <Button onClick={() => setAnchorElPagar(null)}>Não</Button>
+            </Grid>
           </Grid>
-          <Button
-            onClick={() => {
-              handleAlterStatusDAM('pay', { pago: 1 });
-              setAnchorElPagar(null);
-            }}>
-            Sim
-          </Button>
-          <Button onClick={() => setAnchorElPagar(null)}>Não</Button>
         </Menu>
         <Menu
           id="fade-menu"

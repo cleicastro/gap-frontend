@@ -20,4 +20,38 @@ Funcionalidades:
 Funcionalidades:
     ✔ Header com busca rápida do contribuinte(Nome, CPF e CNPJ) e filtros @done(20-08-27 17:32)
     ✔ Card como view padrão @done(20-08-27 16:53)
-    ☐ Tabela como view secundária
+    ✔ Tabela como view secundária @done(20-09-01 21:52)
+
+
+# REVISADO COM A PATRICIA
+Ajustes:
+    ✔ Aumentar o tamanho da fonte na visualização da tabela @done(20-09-02 10:22)
+    ✔ Adicionar o campo tomador/prestador nos filtros de nfsa @done(20-09-02 10:47)
+    ✔ Alterar checkbox para selectbox nos filtros @done(20-09-02 13:34)
+    ✔ Ao clicar no filtrar a janela do filtro deverá fechar e manter os dados do filtro @done(20-09-02 13:34)
+    ✔ Na nfsa o filtro de valores deverá consultar o valor da nota fiscal @done(20-09-02 13:34)
+    ✔ Melhorar a performace no auto complete do prestador/fornecedor @done(20-09-02 16:59)
+    ✔ Adicionar o feature para editar e adicionar um novo prestador/fornecedor @done(20-09-02 16:59)
+    ☐ Remover a informação do documento inserido com sucesso do 'modal salvo'
+    ☐ No campo da Descrição do dam deverá copiar o item da nota fiscal
+    ☐ Adicionar o campo informações adicionais na tela de cadastro do item
+    ☐ Adicionar o botão para pré visualizar entre o voltar e salvar em todas funcionalidades
+    ☐ Permanecer o negrito nos campos do DAM
+    ☐ Na emissão de alvará quando o contribuinte não estiver cadastro para a emissão, o sistema deverá realizar uma busca na receita e preencher os dados e atualizar seu cadastro de alvará
+    ☐ Alterar a lista de receitas para um autocomplete(Select) na aba do DAM e classificar por ordem alfabética
+    ✔ Na tela de cadastro do contribuinte exibir somente a tabela com os cadastros com a opção de um botão de adicionar @done(20-09-04 01:10)
+    ✔ A data de vencimento do Dam está crashando @done(20-09-02 20:46)
+    ✔ O validation do formulário do alvará não está executando @done(20-09-02 20:46)
+    ☐ Ao sair de todas as janelas de novo cadastro os dados deverão ser limpados.
+    ☐ Ao carregar os dados do contribuinte para editar os campos com máscaras CPF/CNPJ e CEP não estão carregando os dados
+    ☐ Atualizar a listaContribuinte quando inserir ou atualizar um contribuinte.
+    ☐ Implementar o tema dark
+    ☐ Corrigir o card do Dam que não atualiza logo após o update
+
+
+
+
+
+
+
+

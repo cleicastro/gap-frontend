@@ -1,11 +1,11 @@
 const { makeStyles } = require('@material-ui/styles');
 
-const usetyles = makeStyles(() => ({
+const usetyles = makeStyles((theme) => ({
   form: {
     display: 'flex',
     margin: '40px auto',
     maxWidth: 730,
-    background: '#fff',
+    background: theme.palette.cammon.light,
     borderRadius: 8,
     flexDirection: 'column'
   },
@@ -13,8 +13,8 @@ const usetyles = makeStyles(() => ({
     height: 48
   },
   listErros: {
-    color: '#fff',
-    background: '#DAA520'
+    color: theme.palette.cammon.light,
+    background: theme.palette.cammon.light
   }
 }));
 

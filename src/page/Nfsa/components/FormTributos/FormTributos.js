@@ -90,13 +90,13 @@ function FormTributos() {
                   inputRef={register}
                   control={control}
                   InputLabelProps={{
-                    shrink: true
+                    shrink: true,
+                    readOnly: true
                   }}
                   required
                   name="aliquotaIss"
                   label="Alíquota do ISS: (%)"
                   fullWidth
-                  disabled
                 />
               </Grid>
               <Grid item xs={6} sm={4}>
@@ -104,13 +104,13 @@ function FormTributos() {
                   inputRef={register}
                   control={control}
                   InputLabelProps={{
-                    shrink: true
+                    shrink: true,
+                    readOnly: true
                   }}
                   required
                   name="uf"
                   label="UF"
                   fullWidth
-                  disabled
                 />
               </Grid>
               <Grid item xs={12} sm={4}>
@@ -118,13 +118,13 @@ function FormTributos() {
                   inputRef={register}
                   control={control}
                   InputLabelProps={{
-                    shrink: true
+                    shrink: true,
+                    readOnly: true
                   }}
                   required
                   name="municipio"
                   label="Município"
                   fullWidth
-                  disabled
                 />
               </Grid>
             </Grid>
@@ -153,7 +153,8 @@ function FormTributos() {
                   inputRef={register}
                   control={control}
                   InputLabelProps={{
-                    shrink: true
+                    shrink: true,
+                    readOnly: true
                   }}
                   InputProps={{
                     startAdornment: (
@@ -164,7 +165,6 @@ function FormTributos() {
                   name="baseCalculo"
                   label="Base de cálculo"
                   fullWidth
-                  disabled
                 />
               </Grid>
               <Grid item xs={12} sm={4} md={2}>
@@ -173,7 +173,8 @@ function FormTributos() {
                   inputRef={register}
                   control={control}
                   InputLabelProps={{
-                    shrink: true
+                    shrink: true,
+                    readOnly: true
                   }}
                   InputProps={{
                     startAdornment: (
@@ -184,7 +185,6 @@ function FormTributos() {
                   name="irValor"
                   label="Valor do IR"
                   fullWidth
-                  disabled
                 />
               </Grid>
               <Grid item xs={12} sm={4} md={2}>
@@ -193,7 +193,8 @@ function FormTributos() {
                   inputRef={register}
                   control={control}
                   InputLabelProps={{
-                    shrink: true
+                    shrink: true,
+                    readOnly: true
                   }}
                   InputProps={{
                     startAdornment: (
@@ -204,7 +205,6 @@ function FormTributos() {
                   name="valorISS"
                   label="Valor do ISS"
                   fullWidth
-                  disabled
                 />
               </Grid>
               <Grid item xs={12} sm={4} md={2}>
@@ -213,7 +213,8 @@ function FormTributos() {
                   inputRef={register}
                   control={control}
                   InputLabelProps={{
-                    shrink: true
+                    shrink: true,
+                    readOnly: true
                   }}
                   InputProps={{
                     startAdornment: (
@@ -224,7 +225,6 @@ function FormTributos() {
                   name="taxaExp"
                   label="Taxa de expedição"
                   fullWidth
-                  disabled
                 />
               </Grid>
               <Grid item xs={12} sm={4} md={3}>
@@ -233,7 +233,8 @@ function FormTributos() {
                   inputRef={register}
                   control={control}
                   InputLabelProps={{
-                    shrink: true
+                    shrink: true,
+                    readOnly: true
                   }}
                   InputProps={{
                     startAdornment: (
@@ -244,7 +245,6 @@ function FormTributos() {
                   name="valorNF"
                   label="Valor da Nota"
                   fullWidth
-                  disabled
                 />
               </Grid>
             </Grid>
@@ -279,7 +279,10 @@ function FormTributos() {
                       name="irPercente"
                       type="number"
                       inputRef={register}
-                      disabled
+                      InputLabelProps={{
+                        shrink: true,
+                        readOnly: true
+                      }}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="start">%</InputAdornment>
@@ -294,7 +297,10 @@ function FormTributos() {
                       name="irValorCalc"
                       type="number"
                       inputRef={register}
-                      disabled
+                      InputLabelProps={{
+                        shrink: true,
+                        readOnly: true
+                      }}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">R$</InputAdornment>
@@ -309,7 +315,10 @@ function FormTributos() {
                       name="valorDeducao"
                       type="number"
                       inputRef={register}
-                      disabled
+                      InputLabelProps={{
+                        shrink: true,
+                        readOnly: true
+                      }}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">R$</InputAdornment>
@@ -323,7 +332,10 @@ function FormTributos() {
                       label="Valor do IR"
                       type="number"
                       inputRef={register}
-                      disabled
+                      InputLabelProps={{
+                        shrink: true,
+                        readOnly: true
+                      }}
                       name="irValorView"
                       InputProps={{
                         startAdornment: (
@@ -361,7 +373,10 @@ function FormTributos() {
                         name="pisPercente"
                         type="number"
                         inputRef={register}
-                        disabled
+                        InputLabelProps={{
+                          shrink: true,
+                          readOnly: true
+                        }}
                         endAdornment={
                           <InputAdornment position="start">%</InputAdornment>
                         }
@@ -374,7 +389,10 @@ function FormTributos() {
                         name="pisValor"
                         type="number"
                         inputRef={register}
-                        disabled
+                        InputLabelProps={{
+                          shrink: true,
+                          readOnly: true
+                        }}
                         startAdornment={
                           <InputAdornment position="start">R$</InputAdornment>
                         }
@@ -401,7 +419,10 @@ function FormTributos() {
                         name="inssPercente"
                         type="number"
                         inputRef={register}
-                        disabled
+                        InputLabelProps={{
+                          shrink: true,
+                          readOnly: true
+                        }}
                         endAdornment={
                           <InputAdornment position="start">%</InputAdornment>
                         }
@@ -414,7 +435,10 @@ function FormTributos() {
                         name="inssValor"
                         type="number"
                         inputRef={register}
-                        disabled
+                        InputLabelProps={{
+                          shrink: true,
+                          readOnly: true
+                        }}
                         startAdornment={
                           <InputAdornment position="start">R$</InputAdornment>
                         }
@@ -441,7 +465,10 @@ function FormTributos() {
                         name="confinsPercente"
                         type="number"
                         inputRef={register}
-                        disabled
+                        InputLabelProps={{
+                          shrink: true,
+                          readOnly: true
+                        }}
                         endAdornment={
                           <InputAdornment position="start">%</InputAdornment>
                         }
@@ -454,7 +481,10 @@ function FormTributos() {
                         name="confinsValor"
                         type="number"
                         inputRef={register}
-                        disabled
+                        InputLabelProps={{
+                          shrink: true,
+                          readOnly: true
+                        }}
                         startAdornment={
                           <InputAdornment position="start">R$</InputAdornment>
                         }
@@ -481,7 +511,10 @@ function FormTributos() {
                         name="csllPercente"
                         type="number"
                         inputRef={register}
-                        disabled
+                        InputLabelProps={{
+                          shrink: true,
+                          readOnly: true
+                        }}
                         endAdornment={
                           <InputAdornment position="start">%</InputAdornment>
                         }
@@ -494,7 +527,10 @@ function FormTributos() {
                         name="csllValor"
                         type="number"
                         inputRef={register}
-                        disabled
+                        InputLabelProps={{
+                          shrink: true,
+                          readOnly: true
+                        }}
                         startAdornment={
                           <InputAdornment position="start">R$</InputAdornment>
                         }

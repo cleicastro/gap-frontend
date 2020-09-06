@@ -5,56 +5,96 @@ import {
   List,
   ListItem,
   ListItemText,
-  Grid
+  Grid,
+  Fade,
+  Fab
 } from '@material-ui/core';
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 
-import { ButtonStep, MenuDocumentEvents } from '../../../../components';
-import useStyles from './styles';
 import {
-  useStepDam,
-  useSaveDam,
-  usePreviewDam,
-  useOpenNewDam
-} from '../../../../hooks';
-import { DamContext } from '../../../../contexts';
-import ModalSave from '../../../../components/ModalSave/ModalSave';
+  ModalSave,
+  ButtonStep,
+  MenuDocumentEvents,
+  AlertShow
+} from '../../../../components';
+import useStyles from './styles';
+import { useStepDam, usePreviewDam } from '../../../../hooks';
+import { DamContext, ACTIONS } from '../../../../contexts';
+import { useSave } from '../../../../hooks/dam/useSave';
+import { useEdit } from '../../../../hooks/dam/useEdit';
+import {
+  damStatusEdit,
+  messageResponseEdit,
+  messageResponseSave
+} from '../../../../util';
 
 export default function PreviewDam() {
   const {
-    state: { showModalDetails, dataDam, editDam }
+    state: { showModalDetails, dataDam, isEdit },
+    dispatch
   } = useContext(DamContext);
 
   const classes = useStyles();
   const [openModalMenu, setOpenModalMenu] = useState(false);
-  const setWindowNewDam = useOpenNewDam();
+  const [message, setMessage] = useState({});
 
   const { items, valorTotal, contribuinte, dam } = usePreviewDam();
   const [stepActivity, setStepActivity] = useStepDam();
+  const setSave = useSave();
+  const setEdit = useEdit();
 
-  const [
-    statusServer,
-    successRequest,
-    setSave,
-    setEditStatus,
-    setEditDam
-  ] = useSaveDam();
-
-  const handlePrevStep = () => setStepActivity(stepActivity - 1);
-  const handleSaveDAM = () => {
+  const handleSaveDAM = useCallback(() => {
+    setMessage({});
     setOpenModalMenu(true);
-    if (!editDam) {
-      setSave();
+    if (!isEdit) {
+      setSave(dam).then((response) => {
+        const processMessageDam = messageResponseSave(response);
+        if (response.status === 201) {
+          dispatch({
+            type: ACTIONS.ADD,
+            payload: { ...response }
+          });
+        }
+        setMessage(processMessageDam);
+      });
     } else {
-      setEditDam();
+      setEdit(dataDam.id, dam).then((response) => {
+        const processMessageDam = messageResponseEdit(response);
+        if (response.status === 200) {
+          dispatch({
+            type: ACTIONS.UPDATE_DAM,
+            payload: { ...dataDam, ...dam }
+          });
+        }
+        setMessage(processMessageDam);
+      });
     }
-  };
+  }, [dam, dataDam, dispatch, isEdit, setEdit, setSave]);
 
   const handleAlterStatusDAM = useCallback(
     (type, param) => {
-      setEditStatus(dataDam.id, type, param);
+      setMessage({});
+      setEdit(dataDam.id, param).then((response) => {
+        const processStatusDam = damStatusEdit(response, type);
+        if (response.status === 200) {
+          dispatch({
+            type: ACTIONS.UPDATE_DAM,
+            payload: { ...dam, ...processStatusDam.damStatus }
+          });
+        }
+        setMessage(processStatusDam.message);
+      });
     },
-    [dataDam.id, setEditStatus]
+    [dam, dataDam.id, dispatch, setEdit]
   );
+
+  const handleOpenWindow = useCallback(() => {
+    dispatch({
+      type: ACTIONS.MODAL_NEW_DAM
+    });
+  }, [dispatch]);
+
+  const handlePrevStep = () => setStepActivity(stepActivity - 1);
 
   return (
     <>
@@ -124,7 +164,7 @@ export default function PreviewDam() {
                   minute: 'numeric',
                   second: 'numeric',
                   hour12: false
-                }).format(new Date())}
+                }).format(new Date(dam.emissao))}
               </Typography>
             </Grid>
             <Grid item xs={4} align="center">
@@ -156,33 +196,34 @@ export default function PreviewDam() {
 
       <ModalSave
         openModalMenu={openModalMenu}
-        statusServer={statusServer}
-        successRequest={successRequest}>
-        <>
-          {!editDam && (
-            <Typography variant="subtitle1">
-              {`O Número do seu DAM é #${dataDam.id}.\n
-                  Selecione um envento para este documento.`}
-            </Typography>
-          )}
-          <MenuDocumentEvents
-            values={{ id_dam: dataDam.id }}
-            handleAlterStatusDAM={handleAlterStatusDAM}
-            handleClose={setWindowNewDam}
-            visibleOptions={{
-              imprimir: true,
-              pagar: !dataDam.pago && dataDam.status !== 'Cancelado',
-              copiar: showModalDetails,
-              editar: showModalDetails,
-              cancelar: dataDam.status !== 'Cancelado',
-              nfsa: false,
-              alvara: false,
-              recibo: false,
-              sair: true
-            }}
-          />
-        </>
+        statusServer={message.type}
+        successRequest={message.type}>
+        <MenuDocumentEvents
+          values={{ id_dam: dataDam.id }}
+          handleAlterStatusDAM={handleAlterStatusDAM}
+          handleClose={handleOpenWindow}
+          visibleOptions={{
+            imprimir: true,
+            pagar: !dataDam.pago && dataDam.status !== 'Cancelado',
+            copiar: showModalDetails,
+            editar: showModalDetails,
+            cancelar: dataDam.status !== 'Cancelado',
+            nfsa: false,
+            alvara: false,
+            recibo: false,
+            sair: true
+          }}
+        />
+        <div className={classes.container}>
+          <Fade in={!!message.type}>
+            <Fab aria-label="save" className={classes.buttonClassname}>
+              <ThumbUpIcon />
+            </Fab>
+          </Fade>
+          <AlertShow messageProps={message} />
+        </div>
       </ModalSave>
+      <AlertShow messageProps={message} />
     </>
   );
 }

@@ -15,7 +15,7 @@ import {
 } from '@material-ui/icons';
 
 import useStyles from './styles';
-import { useStoreAlvara, useFilterAlvara, useAlvara } from '../../../../hooks';
+import { useStoreAlvara, useFilterAlvara } from '../../../../hooks';
 import { AlvaraFuncionamentoContext } from '../../../../contexts';
 
 function Header({ handleViewTable, handleViewFilter }) {

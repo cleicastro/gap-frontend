@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, useState, useEffect } from 'react';
+import React, { useContext, useCallback, useState } from 'react';
 
 import {
   Grid,
@@ -8,63 +8,88 @@ import {
   DialogTitle,
   DialogActions,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Fab,
+  Fade
 } from '@material-ui/core';
+import CheckIcon from '@material-ui/icons/Check';
 
+import { useSelector } from 'react-redux';
 import useStyles from './styles';
 import PreviewDam from '../PreviewDam';
 import { DamContext, ACTIONS } from '../../../../contexts';
-import { MenuDocumentEvents } from '../../../../components';
-import { useSaveDam, useOpenNewDam } from '../../../../hooks';
+import { MenuDocumentEvents, AlertShow } from '../../../../components';
 import ModalSave from '../../../../components/ModalSave/ModalSave';
+import { useEdit } from '../../../../hooks/dam/useEdit';
+import { damStatusEdit } from '../../../../util';
 
 function ModalDetailsDam() {
-  const theme = useTheme();
-  const fullScreenModal = useMediaQuery(theme.breakpoints.down('sm'));
-  const classes = useStyles();
-  const [openModalMenu, setOpenModalMenu] = useState(false);
-  // eslint-disable-next-line no-unused-vars
-  const [statusServer, successRequest, setSave, setEditStatus] = useSaveDam();
-  const setWindowNewDam = useOpenNewDam();
-
   const {
     state: { showModalDetails, dataDam },
     dispatch
   } = useContext(DamContext);
 
-  useEffect(() => {
-    if (successRequest) {
-      setOpenModalMenu(false);
-    }
-  }, [successRequest]);
+  const theme = useTheme();
+  const fullScreenModal = useMediaQuery(theme.breakpoints.down('sm'));
+  const classes = useStyles();
+  const [openModalMenu, setOpenModalMenu] = useState(false);
+  const [message, setMessage] = useState({});
+  const setEdit = useEdit();
+  const dataPagamento = useSelector((state) => state.datePayment.datePayment);
 
-  function handleClosedModalDetails() {
+  const handleClosedModalDetails = useCallback(() => {
+    setMessage({});
+    dispatch({
+      type: ACTIONS.CLEAN_DATA
+    });
+  }, [dispatch]);
+
+  const handleCopyDam = useCallback(() => {
+    dispatch({
+      type: ACTIONS.MODAL_NEW_DAM,
+      payload: false
+    });
     dispatch({
       type: ACTIONS.MODAL_DETAILS,
       payload: false
     });
-  }
+  }, [dispatch]);
+
+  const handleEditDam = useCallback(() => {
+    dispatch({
+      type: ACTIONS.MODAL_NEW_DAM,
+      payload: true
+    });
+    dispatch({
+      type: ACTIONS.MODAL_DETAILS,
+      payload: false
+    });
+  }, [dispatch]);
 
   const handleAlterStatusDAM = useCallback(
     (type, param) => {
       setOpenModalMenu(true);
-      setEditStatus(dataDam.id, type, param);
+      setMessage({});
+      setEdit(dataDam.id, param).then((response) => {
+        const processStatusDam = damStatusEdit(response, type);
+        if (response.status === 200) {
+          dispatch({
+            type: ACTIONS.UPDATE_DAM,
+            payload: {
+              ...dataDam,
+              ...processStatusDam.damStatus,
+              dataPagamento
+            }
+          });
+        }
+        setMessage(processStatusDam.message);
+        setTimeout(() => {
+          setOpenModalMenu(false);
+        }, 2000);
+      });
     },
-    [dataDam.id, setEditStatus]
+    [dataDam, dataPagamento, dispatch, setEdit]
   );
-
-  const handleCopyDam = () => {
-    handleClosedModalDetails();
-    setWindowNewDam();
-  };
-
-  const handleEditDam = () => {
-    dispatch({
-      type: ACTIONS.EDIT_DAM_OPERATION
-    });
-    handleClosedModalDetails();
-    setWindowNewDam();
-  };
 
   return (
     <Dialog
@@ -81,10 +106,11 @@ function ModalDetailsDam() {
           handleClose={handleClosedModalDetails}
           visibleOptions={{
             imprimir: true,
-            pagar: dataDam && !dataDam.pago && dataDam.status !== 'Cancelado',
             copiar: showModalDetails,
             editar:
-              dataDam && showModalDetails && dataDam.status !== 'Cancelado',
+              showModalDetails && dataDam && dataDam.status !== 'Cancelado',
+
+            pagar: dataDam && !dataDam.pago && dataDam.status !== 'Cancelado',
             cancelar: dataDam && dataDam.status !== 'Cancelado',
             nfsa: false,
             alvara: false,
@@ -104,9 +130,18 @@ function ModalDetailsDam() {
             <PreviewDam />
             <ModalSave
               openModalMenu={openModalMenu}
-              statusServer={statusServer}
-              successRequest={successRequest}
-            />
+              statusServer={message.type}
+              successRequest={message.type}>
+              <div className={classes.container}>
+                <Fade in={!!message.type}>
+                  <Fab aria-label="save" className={classes.buttonClassname}>
+                    <CheckIcon />
+                  </Fab>
+                </Fade>
+                <AlertShow messageProps={message} />
+              </div>
+            </ModalSave>
+            <AlertShow messageProps={message} />
           </Grid>
         </Grid>
       </DialogContent>

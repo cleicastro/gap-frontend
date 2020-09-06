@@ -6,7 +6,8 @@ const styles = StyleSheet.create({
   section: {
     display: 'flex',
     flexGrow: 1,
-    margin: 5
+    margin: 5,
+    padding: 15
   },
   gridContainer: {
     flexDirection: 'row',

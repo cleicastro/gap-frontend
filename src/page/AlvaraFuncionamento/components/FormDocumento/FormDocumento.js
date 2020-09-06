@@ -1,15 +1,39 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Typography, Grid, TextField, InputAdornment } from '@material-ui/core';
 
 import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers';
+
 import { ButtonStep } from '../../../../components';
-import { useInitialDocumentAlvara, useStepAlvara } from '../../../../hooks';
+import { useStepAlvara } from '../../../../hooks';
 
 import { documentSchema, mascaraReal } from '../../../../util';
+import {
+  AlvaraFuncionamentoContext,
+  ACTIONS_ALVARA
+} from '../../../../contexts';
+import { useDocument } from '../../../../hooks/dam/useDocument';
 
 function FormDocumento() {
-  const [document, setDocument] = useInitialDocumentAlvara();
+  const {
+    state: { document, receitaSeleted },
+    dispatch
+  } = useContext(AlvaraFuncionamentoContext);
   const [stepActivity, setStepActivity] = useStepAlvara();
+  const setDocument = useDocument();
+
+  const documentInitial = {
+    emissao: new Date(),
+    receita: receitaSeleted.cod,
+    docOrigem: '',
+    infoAdicionais: '',
+    juros: 0,
+    valorMulta: 0,
+    taxaExp: 5,
+    valorPrincipal: 0
+  };
+
+  const loadDocument = setDocument({ ...documentInitial, ...document });
 
   const {
     control,
@@ -19,8 +43,8 @@ function FormDocumento() {
     setValue,
     errors
   } = useForm({
-    defaultValues: document,
-    validationSchema: documentSchema
+    defaultValues: loadDocument,
+    resolver: yupResolver(documentSchema)
   });
 
   const calcTotal = (event) => {
@@ -34,11 +58,16 @@ function FormDocumento() {
     setValue('valorTotal', result.toFixed(2));
   };
 
-  const handlePrevStep = () => setStepActivity(stepActivity - 1);
+  const handlePrevStep = () => {
+    setStepActivity(stepActivity - 1);
+    const requestDocument = setDocument({ ...loadDocument, ...getValues() });
+    dispatch({ type: ACTIONS_ALVARA.DOCUMENT, payload: requestDocument });
+  };
 
   const onSubmit = (data) => {
     setStepActivity(stepActivity + 1);
-    setDocument(data);
+    const requestDocument = setDocument({ ...loadDocument, ...data });
+    dispatch({ type: ACTIONS_ALVARA.DOCUMENT, payload: requestDocument });
   };
 
   return (
@@ -61,14 +90,18 @@ function FormDocumento() {
         </Grid>
         <Grid item xs={12} md={4}>
           <TextField
+            defaultValue={document.emissao}
             inputRef={register}
             control={control}
-            id="emissaoConvertPT"
-            name="emissaoConvertPT"
-            disabled
-            error={!!errors.emissaoConvertPT}
+            id="emissao"
+            name="emissao"
+            error={!!errors.emissao}
             label="Data de emissão"
             fullWidth
+            type="datetime-local"
+            InputLabelProps={{
+              shrink: true
+            }}
           />
         </Grid>
         <Grid item xs={12} md={4}>
@@ -101,11 +134,13 @@ function FormDocumento() {
         </Grid>
         <Grid item xs={6} md={4}>
           <TextField
+            InputProps={{
+              readOnly: true
+            }}
             inputRef={register}
             control={control}
             id="receita"
             name="receita"
-            disabled
             label="Receita"
             fullWidth
             error={!!errors.receita}
@@ -200,12 +235,12 @@ function FormDocumento() {
             name="valorTotal"
             type="number"
             step={0.5}
-            disabled
             label="Valor total"
             error={!!errors.valorTotal}
             fullWidth
             InputLabelProps={{
-              shrink: true
+              shrink: true,
+              readOnly: true
             }}
             helperText={errors.valorTotal && errors.valorTotal.message}
           />

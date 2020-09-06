@@ -39,7 +39,7 @@ const options = {
   }
 };
 
-const devices = [
+const incomes = [
   {
     title: 'IRRF',
     value: '63'
@@ -54,4 +54,4 @@ const devices = [
   }
 ];
 
-export { data, options, devices };
+export { data, options, incomes };

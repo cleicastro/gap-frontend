@@ -5,7 +5,7 @@ const useStyles = makeStyles((theme) => ({
   item: {
     display: 'flex',
     paddingTop: 0,
-    paddingBottom: 0,
+    paddingBottom: 0
   },
   button: {
     color: colors.blueGrey[800],
@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
     textTransform: 'none',
     letterSpacing: 0,
     width: '100%',
-    fontWeight: theme.typography.fontWeightMedium,
+    fontWeight: theme.typography.fontWeightMedium
   },
   icon: {
     color: theme.palette.icon,
@@ -22,15 +22,15 @@ const useStyles = makeStyles((theme) => ({
     height: 24,
     display: 'flex',
     alignItems: 'center',
-    marginRight: theme.spacing(1),
+    marginRight: theme.spacing(1)
   },
   active: {
-    color: theme.palette.primary.main,
+    color: theme.palette.primary.light,
     fontWeight: theme.typography.fontWeightMedium,
     '& $icon': {
-      color: theme.palette.primary.main,
-    },
-  },
+      color: theme.palette.primary.light
+    }
+  }
 }));
 
 export default useStyles;

@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 import {
   Grid,
@@ -7,66 +7,50 @@ import {
   FormControlLabel,
   Radio
 } from '@material-ui/core';
-import { ContribuinteContext } from '../../../../contexts';
+import { useFormContext } from 'react-hook-form';
 
 function FormBancario() {
-  const { contribuinte, isDisbledForm, control, register } = useContext(
-    ContribuinteContext
-  );
-  const [data, setData] = useState(contribuinte);
-  const [isDisabledConta, setisDisabledConta] = useState(
-    !contribuinte.tipoConta
-  );
+  const { control, register, setValue, watch } = useFormContext();
 
-  useEffect(() => {
-    setData(contribuinte);
-  }, [contribuinte]);
+  const [isDisabledConta, setisDisabledConta] = useState(
+    watch('tipoConta') === ''
+  );
 
   function onChangeHandler(e) {
     const { name, value } = e.target;
-
     if (name === 'tipoConta') {
+      setValue('tipoConta', value);
       if (value === '') {
         setisDisabledConta(true);
       } else {
         setisDisabledConta(false);
       }
     }
-
-    setData((prev) => ({ ...prev, [name]: value }));
   }
 
   return (
     <Grid container spacing={3}>
       <Grid item xs={12} sm={12}>
         <RadioGroup
+          onChange={onChangeHandler}
           row
           aria-label="position"
-          name="tipoConta"
-          onChange={onChangeHandler}
-          valaue={contribuinte.tipoConta === null ? '' : contribuinte.tipoConta}
-          control={control}>
+          name="tipoConta">
           <FormControlLabel
-            disabled={isDisbledForm}
-            control={<Radio />}
+            control={<Radio checked={watch('tipoConta') === ''} />}
             inputRef={register}
-            checked={data.tipoConta === '' || data.tipoConta === null}
             value=""
             label="Sem Conta"
           />
           <FormControlLabel
-            disabled={isDisbledForm}
-            control={<Radio />}
+            control={<Radio checked={watch('tipoConta') === 'CC'} />}
             inputRef={register}
-            checked={data.tipoConta === 'CC'}
             value="CC"
             label="Conta Corrente"
           />
           <FormControlLabel
-            disabled={isDisbledForm}
-            control={<Radio />}
+            control={<Radio checked={watch('tipoConta') === 'CP'} />}
             inputRef={register}
-            checked={data.tipoConta === 'CP'}
             value="CP"
             label="Conta Poupança"
           />
@@ -74,50 +58,42 @@ function FormBancario() {
       </Grid>
       <Grid item xs={12} sm={3}>
         <TextField
+          disabled={isDisabledConta}
           control={control}
           inputRef={register}
-          onChange={onChangeHandler}
-          disabled={isDisbledForm || isDisabledConta}
           fullWidth
           label="Banco"
           name="banco"
-          value={data.banco}
         />
       </Grid>
       <Grid item xs={12} sm={3}>
         <TextField
+          disabled={isDisabledConta}
           control={control}
           inputRef={register}
-          onChange={onChangeHandler}
-          disabled={isDisbledForm || isDisabledConta}
           fullWidth
           label="Agência"
           name="agencia"
-          value={data.agencia}
         />
       </Grid>
       <Grid item xs={12} sm={3}>
         <TextField
+          disabled={isDisabledConta}
           control={control}
           inputRef={register}
-          onChange={onChangeHandler}
-          disabled={isDisbledForm || isDisabledConta}
           fullWidth
           label="Conta"
           name="conta"
-          value={data.conta}
         />
       </Grid>
       <Grid item xs={12} sm={3}>
         <TextField
+          disabled={isDisabledConta}
           control={control}
           inputRef={register}
-          onChange={onChangeHandler}
-          disabled={isDisbledForm || isDisabledConta}
           fullWidth
           label="Variação"
           name="variacao"
-          value={data.variacao}
         />
       </Grid>
     </Grid>

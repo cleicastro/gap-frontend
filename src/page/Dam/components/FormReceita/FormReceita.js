@@ -19,6 +19,7 @@ import { ButtonStep } from '../../../../components';
 import useStyles from './styles';
 import { useStoreReceita, useStepDam } from '../../../../hooks';
 import { DamContext, ACTIONS } from '../../../../contexts';
+import { useDocument } from '../../../../hooks/dam/useDocument';
 
 function filterReceita(valueFormated, receitas) {
   const params = (receita) => {
@@ -29,16 +30,38 @@ function filterReceita(valueFormated, receitas) {
 }
 
 function FormReceita() {
-  const { dispatch } = useContext(DamContext);
+  const {
+    state: { document, dataDam },
+    dispatch
+  } = useContext(DamContext);
   const classes = useStyles();
   const [receitas, receitaSeleted] = useStoreReceita();
   const [listReceita, setListReceita] = useState(receitas);
   const [stepActivity, setStepActivity] = useStepDam();
+  const setDocument = useDocument();
 
   const { handleSubmit } = useForm();
 
   function handleSelectReceita(receita) {
-    dispatch({ type: ACTIONS.SELECT_RECEITA, payload: receita });
+    const documentInitial = {
+      emissao: new Date(),
+      receita: receita.cod,
+      docOrigem: '',
+      infoAdicionais: '',
+      juros: 0,
+      valorMulta: 0,
+      taxaExp: 5,
+      valorPrincipal: Number(receita.valor_fixo) > 0 ? receita.valor_fixo : 0
+    };
+
+    const documentAux = receita > 0 ? documentInitial : document;
+    const loadDocument = setDocument({ ...documentAux });
+
+    dispatch({
+      type: ACTIONS.SELECT_RECEITA,
+      payload: receita.length > 0 ? receita : dataDam.receita
+    });
+    dispatch({ type: ACTIONS.DOCUMENT, payload: loadDocument });
     setStepActivity(stepActivity + 1);
   }
 

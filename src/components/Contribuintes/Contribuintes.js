@@ -1,6 +1,12 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useContext, memo } from 'react';
-import clsx from 'clsx';
+import React, {
+  useContext,
+  memo,
+  useState,
+  useEffect,
+  useRef,
+  useCallback
+} from 'react';
 
 import {
   CssBaseline,
@@ -9,55 +15,71 @@ import {
   Table,
   TableHead,
   TableBody,
-  TableFooter,
   TableRow,
   TableCell,
   TextField,
   CircularProgress,
-  Link,
-  Snackbar
+  Grid,
+  Typography,
+  Zoom,
+  Button,
+  Box,
+  Icon
 } from '@material-ui/core';
-
-import Fab from '@material-ui/core/Fab';
-import CheckIcon from '@material-ui/icons/Check';
-import SaveIcon from '@material-ui/icons/Save';
 
 import InfiniteScroll from 'react-infinite-scroller';
 import { useStyles, StyledTableCell } from './styles';
 
-import FormCadContribuinte from './FormCadContribuinte';
 import { ContribuinteContext } from '../../contexts';
+import FormCadContribuinte from './FormCadContribuinte/FormCadContribuinte';
 
-function Contribuintes() {
+function Contribuintes(props) {
+  const { contribuinte } = props;
   const {
     handleOrderSort,
-    handleSelectedContribuinte,
-    updateDataContribuinte,
     setPagination,
-    setOpenSnackbar,
     handleParams,
     pagination,
-    listContribuinte,
-    openSnackbar,
-    isProgress
+    listContribuinte
   } = useContext(ContribuinteContext);
 
   const classes = useStyles();
-  const buttonClassname = clsx({
-    [classes.buttonSuccess]:
-      updateDataContribuinte && updateDataContribuinte.message
-  });
+  const [checked, setChecked] = useState(!!contribuinte);
+  const [transation, setTrasation] = useState(!contribuinte);
+  const timeTransection = useRef();
+  const [contribuinteSelected, setContribuinteSelected] = useState(
+    contribuinte || {}
+  );
+
+  useEffect(() => {
+    timeTransection.current = setTimeout(() => {
+      setTrasation((value) => !value);
+    }, 200);
+    return () => {
+      clearTimeout(timeTransection.current);
+    };
+  }, [checked]);
+
+  const handleOpenNew = useCallback(() => {
+    setContribuinteSelected({});
+    setChecked((value) => !value);
+  }, []);
+
+  const handleSelectedContribuinte = useCallback((data) => {
+    setContribuinteSelected(data);
+    setChecked(true);
+  }, []);
 
   return (
-    <>
+    <main className={classes.layout}>
       <CssBaseline />
-      <main className={classes.layout}>
-        <Paper className={classes.paper}>
-          <FormCadContribuinte />
-        </Paper>
-        <Paper
-          className={classes.paper}
-          style={{ maxHeight: 400, overflow: 'auto' }}>
+      <Zoom
+        in={!checked}
+        style={{
+          transitionDelay: !checked ? '200ms' : '0ms',
+          display: transation ? 'none' : 'flex'
+        }}>
+        <Box style={{ maxHeight: '62vh', overflow: 'auto', marginTop: 10 }}>
           <InfiniteScroll
             useWindow={false}
             pageStart={0}
@@ -109,6 +131,7 @@ function Contribuintes() {
                         size="small"
                         id="id"
                         onChange={handleParams}
+                        variant="outlined"
                       />
                     </TableCell>
                     <TableCell>
@@ -118,6 +141,7 @@ function Contribuintes() {
                         size="small"
                         id="doc"
                         onChange={handleParams}
+                        variant="outlined"
                       />
                     </TableCell>
                     <TableCell>
@@ -127,6 +151,8 @@ function Contribuintes() {
                         size="small"
                         id="nome"
                         onChange={handleParams}
+                        variant="outlined"
+                        fullWidth
                       />
                     </TableCell>
                     <TableCell>
@@ -135,6 +161,8 @@ function Contribuintes() {
                         size="small"
                         id="tipo"
                         onChange={handleParams}
+                        variant="outlined"
+                        fullWidth
                       />
                     </TableCell>
                     <TableCell>
@@ -143,6 +171,8 @@ function Contribuintes() {
                         size="small"
                         id="enderecoCidade"
                         onChange={handleParams}
+                        variant="outlined"
+                        fullWidth
                       />
                     </TableCell>
                   </TableRow>
@@ -151,57 +181,86 @@ function Contribuintes() {
                   {listContribuinte.map((value) => (
                     <TableRow key={value.id}>
                       <TableCell align="center">
-                        <Link
-                          component="button"
+                        <Button
                           onClick={() => handleSelectedContribuinte(value)}
-                          variant="body2">
+                          color="primary"
+                          size="small"
+                          variant="contained"
+                          aria-label="edit contribuinte"
+                          component="span"
+                          startIcon={<Icon>edit</Icon>}>
                           {value.id}
-                        </Link>
+                        </Button>
                       </TableCell>
-                      <TableCell>{value.doc}</TableCell>
-                      <TableCell>{value.nome}</TableCell>
-                      <TableCell align="center">{value.tipo}</TableCell>
                       <TableCell>
-                        {value.cidade} | {value.bairro} | {value.endereco}
+                        <Typography variant="inherit" style={{ fontSize: 12 }}>
+                          {value.doc}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="inherit" style={{ fontSize: 12 }}>
+                          {value.nome}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Typography variant="inherit" style={{ fontSize: 12 }}>
+                          {value.tipo}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="inherit" style={{ fontSize: 12 }}>
+                          {value.cidade} | {value.bairro} | {value.endereco}
+                        </Typography>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
-                <TableFooter>
-                  <TableRow>
-                    <TableCell />
-                    <TableCell>Contribuintes</TableCell>
-                    <TableCell colSpan={4} align="center">
-                      {listContribuinte.length} de {pagination.total}
-                    </TableCell>
-                  </TableRow>
-                </TableFooter>
               </Table>
             </TableContainer>
           </InfiniteScroll>
-        </Paper>
-        <Snackbar
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-          key="load"
-          open={openSnackbar}
-          autoHideDuration={6000}
-          onClose={() => setOpenSnackbar(false)}>
-          <>
-            <div className={classes.wrapper}>
-              <Fab
-                aria-label="save"
-                color="primary"
-                className={buttonClassname}>
-                {!isProgress ? <CheckIcon /> : <SaveIcon />}
-              </Fab>
-              {isProgress && (
-                <CircularProgress size={68} className={classes.fabProgress} />
-              )}
-            </div>
-          </>
-        </Snackbar>
-      </main>
-    </>
+        </Box>
+      </Zoom>
+      <Zoom
+        in={checked}
+        style={{
+          transitionDelay: checked ? '200ms' : '0ms',
+          display: transation ? 'flex' : 'none'
+        }}>
+        <Box>
+          <FormCadContribuinte
+            contribuinteSelected={contribuinteSelected}
+            closeWindow={handleOpenNew}
+          />
+        </Box>
+      </Zoom>
+      {!checked && (
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Paper className={classes.paper}>
+              <Typography variant="inherit" component="h4">
+                Contribuintes: {listContribuinte.length} de {pagination.total}
+              </Typography>
+            </Paper>
+            <Grid
+              style={{ marginTop: 10 }}
+              container
+              direction="row"
+              justify="flex-end"
+              alignItems="center">
+              <Grid item>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  onClick={handleOpenNew}>
+                  Novo
+                </Button>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      )}
+    </main>
   );
 }
 

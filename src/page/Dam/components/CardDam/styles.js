@@ -2,11 +2,13 @@ import { makeStyles } from '@material-ui/styles';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    flexGrow: 1
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column'
   },
   content: {
-    alignItems: 'center',
-    display: 'flex'
+    display: 'flex',
+    alignItems: 'center'
   },
   title: {
     fontWeight: 700

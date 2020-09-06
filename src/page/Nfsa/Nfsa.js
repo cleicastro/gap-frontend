@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Grid, Box } from '@material-ui/core';
 
 import { NfsaProvider } from '../../contexts';
@@ -27,6 +27,12 @@ const Nfsa = () => {
     }
   }); */
 
+  const handleViewTable = useCallback(() => setViewTable((prev) => !prev), []);
+
+  const handleOpenFilter = useCallback(() => {
+    setOpenFilter((prev) => !prev);
+  }, []);
+
   return (
     <NfsaProvider>
       <div className={classes.root}>
@@ -34,8 +40,8 @@ const Nfsa = () => {
           <Grid item xs={12}>
             <Box displayPrint="none">
               <Header
-                handleViewTable={() => setViewTable((prev) => !prev)}
-                handleViewFilter={() => setOpenFilter((prev) => !prev)}
+                handleViewTable={handleViewTable}
+                handleViewFilter={handleOpenFilter}
               />
             </Box>
           </Grid>
@@ -45,10 +51,7 @@ const Nfsa = () => {
         </Grid>
         <ModalDetailsNfsa />
         <NewNfsa />
-        <Filtros
-          showFiltro={openFilter}
-          handleSair={() => setOpenFilter(false)}
-        />
+        <Filtros showFiltro={openFilter} handleSair={handleOpenFilter} />
       </div>
     </NfsaProvider>
   );

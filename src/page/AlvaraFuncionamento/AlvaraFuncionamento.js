@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Grid, Box } from '@material-ui/core';
 import useStyles from './styles';
 import {
@@ -10,15 +10,18 @@ import {
   NewAlvara
 } from './components';
 import { AlvaraFuncionamentoProvider } from '../../contexts';
-import { useAlvara } from '../../hooks';
 
 function AlvaraFuncionamento() {
-  useAlvara();
-
   const classes = useStyles();
   const [viewTable, setViewTable] = useState(false);
   // eslint-disable-next-line no-unused-vars
   const [openFilter, setOpenFilter] = useState(false);
+
+  const handleViewTable = useCallback(() => setViewTable((prev) => !prev), []);
+
+  const handleOpenFilter = useCallback(() => {
+    setOpenFilter((prev) => !prev);
+  }, []);
 
   return (
     <AlvaraFuncionamentoProvider>
@@ -27,8 +30,8 @@ function AlvaraFuncionamento() {
           <Grid item xs={12}>
             <Box displayPrint="none">
               <Header
-                handleViewTable={() => setViewTable((prev) => !prev)}
-                handleViewFilter={() => setOpenFilter((prev) => !prev)}
+                handleViewTable={handleViewTable}
+                handleViewFilter={handleOpenFilter}
               />
             </Box>
           </Grid>
@@ -39,10 +42,7 @@ function AlvaraFuncionamento() {
       </div>
       <NewAlvara />
       <ModalDetails />
-      <Filtros
-        showFiltro={openFilter}
-        handleSair={() => setOpenFilter(false)}
-      />
+      <Filtros showFiltro={openFilter} handleSair={handleOpenFilter} />
     </AlvaraFuncionamentoProvider>
   );
 }

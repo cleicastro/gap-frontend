@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useCallback, useMemo } from 'react';
 import {
   TableContainer,
   Paper,
@@ -15,8 +15,10 @@ import {
 import InfoIcon from '@material-ui/icons/Info';
 
 import InfiniteScroll from 'react-infinite-scroller';
+import { usePagination } from '@material-ui/lab';
+import { useStore } from 'react-redux';
 import { useStyles, StyledTableCell, StyledTableRow } from './styles';
-import { useStoreAlvara, usePaginationAlvara } from '../../../../hooks';
+import { AlvaraFuncionamentoContext } from '../../../../contexts';
 
 const classButton = (status, classes) => {
   switch (status) {
@@ -46,9 +48,12 @@ const classCaption = (status, days) => {
 
 function TableAlvara() {
   const classes = useStyles();
-  const [listAlvara, valueTotal, setSelecetAlvara] = useStoreAlvara();
-  const [pagination, setPagination] = usePaginationAlvara();
+  const {
+    state: { listAlvara, pagination, paramsQuery }
+  } = useContext(AlvaraFuncionamentoContext);
 
+  const setSelecetAlvara = useStore();
+  const setPagination = usePagination();
   const [order, setOrder] = useState('id');
   const [sort, setSort] = useState(false);
 
@@ -60,6 +65,8 @@ function TableAlvara() {
     vencimento: '',
     valorTotal: 0
   });
+
+  const valueTotal = useMemo(() => listAlvara.length, [listAlvara]);
 
   function handleChangeParams(event) {
     const { id, value } = event.target;
@@ -75,13 +82,31 @@ function TableAlvara() {
     }
   }
 
-  function handlePagination(currentPage) {
-    setPagination({
+  const handlePagination = useCallback(
+    (currentPage) => {
+      if (pagination.current_page < pagination.last_page) {
+        const set = setPagination({
+          ...paramsQuery,
+          order,
+          sort,
+          page: currentPage + 1
+        });
+        set.then((response) => {
+          if (response.status !== 200) {
+            alert('Falha no carregamento dos dados, favor tente mais tarde!');
+          }
+        });
+      }
+    },
+    [
       order,
-      sort,
-      page: currentPage + 1
-    });
-  }
+      pagination.current_page,
+      pagination.last_page,
+      paramsQuery,
+      setPagination,
+      sort
+    ]
+  );
 
   return (
     <InfiniteScroll

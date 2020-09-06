@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 
 import { Grid, Box } from '@material-ui/core';
 
@@ -19,6 +19,13 @@ const Dam = () => {
   const classes = useStyles();
   const [viewTable, setViewTable] = useState(false);
   const [openFilter, setOpenFilter] = useState(false);
+
+  const handleViewTable = useCallback(() => setViewTable((prev) => !prev), []);
+
+  const handleOpenFilter = useCallback(() => {
+    setOpenFilter((prev) => !prev);
+  }, []);
+
   return (
     <DamProvider>
       <div className={classes.root}>
@@ -26,8 +33,8 @@ const Dam = () => {
           <Grid item xs={12}>
             <Box displayPrint="none">
               <Header
-                handleViewTable={() => setViewTable((prev) => !prev)}
-                handleViewFilter={() => setOpenFilter((prev) => !prev)}
+                handleViewTable={handleViewTable}
+                handleViewFilter={handleOpenFilter}
               />
             </Box>
           </Grid>
@@ -38,10 +45,7 @@ const Dam = () => {
       </div>
       <NewDam />
       <ModalDetailsDam />
-      <Filtros
-        showFiltro={openFilter}
-        handleSair={() => setOpenFilter(false)}
-      />
+      <Filtros showFiltro={openFilter} handleSair={handleOpenFilter} />
     </DamProvider>
   );
 };

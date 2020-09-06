@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useContext, useMemo } from 'react';
 import {
   TableContainer,
   Paper,
@@ -16,7 +16,9 @@ import InfoIcon from '@material-ui/icons/Info';
 
 import InfiniteScroll from 'react-infinite-scroller';
 import { useStyles, StyledTableCell, StyledTableRow } from './styles';
-import { useStoreDam, usePaginationDam } from '../../../../hooks';
+import { usePaginationDam } from '../../../../hooks/dam/usePagination';
+import { useStoreDam } from '../../../../hooks/dam/useStore';
+import { DamContext } from '../../../../contexts';
 
 const classButton = (status, classes) => {
   switch (status) {
@@ -46,8 +48,11 @@ const classCaption = (status, days) => {
 
 function TableDam() {
   const classes = useStyles();
-  const [listDam, valueTotal, setSelecetDam] = useStoreDam();
-  const [pagination, setPagination] = usePaginationDam();
+  const {
+    state: { listDam, pagination, paramsQuery }
+  } = useContext(DamContext);
+  const setSelecetDam = useStoreDam();
+  const setPagination = usePaginationDam();
 
   const [order, setOrder] = useState('id');
   const [sort, setSort] = useState(false);
@@ -60,6 +65,8 @@ function TableDam() {
     vencimento: '',
     valorTotal: 0
   });
+
+  const valueTotal = useMemo(() => listDam.length, [listDam]);
 
   function handleChangeParams(event) {
     const { id, value } = event.target;
@@ -75,13 +82,31 @@ function TableDam() {
     }
   }
 
-  function handlePagination(currentPage) {
-    setPagination({
+  const handlePagination = useCallback(
+    (currentPage) => {
+      if (pagination.current_page < pagination.last_page) {
+        const set = setPagination({
+          ...paramsQuery,
+          order,
+          sort,
+          page: currentPage + 1
+        });
+        set.then((response) => {
+          if (response.status !== 200) {
+            alert('Falha no carregamento dos dados, favor tente mais tarde!');
+          }
+        });
+      }
+    },
+    [
       order,
-      sort,
-      page: currentPage + 1
-    });
-  }
+      pagination.current_page,
+      pagination.last_page,
+      paramsQuery,
+      setPagination,
+      sort
+    ]
+  );
 
   return (
     <InfiniteScroll

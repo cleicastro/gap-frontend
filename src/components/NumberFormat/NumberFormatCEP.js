@@ -6,8 +6,16 @@ function NumberFormatCEP(props) {
   return (
     <NumberFormat
       {...other}
+      onValueChange={(values) => {
+        onChange({
+          target: {
+            name: props.name,
+            value: values.value
+          }
+        });
+      }}
       getInputRef={inputRef}
-      format="##.###-###"
+      format="#####-###"
       mask="_"
     />
   );

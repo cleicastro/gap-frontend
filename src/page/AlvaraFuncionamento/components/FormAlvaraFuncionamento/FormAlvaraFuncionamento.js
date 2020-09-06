@@ -1,11 +1,13 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Grid, TextField } from '@material-ui/core';
 import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers';
 
+import { Alert } from '@material-ui/lab';
 import { ButtonStep } from '../../../../components';
 import { useStepAlvara } from '../../../../hooks';
 
-import { alvaraFuncionamento } from '../../../../util';
+import { alvaraFuncionamentoSchema } from '../../../../util';
 
 import {
   AlvaraFuncionamentoContext,
@@ -14,31 +16,40 @@ import {
 
 function FormAlvaraFuncionamento() {
   const {
-    state: { taxpayerSeleted },
+    state: { taxpayerSeleted, dataAlvaraFuncionamento },
     dispatch
   } = useContext(AlvaraFuncionamentoContext);
-  const {
-    cadAlvara: {
-      atividade_principal: atividadePrincipal,
-      atividade_secundaria_I: atividadeSecundariaI,
-      atividade_secundaria_II: atividadeSecundariaII,
-      inscricao_municipal: inscricaoMunicipal
-    }
-  } = taxpayerSeleted;
+  const cadastroAlvara = {
+    atividadePrincipal:
+      taxpayerSeleted.cadAlvara && taxpayerSeleted.cadAlvara.atividadePrincipal,
+    atividadeSecundariaI:
+      taxpayerSeleted.cadAlvara &&
+      taxpayerSeleted.cadAlvara.atividadeSecundariaI,
+    atividadeSecundariaII:
+      taxpayerSeleted.cadAlvara &&
+      taxpayerSeleted.cadAlvara.cadAlvara.atividadeSecundariaII,
+    inscricaoMunicipal:
+      taxpayerSeleted.cadAlvara &&
+      taxpayerSeleted.cadAlvara.cadAlvara.inscricaoMunicipal
+  };
 
-  const { register, handleSubmit, control, errors } = useForm({
+  const { register, handleSubmit, control, errors, getValues } = useForm({
+    resolver: yupResolver(alvaraFuncionamentoSchema),
     defaultValues: {
       ...taxpayerSeleted,
-      atividadePrincipal,
-      atividadeSecundariaI,
-      atividadeSecundariaII,
-      inscricaoMunicipal
-    },
-    validationSchema: alvaraFuncionamento
+      ...cadastroAlvara,
+      ...dataAlvaraFuncionamento
+    }
   });
 
   const [stepActivity, setStepActivity] = useStepAlvara();
-  const handlePrevStep = () => setStepActivity(stepActivity - 1);
+  const handlePrevStep = () => {
+    dispatch({
+      type: ACTIONS_ALVARA.SELECT_ALVARA_FUNCIONAMENTO,
+      payload: getValues()
+    });
+    setStepActivity(stepActivity - 1);
+  };
 
   const handleSetAlvara = (values) => {
     dispatch({
@@ -50,6 +61,12 @@ function FormAlvaraFuncionamento() {
 
   return (
     <form onSubmit={handleSubmit(handleSetAlvara)}>
+      {!taxpayerSeleted.cadAlvara && (
+        <Alert severity="warning">
+          Este contribuinte não possui cadastro de emissão de alvará, é
+          recomendável atualizar o cadastro.
+        </Alert>
+      )}
       <Grid container spacing={3}>
         <Grid item sm={4} xs={12}>
           <TextField

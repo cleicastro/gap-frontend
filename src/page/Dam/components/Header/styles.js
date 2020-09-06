@@ -7,7 +7,8 @@ const useStyles = makeStyles((theme) => ({
   },
   differenceValue: {
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
+    color: theme.palette.primary.dark
   },
   iconMenu: {
     marginLeft: theme.spacing(2)

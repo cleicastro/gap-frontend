@@ -1,46 +1,9 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { memo } from 'react';
 import { Grid, TextField } from '@material-ui/core';
-import { ContribuinteContext } from '../../../../contexts';
+import { useFormContext } from 'react-hook-form';
 
 function FormAlvara() {
-  const {
-    contribuinte,
-    isDisbledForm,
-    control,
-    register,
-    empresaResponse
-  } = useContext(ContribuinteContext);
-  const { cadAlvara } = contribuinte;
-  const [data, setData] = useState({
-    inscricaoMunicipal: cadAlvara ? cadAlvara.inscricao_municipal : '',
-    nomeFantasia: cadAlvara ? cadAlvara.nome_fantasia : '',
-    atividadePrincipal: cadAlvara ? cadAlvara.atividade_principal : '',
-    atividadeSecundariaI: cadAlvara ? cadAlvara.atividade_secundaria_I : '',
-    atividadeSecundariaII: cadAlvara ? cadAlvara.atividade_secundaria_II : ''
-  });
-
-  useEffect(() => {
-    if (empresaResponse) {
-      const {
-        alias,
-        secondary_activities: secondaryActivities,
-        primary_activity: primaryActivity
-      } = empresaResponse;
-      setData((value) => ({
-        ...value,
-        nomeFantasia: alias,
-        atividadePrincipal: primaryActivity.description,
-        atividadeSecundariaI: secondaryActivities[0].description,
-        atividadeSecundariaII: secondaryActivities[1].description
-      }));
-    }
-  }, [empresaResponse]);
-
-  function onChangeHandler(e) {
-    const { name, value } = e.target;
-    setData((prev) => ({ ...prev, [name]: value }));
-  }
-
+  const { control, register, errors } = useFormContext();
   return (
     <Grid container spacing={3}>
       <Grid item sm={4} xs={12}>
@@ -49,9 +12,11 @@ function FormAlvara() {
           label="Inscrição Municipal"
           name="inscricaoMunicipal"
           inputRef={register}
-          value={data.inscricaoMunicipal}
-          disabled={isDisbledForm}
-          onChange={onChangeHandler}
+          control={control}
+          error={!!errors.inscricaoMunicipal}
+          helperText={
+            errors.inscricaoMunicipal && errors.inscricaoMunicipal.message
+          }
         />
       </Grid>
       <Grid item sm={8} xs={12}>
@@ -59,10 +24,10 @@ function FormAlvara() {
           fullWidth
           label="Nome Fantasia"
           name="nomeFantasia"
+          inputRef={register}
           control={control}
-          value={data.nomeFantasia}
-          disabled={isDisbledForm}
-          onChange={onChangeHandler}
+          error={!!errors.nomeFantasia}
+          helperText={errors.nomeFantasia && errors.nomeFantasia.message}
         />
       </Grid>
 
@@ -71,9 +36,12 @@ function FormAlvara() {
           fullWidth
           label="Atividade Principal"
           name="atividadePrincipal"
-          value={data.atividadePrincipal}
-          disabled={isDisbledForm}
-          onChange={onChangeHandler}
+          inputRef={register}
+          control={control}
+          error={!!errors.atividadePrincipal}
+          helperText={
+            errors.atividadePrincipal && errors.atividadePrincipal.message
+          }
         />
       </Grid>
       <Grid item sm={6} xs={12}>
@@ -81,9 +49,12 @@ function FormAlvara() {
           fullWidth
           label="Atividade Secundária I"
           name="atividadeSecundariaI"
-          value={data.atividadeSecundariaI}
-          disabled={isDisbledForm}
-          onChange={onChangeHandler}
+          inputRef={register}
+          control={control}
+          error={!!errors.atividadeSecundariaI}
+          helperText={
+            errors.atividadeSecundariaI && errors.atividadeSecundariaI.message
+          }
         />
       </Grid>
       <Grid item sm={6} xs={12}>
@@ -91,13 +62,16 @@ function FormAlvara() {
           fullWidth
           label="Atividade  Secundária II"
           name="atividadeSecundariaII"
-          value={data.atividadeSecundariaII}
-          disabled={isDisbledForm}
-          onChange={onChangeHandler}
+          inputRef={register}
+          control={control}
+          error={!!errors.atividadeSecundariaII}
+          helperText={
+            errors.atividadeSecundariaII && errors.atividadeSecundariaII.message
+          }
         />
       </Grid>
     </Grid>
   );
 }
 
-export default FormAlvara;
+export default memo(FormAlvara);

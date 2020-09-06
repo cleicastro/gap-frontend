@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Grid,
   TextField,
@@ -6,112 +6,140 @@ import {
   FormControlLabel,
   Radio
 } from '@material-ui/core';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 
-import { ContribuinteContext } from '../../../../contexts';
+import { useFormContext } from 'react-hook-form';
+
 import { NumberFormatCNPJ, NumberFormatCPF } from '../../../NumberFormat';
+import { useSearchCNPJ } from '../../../../hooks';
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 function FormInfoPessoais() {
-  const {
-    contribuinte,
-    isDisbledForm,
-    control,
-    register,
-    searchCNPJ,
-    empresaResponse
-  } = useContext(ContribuinteContext);
-  const [data, setData] = useState(contribuinte);
+  const [open, setOpen] = useState(false);
+  const [messageError, setMessageError] = useState('');
+  const { control, register, setValue, errors, watch } = useFormContext();
+  const setSearchCNPJ = useSearchCNPJ();
 
-  useEffect(() => {
-    setData(contribuinte);
-  }, [contribuinte]);
-
-  useEffect(() => {
-    if (empresaResponse) {
-      const { name, email, phone: number } = empresaResponse;
-      setData((prev) => ({
-        ...prev,
-        nome: name,
-        email,
-        telefone: `${number}`
-      }));
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
     }
-  }, [empresaResponse]);
+    setOpen(false);
+  };
 
-  function onChangeHandler(e) {
+  function handlerSearchCNPJ(e) {
+    const { value } = e.target;
+    if (watch('tipo') === 'PJ' && value.length === 14) {
+      const responseCNPJ = setSearchCNPJ(value.replace(/[^\d]+/g, ''));
+      responseCNPJ.then((response) => {
+        if (response.status === 200) {
+          const dataCnpj = response.data;
+          setValue('nome', dataCnpj.name);
+          setValue('telefone', dataCnpj.phone);
+          setValue('email', dataCnpj.email);
+
+          setValue('nomeFantasia', dataCnpj.alias);
+          setValue('atividadePrincipal', dataCnpj.primary_activity.description);
+          setValue(
+            'atividadeSecundariaI',
+            dataCnpj.secondary_activities[0].description
+          );
+          setValue(
+            'atividadeSecundariaII',
+            dataCnpj.secondary_activities[1].description
+          );
+
+          setValue('endereco', dataCnpj.address.street);
+          setValue('cep', dataCnpj.address.zip);
+          setValue('uf', dataCnpj.address.state);
+          setValue('cidade', dataCnpj.address.city);
+          setValue('numero', dataCnpj.address.number);
+          setValue('bairro', dataCnpj.address.neighborhood);
+        } else {
+          setMessageError(
+            `${response.message}\n
+              status code:  ${response.error.response.status}\n
+              message:  ${response.error.response.data.message}\n`
+          );
+          setOpen(true);
+        }
+      });
+    }
+  }
+  function onChangeHandlerTypeAcount(e) {
     const { name, value } = e.target;
-    if (data.tipo === 'PJ' && value.length === 14) {
-      searchCNPJ(value.replace(/[^\d]+/g, ''));
+    if (name === 'tipo') {
+      setValue('tipo', value);
     }
-    setData((prev) => ({ ...prev, [name]: value }));
   }
 
   return (
     <Grid container spacing={3}>
+      <Snackbar open={open} autoHideDuration={8000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="warning">
+          {messageError}
+        </Alert>
+      </Snackbar>
       <Grid item xs={12} sm={3}>
         <RadioGroup
           row
           aria-label="position"
           name="tipo"
-          onChange={onChangeHandler}
-          valaue={data.tipo}
-          control={control}>
+          onChange={onChangeHandlerTypeAcount}>
           <FormControlLabel
-            disabled={isDisbledForm}
+            control={<Radio checked={watch('tipo') === 'PF'} />}
             value="PF"
-            control={<Radio />}
-            checked={data.tipo === 'PF'}
-            inputRef={register}
             label="CPF"
+            inputRef={register}
           />
           <FormControlLabel
-            disabled={isDisbledForm}
+            control={<Radio checked={watch('tipo') === 'PJ'} />}
             value="PJ"
-            control={<Radio />}
-            inputRef={register}
-            checked={data.tipo === 'PJ'}
             label="CNPJ"
+            inputRef={register}
           />
         </RadioGroup>
       </Grid>
       <Grid item xs={12} sm={3}>
         <TextField
+          onChange={handlerSearchCNPJ}
           inputRef={register}
           control={control}
-          value={data.doc}
-          onChange={onChangeHandler}
-          disabled={isDisbledForm}
           fullWidth
-          label={data.tipo === 'PF' ? 'CPF' : 'CNPJ'}
+          label={watch('tipo') === 'PF' ? 'CPF' : 'CNPJ'}
           name="doc"
-          required
-          InputProps={{
-            inputComponent:
-              data.tipo === 'PF' ? NumberFormatCPF : NumberFormatCNPJ
-          }}
+          InputProps={
+            {
+              // inputComponent:
+              //   watch('tipo') === 'PF' ? NumberFormatCPF : NumberFormatCNPJ
+            }
+          }
+          error={!!errors.doc}
+          helperText={errors.doc && errors.doc.message}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
         <TextField
           inputRef={register}
           control={control}
-          value={data.nome}
-          onChange={onChangeHandler}
-          disabled={isDisbledForm}
           fullWidth
           name="nome"
           type="text"
           label="Nome"
+          error={!!errors.nome}
+          helperText={errors.nome && errors.nome.message}
         />
       </Grid>
       <Grid item xs={12} sm={3}>
         <TextField
           inputRef={register}
           control={control}
-          value={data.docEstadual}
-          onChange={onChangeHandler}
-          disabled={isDisbledForm}
           fullWidth
-          label={data.tipo === 'PF' ? 'RG' : 'Inscrição Estadual'}
+          label="Inscrição Estadual"
           name="docEstadual"
         />
       </Grid>
@@ -119,9 +147,6 @@ function FormInfoPessoais() {
         <TextField
           inputRef={register}
           control={control}
-          value={data.docEmissao ? data.docEmissao : ''}
-          onChange={onChangeHandler}
-          disabled={isDisbledForm}
           fullWidth
           label="Data de emissão"
           name="docEmissao"
@@ -135,9 +160,6 @@ function FormInfoPessoais() {
         <TextField
           inputRef={register}
           control={control}
-          value={data.docOrgao}
-          onChange={onChangeHandler}
-          disabled={isDisbledForm}
           fullWidth
           label="Orgão emissor"
           name="docOrgao"
@@ -147,25 +169,23 @@ function FormInfoPessoais() {
         <TextField
           inputRef={register}
           control={control}
-          value={data.telefone}
-          onChange={onChangeHandler}
-          disabled={isDisbledForm}
           fullWidth
           label="Telefone"
           name="telefone"
+          error={!!errors.telefone}
+          helperText={errors.telefone && errors.telefone.message}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
         <TextField
           inputRef={register}
           control={control}
-          value={data.email}
-          onChange={onChangeHandler}
-          disabled={isDisbledForm}
           fullWidth
           label="email"
           name="email"
           type="email"
+          error={!!errors.email}
+          helperText={errors.email && errors.email.message}
         />
       </Grid>
     </Grid>

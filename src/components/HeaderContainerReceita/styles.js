@@ -7,7 +7,8 @@ const useStyles = makeStyles((theme) => ({
   },
   differenceValue: {
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
+    color: theme.palette.primary.main
   },
   iconMenu: {
     marginLeft: theme.spacing(2)
@@ -15,9 +16,9 @@ const useStyles = makeStyles((theme) => ({
   search: {
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
-    backgroundColor: theme.palette.cammon.light,
+    backgroundColor: theme.palette.primary.dark,
     '&:hover': {
-      backgroundColor: theme.palette.cammon.light
+      backgroundColor: theme.palette.primary.main
     },
     marginLeft: 0,
     width: '100%',

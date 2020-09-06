@@ -40,16 +40,19 @@ function dateSetting(dateVencimento) {
     year: 'numeric'
   }).format(toDay);
 
+  const newdate = new Date(Date(dateVencimento));
+  const dateVencimentoAux = newdate.setDate(newdate.getDate() + diasVencer);
+
   const vencimento = Intl.DateTimeFormat('fr-CA', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric'
-  }).format(dateVencimento.setDate(dateVencimento.getDate() + diasVencer));
+  }).format(new Date(dateVencimentoAux));
 
   const emissao = new Date(`${new Date().toString().split('GMT')[0]} UTC`)
     .toISOString()
-    .split('.')[0]
-    .replace('T', ' ');
+    .split('.')[0];
+  // .replace('T', ' ');
 
   return {
     referencia,
@@ -57,6 +60,16 @@ function dateSetting(dateVencimento) {
     emissao,
     vencimento
   };
+}
+
+function convertDateTimerFR(dateING) {
+  const dateValue = new Date(
+    `${new Date(dateING).toString().split('GMT')[0]} UTC`
+  )
+    .toISOString()
+    .split('.')[0]
+    .replace('T', ' ');
+  return dateValue;
 }
 
 function initialTributosNfsa() {
@@ -471,18 +484,22 @@ export const useSaveNfsa = () => {
   const nfsa = { ...dataNfsa, idPrestador, idTomador };
 
   function setSave() {
-    saveNfsa(dataItemNfsa, nfsa, document).then((response) => {
-      dispatch(addNewNfsaAction(response));
-      setStatusServer(response.status);
-      dispatch({
-        type: ACTIONS_NFSA_CONTEXT.SELECT_NFSA,
-        payload: response.data
-      });
-      dispatchNfsa({
-        type: ACTIONS_NFSA_CONTEXT.SELECT_NFSA,
-        payload: response.data
-      });
-    });
+    const { emissao } = document;
+    const dateProcess = convertDateTimerFR(emissao);
+    saveNfsa(dataItemNfsa, nfsa, { ...document, emissao: dateProcess }).then(
+      (response) => {
+        dispatch(addNewNfsaAction(response));
+        setStatusServer(response.status);
+        dispatch({
+          type: ACTIONS_NFSA_CONTEXT.SELECT_NFSA,
+          payload: response.data
+        });
+        dispatchNfsa({
+          type: ACTIONS_NFSA_CONTEXT.SELECT_NFSA,
+          payload: response.data
+        });
+      }
+    );
   }
 
   function setEditStatus(id, type, param) {
@@ -515,14 +532,19 @@ export const useSaveNfsa = () => {
     });
   }
   function setEdit(id) {
-    editNfsa(dataItemNfsa, nfsa, dataDam, id).then((response) => {
-      dispatch(editNfsaAction({ ...nfsa, ...taxpayerSeleted }));
-      setStatusServer(response.status);
-      dispatchNfsa({
-        type: ACTIONS_NFSA_CONTEXT.SELECT_NFSA,
-        payload: { ...nfsa, ...taxpayerSeleted }
-      });
-    });
+    const { emissao } = document;
+    const dateProcess = convertDateTimerFR(emissao);
+
+    editNfsa(dataItemNfsa, nfsa, { ...dataDam, emissao: dateProcess }, id).then(
+      (response) => {
+        dispatch(editNfsaAction({ ...nfsa, ...taxpayerSeleted }));
+        setStatusServer(response.status);
+        dispatchNfsa({
+          type: ACTIONS_NFSA_CONTEXT.SELECT_NFSA,
+          payload: { ...nfsa, ...taxpayerSeleted }
+        });
+      }
+    );
   }
   return [statusServer, successRequest, setSave, setEditStatus, setEdit];
 };

@@ -1,15 +1,23 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Typography, Grid, TextField, InputAdornment } from '@material-ui/core';
 
 import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers';
+
 import { ButtonStep } from '../../../../components';
-import { useInitialDocument, useStepDam } from '../../../../hooks';
+import { useStepDam } from '../../../../hooks';
 
 import { documentSchema, mascaraReal } from '../../../../util';
+import { DamContext, ACTIONS } from '../../../../contexts';
+import { useDocument } from '../../../../hooks/dam/useDocument';
 
 function FormDocumento() {
-  const [document, setDocument] = useInitialDocument();
+  const {
+    state: { document },
+    dispatch
+  } = useContext(DamContext);
   const [stepActivity, setStepActivity] = useStepDam();
+  const setDocument = useDocument();
 
   const {
     control,
@@ -20,7 +28,7 @@ function FormDocumento() {
     errors
   } = useForm({
     defaultValues: document,
-    validationSchema: documentSchema
+    resolver: yupResolver(documentSchema)
   });
 
   const calcTotal = (event) => {
@@ -34,11 +42,16 @@ function FormDocumento() {
     setValue('valorTotal', result.toFixed(2));
   };
 
-  const handlePrevStep = () => setStepActivity(stepActivity - 1);
+  const handlePrevStep = () => {
+    setStepActivity(stepActivity - 1);
+    const requestDocument = setDocument({ ...document, ...getValues() });
+    dispatch({ type: ACTIONS.DOCUMENT, payload: requestDocument });
+  };
 
   const onSubmit = (data) => {
-    setDocument(data);
     setStepActivity(stepActivity + 1);
+    const requestDocument = setDocument({ ...document, ...data });
+    dispatch({ type: ACTIONS.DOCUMENT, payload: requestDocument });
   };
 
   return (
@@ -63,12 +76,15 @@ function FormDocumento() {
           <TextField
             inputRef={register}
             control={control}
-            id="emissaoConvertPT"
-            name="emissaoConvertPT"
-            disabled
-            error={!!errors.emissaoConvertPT}
+            id="emissao"
+            name="emissao"
+            error={!!errors.emissao}
             label="Data de emissão"
             fullWidth
+            type="datetime-local"
+            InputLabelProps={{
+              shrink: true
+            }}
           />
         </Grid>
         <Grid item xs={12} md={4}>
@@ -104,11 +120,13 @@ function FormDocumento() {
             control={control}
             id="receita"
             name="receita"
-            disabled
             error={!!errors.receita}
             label="Receita"
             fullWidth
             helperText={errors.receita && errors.receita.message}
+            InputProps={{
+              readOnly: true
+            }}
           />
         </Grid>
         <Grid item xs={6} md={4}>
@@ -119,10 +137,9 @@ function FormDocumento() {
             name="docOrigem"
             label="Documento de origem"
             fullWidth
-            InputLabelProps={{
-              shrink: true
+            InputProps={{
+              readOnly: document.cod === '1113050101'
             }}
-            disabled={document.cod === '1113050101'}
           />
         </Grid>
         <Grid item xs={6} md={4}>
@@ -132,7 +149,8 @@ function FormDocumento() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">R$</InputAdornment>
-              )
+              ),
+              readOnly: document.cod === '1113050101'
             }}
             type="number"
             id="valorPrincipal"
@@ -141,7 +159,6 @@ function FormDocumento() {
             label="Valor principal"
             fullWidth
             onChange={calcTotal}
-            disabled={document.cod === '1113050101'}
             helperText={errors.valorPrincipal && errors.valorPrincipal.message}
           />
         </Grid>
@@ -152,7 +169,8 @@ function FormDocumento() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">R$</InputAdornment>
-              )
+              ),
+              readOnly: document.cod === '1113050101'
             }}
             id="juros"
             name="juros"
@@ -162,7 +180,6 @@ function FormDocumento() {
             error={!!errors.juros}
             fullWidth
             onChange={calcTotal}
-            disabled={document.cod === '1113050101'}
             helperText={errors.juros && errors.juros.message}
           />
         </Grid>
@@ -173,7 +190,8 @@ function FormDocumento() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">R$</InputAdornment>
-              )
+              ),
+              readOnly: document.cod === '1113050101'
             }}
             id="taxaExp"
             name="taxaExp"
@@ -183,7 +201,6 @@ function FormDocumento() {
             error={!!errors.taxaExp}
             fullWidth
             onChange={calcTotal}
-            disabled={document.receita === '1113050101'}
             helperText={errors.taxaExp && errors.taxaExp.message}
           />
         </Grid>
@@ -194,12 +211,12 @@ function FormDocumento() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">R$</InputAdornment>
-              )
+              ),
+              readOnly: true
             }}
             name="valorTotal"
             type="number"
             step={0.5}
-            disabled
             label="Valor total"
             error={!!errors.valorTotal}
             fullWidth

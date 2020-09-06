@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, useState, useEffect } from 'react';
+import React, { useContext, useCallback, useState } from 'react';
 
 import {
   Grid,
@@ -8,71 +8,97 @@ import {
   DialogTitle,
   DialogActions,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Fade,
+  Fab
 } from '@material-ui/core';
+import CheckIcon from '@material-ui/icons/Check';
 
+import { useSelector } from 'react-redux';
 import useStyles from './styles';
 import PreviewDam from '../Preview';
 import {
   ACTIONS_ALVARA,
   AlvaraFuncionamentoContext
 } from '../../../../contexts';
-import { MenuDocumentEvents, ModalSave } from '../../../../components';
-import { useSaveAlvara, useOpenNewAlvara } from '../../../../hooks';
+import {
+  MenuDocumentEvents,
+  ModalSave,
+  AlertShow
+} from '../../../../components';
+import { damStatusEdit } from '../../../../util';
+import { useEdit } from '../../../../hooks/dam/useEdit';
 
 function ModalDetails() {
+  const {
+    state: { showModalDetails, dataAlvaraFuncionamento },
+    dispatch
+  } = useContext(AlvaraFuncionamentoContext);
+
   const theme = useTheme();
   const fullScreenModal = useMediaQuery(theme.breakpoints.down('sm'));
   const classes = useStyles();
   const [openModalMenu, setOpenModalMenu] = useState(false);
-  // eslint-disable-next-line no-unused-vars
-  const [
-    statusServer,
-    successRequest,
-    // eslint-disable-next-line no-unused-vars
-    setSave,
-    setEditStatus
-  ] = useSaveAlvara();
-  const setWindowNewAlvara = useOpenNewAlvara();
+  const [message, setMessage] = useState({});
 
-  const {
-    state: { showModalDetails, dataAlvaraFunvionamento, dataDam },
-    dispatch
-  } = useContext(AlvaraFuncionamentoContext);
+  const setEdit = useEdit();
+  const dataPagamento = useSelector((state) => state.datePayment.datePayment);
 
-  useEffect(() => {
-    if (successRequest) {
-      setOpenModalMenu(false);
-    }
-  }, [successRequest]);
+  const handleClosedModalDetails = useCallback(() => {
+    setMessage({});
+    dispatch({
+      type: ACTIONS_ALVARA.CLEAN_DATA_ALVARA
+    });
+  }, [dispatch]);
 
-  function handleClosedModalDetails() {
+  const handleCopyDam = useCallback(() => {
+    dispatch({
+      type: ACTIONS_ALVARA.MODAL_NEW_ALVARA,
+      payload: false
+    });
     dispatch({
       type: ACTIONS_ALVARA.MODAL_DETAILS,
       payload: false
     });
-  }
+  }, [dispatch]);
+
+  const handleEditDam = useCallback(() => {
+    dispatch({
+      type: ACTIONS_ALVARA.MODAL_NEW_ALVARA,
+      payload: true
+    });
+    dispatch({
+      type: ACTIONS_ALVARA.MODAL_DETAILS,
+      payload: false
+    });
+  }, [dispatch]);
 
   const handleAlterStatusDAM = useCallback(
     (type, param) => {
       setOpenModalMenu(true);
-      setEditStatus(dataAlvaraFunvionamento.id_dam, type, param);
+      setMessage({});
+      setEdit(dataAlvaraFuncionamento.id_dam, param).then((response) => {
+        const processStatusDam = damStatusEdit(response, type);
+        if (response.status === 200) {
+          dispatch({
+            type: ACTIONS_ALVARA.UPDATE_ALVARA,
+            payload: {
+              ...dataAlvaraFuncionamento, dam: {
+                ...dataAlvaraFuncionamento.dam,
+                ...processStatusDam.damStatus,
+              },
+              dataPagamento
+            }
+          });
+        }
+        setMessage(processStatusDam.message);
+        setTimeout(() => {
+          setOpenModalMenu(false);
+        }, 2000);
+      });
     },
-    [dataAlvaraFunvionamento.id_dam, setEditStatus]
+    [dataAlvaraFuncionamento, dataPagamento, dispatch, setEdit]
   );
-
-  const handleCopyDam = () => {
-    handleClosedModalDetails();
-    setWindowNewAlvara();
-  };
-
-  const handleEditDam = () => {
-    dispatch({
-      type: ACTIONS_ALVARA.EDIT_OPERATION
-    });
-    handleClosedModalDetails();
-    setWindowNewAlvara();
-  };
 
   return (
     <Dialog
@@ -82,20 +108,26 @@ function ModalDetails() {
       aria-labelledby="customized-dialog-title">
       <DialogTitle id="customized-dialog-title">
         <MenuDocumentEvents
-          values={{ id_dam: dataAlvaraFunvionamento.id_dam }}
+          values={{ id_dam: dataAlvaraFuncionamento.id_dam }}
           handleAlterStatusDAM={handleAlterStatusDAM}
           handleCopy={handleCopyDam}
           handleEdit={handleEditDam}
           handleClose={handleClosedModalDetails}
           visibleOptions={{
             imprimir: true,
-            pagar: dataDam && !dataDam.pago && dataDam.status !== 'Cancelado',
             copiar: showModalDetails,
             editar:
-              dataDam && showModalDetails && dataDam.status !== 'Cancelado',
-            cancelar: dataDam && dataDam.status !== 'Cancelado',
+              showModalDetails &&
+              dataAlvaraFuncionamento &&
+              dataAlvaraFuncionamento?.dam?.status !== 'Cancelado',
+
+            pagar:
+              !dataAlvaraFuncionamento?.dam?.pago &&
+              dataAlvaraFuncionamento?.dam?.status !== 'Cancelado',
+            cancelar:
+              dataAlvaraFuncionamento?.dam?.status !== 'Cancelado',
             nfsa: false,
-            alvara: true,
+            alvara: false,
             recibo: false,
             sair: true
           }}
@@ -112,9 +144,18 @@ function ModalDetails() {
             <PreviewDam />
             <ModalSave
               openModalMenu={openModalMenu}
-              statusServer={statusServer}
-              successRequest={successRequest}
-            />
+              statusServer={message.type}
+              successRequest={message.type}>
+              <div className={classes.container}>
+                <Fade in={!!message.type}>
+                  <Fab aria-label="save" className={classes.buttonClassname}>
+                    <CheckIcon />
+                  </Fab>
+                </Fade>
+                <AlertShow messageProps={message} />
+              </div>
+            </ModalSave>
+            <AlertShow messageProps={message} />
           </Grid>
         </Grid>
       </DialogContent>

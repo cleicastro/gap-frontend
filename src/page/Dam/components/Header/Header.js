@@ -15,7 +15,7 @@ import {
 } from '@material-ui/icons';
 
 import useStyles from './styles';
-import { useStoreDam, useFilterDam } from '../../../../hooks';
+import { useFilterDam } from '../../../../hooks';
 import { DamContext } from '../../../../contexts';
 
 function Header({ handleViewTable, handleViewFilter }) {

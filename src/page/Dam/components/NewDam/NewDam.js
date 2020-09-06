@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import {
   Dialog,
   AppBar,
@@ -15,10 +15,9 @@ import CloseIcon from '@material-ui/icons/Close';
 import { Add as AddIcon } from '@material-ui/icons';
 import useStyles from './styles';
 
-import { ContribuinteProvier, DamContext } from '../../../../contexts';
+import { ContribuinteProvier, DamContext, ACTIONS } from '../../../../contexts';
 import { Contribuintes } from '../../../../components';
 import StepComponent from './StepComponent';
-import { useOpenNewDam } from '../../../../hooks';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -27,16 +26,30 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 function NewDam() {
   const classes = useStyles();
   const {
-    state: { showModalNewDam }
+    state: { showModalNewDam, openWindowContribuinte, cadastroContribuinte },
+    dispatch
   } = useContext(DamContext);
 
-  const [openWindowContribuinte, setOpenWindowContribuinte] = useState(false);
-  const setWindow = useOpenNewDam();
+  const handleOpoenWindowContribuinte = () => {
+    dispatch({
+      type: ACTIONS.MODAL_CONTRIBUINTES
+    });
+  };
+
+  const handleSetWindow = () => {
+    dispatch({
+      type: ACTIONS.MODAL_NEW_DAM
+    });
+  };
 
   return (
     <>
       <Box displayPrint="none" className={classes.fab}>
-        <Fab color="primary" size="medium" aria-label="add" onClick={setWindow}>
+        <Fab
+          color="primary"
+          size="medium"
+          aria-label="add"
+          onClick={handleSetWindow}>
           <AddIcon />
         </Fab>
       </Box>
@@ -50,7 +63,7 @@ function NewDam() {
             <IconButton
               edge="start"
               color="inherit"
-              onClick={setWindow}
+              onClick={handleSetWindow}
               aria-label="close">
               <CloseIcon />
             </IconButton>
@@ -60,7 +73,7 @@ function NewDam() {
             <Button
               autoFocus
               color="inherit"
-              onClick={() => setOpenWindowContribuinte(true)}>
+              onClick={handleOpoenWindowContribuinte}>
               Contribuintes
             </Button>
           </Toolbar>
@@ -73,21 +86,20 @@ function NewDam() {
         disableBackdropClick
         fullScreen
         open={openWindowContribuinte}
-        onClose={() => setOpenWindowContribuinte(false)}
         TransitionComponent={Transition}>
         <AppBar className={classes.appBar}>
           <Toolbar>
             <IconButton
               edge="start"
               color="inherit"
-              onClick={() => setOpenWindowContribuinte(false)}
+              onClick={handleOpoenWindowContribuinte}
               aria-label="close">
               <CloseIcon />
             </IconButton>
           </Toolbar>
         </AppBar>
         <ContribuinteProvier>
-          <Contribuintes />
+          <Contribuintes contribuinte={cadastroContribuinte} />
         </ContribuinteProvier>
       </Dialog>
     </>

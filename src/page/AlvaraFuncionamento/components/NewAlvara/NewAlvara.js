@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import {
   Dialog,
   AppBar,
@@ -17,7 +17,8 @@ import useStyles from './styles';
 
 import {
   ContribuinteProvier,
-  AlvaraFuncionamentoContext
+  AlvaraFuncionamentoContext,
+  ACTIONS_ALVARA
 } from '../../../../contexts';
 import { Contribuintes } from '../../../../components';
 import StepComponent from './StepComponent';
@@ -30,11 +31,21 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 function NewAlvara() {
   const classes = useStyles();
   const {
-    state: { showModalNewAlvaraFuncionamento }
+    state: {
+      showModalNewAlvaraFuncionamento,
+      openWindowContribuinte,
+      cadastroContribuinte
+    },
+    dispatch
   } = useContext(AlvaraFuncionamentoContext);
 
-  const [openWindowContribuinte, setOpenWindowContribuinte] = useState(false);
   const setWindow = useOpenNewAlvara();
+
+  const handleOpoenWindowContribuinte = () => {
+    dispatch({
+      type: ACTIONS_ALVARA.MODAL_CONTRIBUINTES
+    });
+  };
 
   return (
     <>
@@ -63,7 +74,7 @@ function NewAlvara() {
             <Button
               autoFocus
               color="inherit"
-              onClick={() => setOpenWindowContribuinte(true)}>
+              onClick={handleOpoenWindowContribuinte}>
               Contribuintes
             </Button>
           </Toolbar>
@@ -76,21 +87,20 @@ function NewAlvara() {
         disableBackdropClick
         fullScreen
         open={openWindowContribuinte}
-        onClose={() => setOpenWindowContribuinte(false)}
         TransitionComponent={Transition}>
         <AppBar className={classes.appBar}>
           <Toolbar>
             <IconButton
               edge="start"
               color="inherit"
-              onClick={() => setOpenWindowContribuinte(false)}
+              onClick={handleOpoenWindowContribuinte}
               aria-label="close">
               <CloseIcon />
             </IconButton>
           </Toolbar>
         </AppBar>
         <ContribuinteProvier>
-          <Contribuintes />
+          <Contribuintes contribuinte={cadastroContribuinte} />
         </ContribuinteProvier>
       </Dialog>
     </>

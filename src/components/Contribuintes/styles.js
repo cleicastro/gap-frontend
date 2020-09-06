@@ -6,22 +6,21 @@ const useStyles = makeStyles((theme) => ({
   appBar: {
     position: 'relative'
   },
-  layout: {
-    width: 'auto',
-    marginLeft: theme.spacing(2),
-    marginRight: theme.spacing(2),
-    [theme.breakpoints.up(800 + theme.spacing(2) * 2)]: {
-      width: 800,
-      marginLeft: 'auto',
-      marginRight: 'auto'
-    }
+  textField: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    width: '25ch'
   },
   paper: {
-    marginTop: theme.spacing(1),
+    padding: theme.spacing(1),
+    textAlign: 'center',
+    color: theme.palette.text.secondary
+  },
+  layout: {
+    height: '75vh',
     marginBottom: theme.spacing(1),
     padding: theme.spacing(2),
     [theme.breakpoints.up(800 + theme.spacing(1) * 2)]: {
-      marginTop: theme.spacing(2),
       marginBottom: theme.spacing(2),
       padding: theme.spacing(2)
     }
@@ -62,11 +61,9 @@ const StyledTableCell = withStyles((theme) => ({
   head: {
     backgroundColor: theme.palette.common.light, // theme.palette.common.black,
     color: theme.palette.primary.main,
-    fontSize: 12,
+    fontSize: 14,
+    fontWeight: 'bold',
     cursor: 'pointer'
-  },
-  body: {
-    fontSize: 9
   }
 }))(TableCell);
 

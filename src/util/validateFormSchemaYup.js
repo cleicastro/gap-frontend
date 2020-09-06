@@ -5,8 +5,11 @@ yup.setLocale(ptBR);
 
 export const documentSchema = yup.object().shape({
   referencia: yup.string().required(),
-  emissaoConvertPT: yup.string().required(),
-  vencimento: yup.date().required(),
+  emissao: yup.date().required(),
+  vencimento: yup
+    .date()
+    .required()
+    .when('emissao', (emissao, schema) => emissao && schema.min(emissao)),
   // infoAdicionais: yup.string().matches(/^[,;]$/, {
   //   message: 'Contém caracteres incorretos'
   // }),
@@ -17,7 +20,7 @@ export const documentSchema = yup.object().shape({
   valorTotal: yup.number().required().min(5)
 });
 
-export const alvaraFuncionamento = yup.object().shape({
+export const alvaraFuncionamentoSchema = yup.object().shape({
   atividadePrincipal: yup.string().required().min(5),
   inscricaoMunicipal: yup
     .string()
@@ -45,4 +48,24 @@ export const itemNfsaSchema = yup.object().shape({
   descricao: yup.string(),
   quantidade: yup.number()
   // valor: yup.number()
+});
+
+export const contribuinteSchemma = yup.object().shape({
+  // tipo: yup.string().required().min(2).max(2),
+  doc: yup.string().required().min(14),
+  nome: yup.string().required().min(5),
+  telefone: yup.string(),
+  email: yup.string().email(),
+
+  nomeFantasia: yup.string(),
+  atividadePrincipal: yup.string(),
+  atividadeSecundariaI: yup.string(),
+  atividadeSecundariaII: yup.string(),
+
+  endereco: yup.string().required(),
+  cep: yup.string().required().min(9),
+  uf: yup.string().required().min(2),
+  cidade: yup.string().required().min(3),
+  numero: yup.string(),
+  bairro: yup.string().required().min(5)
 });

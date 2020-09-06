@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useCallback } from 'react';
 import clsx from 'clsx';
 import {
   Card,
@@ -11,15 +11,16 @@ import {
 } from '@material-ui/core';
 import InfiniteScroll from 'react-infinite-scroller';
 
-import { useSelector } from 'react-redux';
 import {
   useStyles,
   useStylesPago,
   useStylesCancelado,
   useStylesVencido
 } from './styles';
-import { useStoreDam, usePaginationDam, useDam } from '../../../../hooks';
 import { CardSkeletron } from '../../../../components';
+import { useStoreDam } from '../../../../hooks/dam/useStore';
+import { DamContext } from '../../../../contexts';
+import { usePaginationDam } from '../../../../hooks/dam/usePagination';
 
 const classValueTotal = (
   status,
@@ -91,27 +92,42 @@ const classCaption = (status, emissao, vencimento, days) => {
 };
 
 function CardDam({ className, handleDamDetail, ...rest }) {
-  // eslint-disable-next-line no-unused-vars
-  const statusServer = useDam();
-  console.log(statusServer);
-
   const setSelecetDam = useStoreDam();
-  const [pagination, setPagination] = usePaginationDam();
+  const {
+    state: { listDam, pagination, paramsQuery }
+  } = useContext(DamContext);
+
+  const setPagination = usePaginationDam();
 
   const classes = useStyles();
   const classesPago = useStylesPago();
   const classesCancelado = useStylesCancelado();
   const classesVencido = useStylesVencido();
 
-  function handlePagination(currentPage) {
-    setPagination({
-      page: currentPage + 1
-    });
-  }
-  const listDam = useSelector((state) => {
-    console.log(state);
-    return state.dam.listDam;
-  });
+  const handlePagination = useCallback(
+    (currentPage) => {
+      if (pagination.current_page < pagination.last_page) {
+        const set = setPagination({
+          ...paramsQuery,
+          page: currentPage + 1
+        });
+        // pra tratar o erro
+        set.then((response) => {
+          if (response.status !== 200) {
+            alert('Falha no carregamento dos dados, favor tente mais tarde!');
+          }
+        });
+      }
+    },
+    [pagination.current_page, pagination.last_page, paramsQuery, setPagination]
+  );
+
+  const setSelectDam = useCallback(
+    (dam) => {
+      setSelecetDam(dam);
+    },
+    [setSelecetDam]
+  );
 
   const DamList = () => {
     return (
@@ -125,7 +141,7 @@ function CardDam({ className, handleDamDetail, ...rest }) {
                   ? classesCancelado.root
                   : clsx(classes.root, className)
               }>
-              <CardActionArea onClick={() => setSelecetDam(dam)}>
+              <CardActionArea onClick={() => setSelectDam(dam)}>
                 <CardHeader
                   avatar={
                     <Avatar
@@ -195,11 +211,15 @@ function CardDam({ className, handleDamDetail, ...rest }) {
       </>
     );
   };
+
   return (
     <InfiniteScroll
       useWindow
       pageStart={0}
-      hasMore={pagination.current_page < pagination.last_page}
+      hasMore={
+        pagination.current_page &&
+        pagination.current_page < pagination.last_page
+      }
       loadMore={handlePagination}
       loader={
         <Grid
@@ -212,11 +232,7 @@ function CardDam({ className, handleDamDetail, ...rest }) {
         </Grid>
       }>
       <Grid container justify="space-between" spacing={3}>
-        {Object.keys(listDam).length > 0 ? (
-          <DamList />
-        ) : (
-            <CardSkeletron length={10} />
-          )}
+        {listDam.length > 0 ? <DamList /> : <CardSkeletron length={10} />}
       </Grid>
     </InfiniteScroll>
   );

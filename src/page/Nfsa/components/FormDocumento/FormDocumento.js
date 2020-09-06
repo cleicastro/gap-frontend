@@ -2,6 +2,8 @@ import React from 'react';
 import { Typography, Grid, TextField, InputAdornment } from '@material-ui/core';
 
 import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers';
+
 import { ButtonStep } from '../../../../components';
 import { useInitialDocumentNfsa, useStepNfsa } from '../../../../hooks';
 
@@ -20,7 +22,7 @@ function FormDocumento() {
     errors
   } = useForm({
     defaultValues: document,
-    validationSchema: documentSchema
+    resolver: yupResolver(documentSchema)
   });
 
   const calcTotal = (event) => {
@@ -63,12 +65,15 @@ function FormDocumento() {
           <TextField
             inputRef={register}
             control={control}
-            id="emissaoConvertPT"
-            name="emissaoConvertPT"
-            disabled
-            error={!!errors.emissaoConvertPT}
+            id="emissao"
+            name="emissao"
+            error={!!errors.emissao}
             label="Data de emissão"
             fullWidth
+            type="datetime-local"
+            InputLabelProps={{
+              shrink: true
+            }}
           />
         </Grid>
         <Grid item xs={12} md={4}>
@@ -105,7 +110,10 @@ function FormDocumento() {
             control={control}
             id="receita"
             name="receita"
-            disabled
+            InputLabelProps={{
+              shrink: true,
+              readOnly: true
+            }}
             label="Receita"
             fullWidth
             error={!!errors.receita}
@@ -121,9 +129,9 @@ function FormDocumento() {
             label="Documento de origem"
             fullWidth
             InputLabelProps={{
-              shrink: true
+              shrink: true,
+              readOnly: true
             }}
-            disabled
           />
         </Grid>
         <Grid item xs={6} md={4}>
@@ -142,7 +150,10 @@ function FormDocumento() {
             label="Valor principal"
             fullWidth
             onChange={calcTotal}
-            disabled
+            InputLabelProps={{
+              shrink: true,
+              readOnly: true
+            }}
             helperText={errors.valorPrincipal && errors.valorPrincipal.message}
           />
         </Grid>
@@ -163,7 +174,10 @@ function FormDocumento() {
             error={!!errors.juros}
             fullWidth
             onChange={calcTotal}
-            disabled
+            InputLabelProps={{
+              shrink: true,
+              readOnly: true
+            }}
             helperText={errors.juros && errors.juros.message}
           />
         </Grid>
@@ -184,7 +198,10 @@ function FormDocumento() {
             error={!!errors.taxaExp}
             fullWidth
             onChange={calcTotal}
-            disabled
+            InputLabelProps={{
+              shrink: true,
+              readOnly: true
+            }}
             helperText={errors.taxaExp && errors.taxaExp.message}
           />
         </Grid>
@@ -200,12 +217,12 @@ function FormDocumento() {
             name="valorTotal"
             type="number"
             step={0.5}
-            disabled
             label="Valor total"
             error={!!errors.valorTotal}
             fullWidth
             InputLabelProps={{
-              shrink: true
+              shrink: true,
+              readOnly: true
             }}
             helperText={errors.valorTotal && errors.valorTotal.message}
           />

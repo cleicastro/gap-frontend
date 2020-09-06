@@ -237,7 +237,7 @@ function Teste({ nfsa }) {
           style={{
             flexGrow: 5,
             border: 1,
-            minHeight: 250,
+            minHeight: 220,
             alignItems: 'flex-start'
           }}>
           <Column>
@@ -251,7 +251,7 @@ function Teste({ nfsa }) {
           style={{
             flexGrow: 1,
             border: 1,
-            minHeight: 250,
+            minHeight: 220,
             alignItems: 'flex-start'
           }}>
           <Column>
@@ -269,7 +269,7 @@ function Teste({ nfsa }) {
           style={{
             flexGrow: 1,
             border: 1,
-            minHeight: 250,
+            minHeight: 220,
             alignItems: 'flex-start'
           }}>
           <Column>
@@ -287,7 +287,7 @@ function Teste({ nfsa }) {
           style={{
             flexGrow: 1,
             border: 1,
-            minHeight: 250,
+            minHeight: 220,
             alignItems: 'flex-start'
           }}>
           <Column>

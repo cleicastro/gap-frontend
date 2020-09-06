@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Modal, Fab, CircularProgress } from '@material-ui/core';
+import { Modal, Fab, CircularProgress, Typography } from '@material-ui/core';
 import CheckIcon from '@material-ui/icons/Check';
 import SaveIcon from '@material-ui/icons/Save';
 import clsx from 'clsx';
@@ -25,15 +25,15 @@ const ModalSave = ({
       disableAutoFocus
       disableBackdropClick
       disableScrollLock
-      aria-labelledby="simple-title"
+      aria-labelledby="modal-save"
       aria-describedby="modal-description"
       className={classes.modal}>
       <div className={classes.paper}>
-        <h2 id="modal-title">
-          {!statusServer && 'Salvando documento...'}
+        <Typography id="modal-title" variant="h4" className={classes.title}>
+          {!statusServer && 'Aguarde...'}
           {statusServer === 201 && `Documento inserido com sucesso!`}
           {statusServer === 200 && `Documento alterado com sucesso!`}
-        </h2>
+        </Typography>
         <div id="modal-description">
           {!successRequest && (
             <div className={classes.progress}>

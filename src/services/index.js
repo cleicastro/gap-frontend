@@ -8,3 +8,4 @@ export { default as TabelaIR } from './TabelaIR';
 export { default as Itens } from './Items';
 export { default as Auth } from './Auth';
 export { default as AlvaraFuncionamento } from './AlvaraFuncionamento';
+export { default as Dashboard } from './Dashboard';

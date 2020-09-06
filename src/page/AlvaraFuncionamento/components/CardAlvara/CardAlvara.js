@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useCallback } from 'react';
 import clsx from 'clsx';
 import {
   Card,
@@ -17,8 +17,9 @@ import {
   useStylesCancelado,
   useStylesVencido
 } from './styles';
-import { usePaginationAlvara, useStoreAlvara } from '../../../../hooks';
+import { usePagination, useStore } from '../../../../hooks/alvara';
 import { CardSkeletron } from '../../../../components';
+import { AlvaraFuncionamentoContext } from '../../../../contexts';
 
 const classValueTotal = (
   status,
@@ -90,20 +91,35 @@ const classCaption = (status, emissao, vencimento, days) => {
 };
 
 function CardAlvara({ className, handleDamDetail, ...rest }) {
-  // eslint-disable-next-line no-unused-vars
-  const [listAlvara, valueTotal, setSelecetAlvara] = useStoreAlvara();
-  const [pagination, setPagination] = usePaginationAlvara();
+  const {
+    state: { listAlvara, pagination, paramsQuery }
+  } = useContext(AlvaraFuncionamentoContext);
+
+  const setSelecetAlvara = useStore();
+  const setPagination = usePagination();
 
   const classes = useStyles();
   const classesPago = useStylesPago();
   const classesCancelado = useStylesCancelado();
   const classesVencido = useStylesVencido();
 
-  function handlePagination(currentPage) {
-    setPagination({
-      page: currentPage + 1
-    });
-  }
+  const handlePagination = useCallback(
+    (currentPage) => {
+      if (pagination.current_page < pagination.last_page) {
+        const set = setPagination({
+          ...paramsQuery,
+          page: currentPage + 1
+        });
+        // pra tratar o erro
+        set.then((response) => {
+          if (response.status !== 200) {
+            alert('Falha no carregamento dos dados, favor tente mais tarde!');
+          }
+        });
+      }
+    },
+    [pagination.current_page, pagination.last_page, paramsQuery, setPagination]
+  );
 
   const AlvaraList = () => {
     return (

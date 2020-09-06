@@ -60,7 +60,7 @@ const StyledTableCell = withStyles((theme) => ({
     cursor: 'pointer'
   },
   body: {
-    fontSize: 9
+    fontSize: 11
   }
 }))(TableCell);
 

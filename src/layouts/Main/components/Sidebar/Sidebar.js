@@ -31,9 +31,9 @@ export default function Sidebar({
       icon: <DashboardIcon />
     },
     {
-      title: 'DAM',
-      href: '/dam',
-      icon: <ApartmentIcon />
+      title: 'NFSA',
+      href: '/nfsa',
+      icon: <InsertDriveFileIcon />
     },
     {
       title: 'Alvará de funcionamento',
@@ -41,9 +41,9 @@ export default function Sidebar({
       icon: <Alvara />
     },
     {
-      title: 'NFSA',
-      href: '/nfsa',
-      icon: <InsertDriveFileIcon />
+      title: 'DAM',
+      href: '/dam',
+      icon: <ApartmentIcon />
     },
     {
       title: 'Cadastros',
