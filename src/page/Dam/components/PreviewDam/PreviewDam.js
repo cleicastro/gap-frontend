@@ -155,7 +155,7 @@ export default function PreviewDam() {
           </Grid>
           <Grid container justify="space-between">
             <Grid item xs={5}>
-              <Typography>
+              {/* <Typography>
                 {Intl.DateTimeFormat('pt-BR', {
                   year: 'numeric',
                   month: 'numeric',
@@ -165,7 +165,7 @@ export default function PreviewDam() {
                   second: 'numeric',
                   hour12: false
                 }).format(new Date(dam.emissao))}
-              </Typography>
+              </Typography> */}
             </Grid>
             <Grid item xs={4} align="center">
               <Typography>

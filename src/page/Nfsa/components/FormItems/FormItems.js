@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
   Grid,
   TableContainer,
@@ -58,7 +58,13 @@ function FormItems() {
     setValue(name, values);
   };
 
-  const handlePrevStep = () => setStepActivity(stepActivity - 1);
+  const handlePrevStep = () => {
+    dispatch({
+      type: ACTIONS_NFSA.SET_ITEMS_NFSA,
+      payload: items
+    });
+    setStepActivity(stepActivity - 1);
+  };
   const handleNextStep = () => {
     dispatch({
       type: ACTIONS_NFSA.SET_ITEMS_NFSA,

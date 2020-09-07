@@ -1,60 +1,113 @@
-import React, { createContext, useReducer } from 'react';
+/* eslint-disable no-case-declarations */
+import React, { createContext, useReducer, useEffect } from 'react';
+import { Nfsa } from '../services';
 
 export const NfsaContext = createContext();
 
 export const ACTIONS = {
-  MODAL_NEW: 'MODAL_NEW_NFSA',
+  LIST: 'NFSA_LIST',
+  LIST_INITIAL: 'LIST_INITIAL',
+  ADD: 'NFSA_ADD',
+  UPDATE_NFSA: 'NFSA_UPDATE',
+  MODAL_NEW_NFSA: 'MODAL_NEW_NFSA',
   MODAL_DETAILS: 'MODAL_DETAILS',
+  MODAL_CONTRIBUINTES: 'MODAL_CONTRIBUINTES_NFSA',
   ACTIVE_STEP: 'ACTIVE_STEP',
   EDIT_OPERATION: 'EDIT_NFSA_OPERATION',
-  SELECT_NFSA: 'SELECT_NFSA',
-  SET_ITEMS_NFSA: 'SET_ITEMS_NFSA',
+  SELECT_NFSA: 'SELECT_NFSA_',
   SELECT_TAXPAYER: 'SELECT_TAXPAYER',
   DOCUMENT: 'DOCUMENT',
-  PARAMS_QUERY: 'PARAMS_QUERY_NFSA'
+  PARAMS_QUERY: 'PARAMS_QUERY_NFSA',
+  CLEAN_DATA_NFSA: 'CLEAN_DATA_NFSA',
+  SET_ITEMS_NFSA: 'SET_ITEMS_NFSA'
 };
 
 export const STATE_INITIAL = {
+  listNfsa: [],
+  pagination: {},
+  receitaSeleted: {
+    cod: '1113050101',
+    descricao: 'NOTA FISCAL AVULSA',
+    icon: 'description',
+    sigla: 'ISSQN-PF',
+    valor_fixo: 0
+  },
   dataNfsa: {},
   dataItemNfsa: [],
   taxpayerSeleted: {},
-  dataDam: {},
   activeStep: 0,
   document: {},
-  editNfsa: false,
+  isEdit: false,
   showModalNewNfsa: false,
   showModalDetails: false,
-  paramsQuery: {}
+  openWindowContribuinte: false,
+  paramsQuery: {},
+  cadastroContribuinte: {}
 };
-
 export const nfsaContextReducer = (state, action) => {
   switch (action.type) {
+    case ACTIONS.LIST_INITIAL:
+      return {
+        ...state,
+        listNfsa: action.payload.data,
+        pagination: action.payload.meta
+      };
+    case ACTIONS.LIST:
+      return {
+        ...state,
+        listNfsa: [...state.listNfsa, ...action.payload.data],
+        pagination: action.payload.meta
+      };
+    case ACTIONS.ADD:
+      return {
+        ...state,
+        listNfsa: [action.payload.data, ...state.listNfsa],
+        dataNfsa: action.payload.data
+      };
+    case ACTIONS.UPDATE_NFSA:
+      const { payload } = action;
+      const { listNfsa } = state;
+
+      const newList = listNfsa.map((nfsa) => {
+        if (nfsa.id === payload.id) {
+          return payload;
+        }
+        return nfsa;
+      });
+      return {
+        ...state,
+        listNfsa: newList,
+        dataNfsa: action.payload
+      };
+
     case ACTIONS.SELECT_TAXPAYER:
       return {
         ...state,
-        taxpayerSeleted: { ...action.payload, ...state.taxpayerSeleted }
-      };
-    case ACTIONS.DOCUMENT:
-      return {
-        ...state,
-        document: action.payload
-      };
-
-    case ACTIONS.SELECT_NFSA:
-      return {
-        ...state,
-        dataDam: action.payload.dam,
-        dataNfsa: action.payload
+        taxpayerSeleted: { ...state.taxpayerSeleted, ...action.payload }
       };
     case ACTIONS.SET_ITEMS_NFSA:
       return {
         ...state,
         dataItemNfsa: action.payload
       };
+    case ACTIONS.DOCUMENT:
+      return {
+        ...state,
+        document: action.payload
+      };
+    case ACTIONS.SELECT_NFSA:
+      return {
+        ...state,
+        dataNfsa: {
+          ...state.dataNfsa,
+          ...action.payload
+        },
+        dataItemNfsa: action.payload.items
+      };
     case ACTIONS.EDIT_OPERATION:
       return {
         ...state,
-        editNfsa: true
+        dataNfsa: true
       };
     case ACTIONS.ACTIVE_STEP:
       return {
@@ -68,36 +121,72 @@ export const nfsaContextReducer = (state, action) => {
         showModalDetails: action.payload
       };
 
-    case ACTIONS.MODAL_NEW:
-      // executes when the modal closes to clear data
-      if (state.showModalNewNfsa) {
-        return {
-          taxpayerSeleted: {},
-          dataNfsa: {},
-          dataItemNfsa: [],
-          activeStep: 0,
-          document: {},
-          editNfsa: false,
-          showModalDetails: false,
-          showModalNewNfsa: false
-        };
-      }
+    case ACTIONS.MODAL_NEW_NFSA:
       return {
         ...state,
-        showModalNewNfsa: true
+        showModalNewNfsa: !state.showModalNewNfsa,
+        isEdit: action.payload
+      };
+    case ACTIONS.MODAL_CONTRIBUINTES:
+      return {
+        ...state,
+        openWindowContribuinte: !state.openWindowContribuinte,
+        cadastroContribuinte: action.payload
       };
     case ACTIONS.PARAMS_QUERY:
       return {
         ...state,
         paramsQuery: action.payload
       };
+    case ACTIONS.CLEAN_DATA_NFSA:
+      return {
+        ...state,
+        taxpayerSeleted: {},
+        document: {
+          emissao: new Date(),
+          receita: '1113050101',
+          docOrigem: '',
+          infoAdicionais: '',
+          juros: 0,
+          valorMulta: 0,
+          taxaExp: 5,
+          valorPrincipal: 0
+        },
+        dataNfsa: {},
+        activeStep: 0,
+        showModalNewDam: false,
+        showModalDetails: false,
+        openWindowContribuinte: false,
+        paramsQuery: {},
+        cadastroContribuinte: {},
+        isEdit: false
+      };
     default:
       return state;
   }
 };
 
+async function requestNFSA(params) {
+  const response = await Nfsa.getNfsa({ ...params });
+  return response;
+}
+
+function initialNfsaAction(nfsa) {
+  return {
+    type: ACTIONS.LIST_INITIAL,
+    payload: nfsa
+  };
+}
+
 export default function NfsaProvider({ children }) {
   const [state, dispatch] = useReducer(nfsaContextReducer, STATE_INITIAL);
+
+  useEffect(() => {
+    const params = { page: 1 };
+    requestNFSA(params).then((response) => {
+      dispatch(initialNfsaAction(response.data));
+    });
+  }, []);
 
   return (
     <NfsaContext.Provider value={{ state, dispatch }}>

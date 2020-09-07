@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Paper, CssBaseline, Box, Snackbar } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
+import { useHistory } from 'react-router-dom';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import Lottie from 'react-lottie';
+import * as animationData from './lottie-job.json';
 
-import { useHistory } from 'react-router-dom';
 import Copyright from '../../components/Copyright';
 import { logar, cleanMessgeUser } from '../../store/loginRedux';
 
@@ -66,6 +68,15 @@ const Login = ({
     setLoad(false);
   }, [history, user, error]);
 
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice'
+    }
+  };
+
   return (
     <Grid container component="main" className={classes.root}>
       <CssBaseline />
@@ -88,6 +99,9 @@ const Login = ({
         </Box>
       </Grid>
       <Grid item xs={false} sm={4} md={7} className={classes.image} />
+      {/* <Grid item xs={false} sm={4} md={7} className="lottie">
+        <Lottie options={defaultOptions} height={400} width={400} />
+      </Grid> */}
 
       <SnakebarMensage type="error" open={messageBackend !== ''}>
         {messageBackend.message}

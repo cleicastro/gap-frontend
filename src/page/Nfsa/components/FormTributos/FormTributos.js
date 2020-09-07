@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Typography,
   Grid,
@@ -14,66 +14,108 @@ import {
 import { useForm } from 'react-hook-form';
 
 import { ButtonStep } from '../../../../components';
-import {
-  useStepNfsa,
-  useInitialTributosNfsa,
-  useSetNfsa
-} from '../../../../hooks';
+import { useStepNfsa } from '../../../../hooks';
+import useTributos from '../../../../hooks/nfsaHooks/useTributos';
+import { NfsaContext, ACTIONS_NFSA } from '../../../../contexts';
+
+function removeIRR(baseCalculo, valorIr) {
+  return (Number(baseCalculo) - Number(valorIr)).toFixed(2);
+}
+function addIRR(baseCalculo, valorIr) {
+  return (Number(baseCalculo) + Number(valorIr)).toFixed(2);
+}
 
 function FormTributos() {
-  const setDataNfsa = useSetNfsa();
+  const {
+    state: { dataItemNfsa },
+    dispatch
+  } = useContext(NfsaContext);
+
   const [stepActivity, setStepActivity] = useStepNfsa();
-  const [tributos, setTributos, setConvertToLiquid] = useInitialTributosNfsa();
-  const { control, register, handleSubmit, setValue, watch } = useForm({
+  const [tributos, setTributos] = useTributos();
+  const {
+    control,
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    getValues
+  } = useForm({
     defaultValues: tributos
   });
 
-  const setValueProcessed = (baseValue) => {
-    setValue('baseCalculo', baseValue.baseCalculo);
-    setValue('irValorCalc', baseValue.irValorCalc);
-    setValue('irValor', baseValue.irValor);
-    setValue('valorDeducao', baseValue.valorDeducao);
-    setValue('irPercente', baseValue.irPercente);
-    setValue('valorISS', baseValue.valorISS);
-    setValue('taxaExp', baseValue.taxaExp);
-    setValue('valorNF', baseValue.valorNF);
-    setValue('pisPercente', baseValue.pisPercente);
-    setValue('pisValor', baseValue.pisValor);
-    setValue('inssPercente', baseValue.inssPercente);
-    setValue('inssValor', baseValue.inssValor);
-    setValue('confinsPercente', baseValue.confinsPercente);
-    setValue('confinsValor', baseValue.confinsValor);
-    setValue('csllPercente', baseValue.csllPercente);
-    setValue('csllValor', baseValue.csllValor);
-    setValue('irValorView', baseValue.irValor);
+  const handlePrevStep = () => {
+    dispatch({
+      type: ACTIONS_NFSA.SELECT_NFSA,
+      payload: {
+        ...getValues(),
+        items: dataItemNfsa.map((item) => {
+          const newValue =
+            Number(getValues('baseCalculo')) / Number(item.quantidade);
+          return { ...item, valor: newValue };
+        })
+      }
+    });
+    setStepActivity(stepActivity - 1);
   };
-
-  const handlePrevStep = () => setStepActivity(stepActivity - 1);
 
   const handleConvertToLiquid = (event) => {
     const { checked } = event.target;
     if (checked) {
-      const convertToLiquid = setConvertToLiquid();
-      setValueProcessed(convertToLiquid);
+      const resultConverted = setTributos({
+        ...tributos,
+        baseCalculo: tributos.convertedToLiquid
+      });
+
+      setValue('valorDeducao', resultConverted.valorDeducao);
+      setValue('irPercente', resultConverted.irPercente);
+      setValue('irValorCalc', resultConverted.irValorCalc);
+      setValue('irValor', resultConverted.irValor);
+      setValue('valorNF', resultConverted.valorNF);
+      setValue('baseCalculo', resultConverted.baseCalculo);
+      setValue('valorISS', resultConverted.valorISS);
     } else {
-      setValueProcessed(tributos);
+      setValue('valorDeducao', tributos.valorDeducao);
+      setValue('irPercente', tributos.irPercente);
+      setValue('irValorCalc', tributos.irValorCalc);
+      setValue('irValor', tributos.irValor);
+      setValue('valorNF', tributos.valorNF);
+      setValue('valorISS', tributos.valorISS);
+      setValue('baseCalculo', tributos.baseCalculo);
     }
   };
+
   const handleIrrRetido = (event) => {
     const { checked } = event.target;
-    if (!checked) {
-      const nothingIr = setTributos({ ...tributos, irRetido: false });
-      setValueProcessed(nothingIr);
-    } else if (watch('converterIRRF')) {
-      const convertToLiquid = setConvertToLiquid();
-      setValueProcessed(convertToLiquid);
+    if (checked) {
+      setValue('valorDeducao', tributos.valorDeducao);
+      setValue('irPercente', tributos.irPercente);
+      setValue('irValorCalc', tributos.irValorCalc);
+      setValue('irValor', tributos.irValor);
+      setValue('valorNF', addIRR(tributos.valorNF, tributos.irValor));
     } else {
-      setValueProcessed(tributos);
+      setValue('valorDeducao', 0);
+      setValue('irPercente', 0);
+      setValue('irValorCalc', 0);
+      setValue('irValor', 0);
+      setValue('baseCalculo', tributos.baseCalculo);
+      setValue('valorISS', tributos.valorISS);
+      setValue('valorNF', removeIRR(tributos.baseCalculo, tributos.irValor));
     }
   };
 
   const onSubmit = (data) => {
-    setDataNfsa({ ...tributos, ...data });
+    dispatch({
+      type: ACTIONS_NFSA.SELECT_NFSA,
+      payload: {
+        ...data,
+        items: dataItemNfsa.map((item) => {
+          const newValue =
+            Number(getValues('baseCalculo')) / Number(item.quantidade);
+          return { ...item, valor: newValue };
+        })
+      }
+    });
     setStepActivity(stepActivity + 1);
   };
   return (
@@ -89,10 +131,6 @@ function FormTributos() {
                 <TextField
                   inputRef={register}
                   control={control}
-                  InputLabelProps={{
-                    shrink: true,
-                    readOnly: true
-                  }}
                   required
                   name="aliquotaIss"
                   label="Alíquota do ISS: (%)"
@@ -103,10 +141,6 @@ function FormTributos() {
                 <TextField
                   inputRef={register}
                   control={control}
-                  InputLabelProps={{
-                    shrink: true,
-                    readOnly: true
-                  }}
                   required
                   name="uf"
                   label="UF"
@@ -117,10 +151,6 @@ function FormTributos() {
                 <TextField
                   inputRef={register}
                   control={control}
-                  InputLabelProps={{
-                    shrink: true,
-                    readOnly: true
-                  }}
                   required
                   name="municipio"
                   label="Município"
@@ -137,7 +167,7 @@ function FormTributos() {
               disabled={!watch('irRetido')}
               control={
                 <Switch
-                  defaultChecked={tributos && tributos.converterIRRF}
+                  defaultChecked={tributos.converterIRRF || false}
                   onChange={handleConvertToLiquid}
                   inputRef={register}
                   name="converterIRRF"
@@ -152,10 +182,6 @@ function FormTributos() {
                   type="number"
                   inputRef={register}
                   control={control}
-                  InputLabelProps={{
-                    shrink: true,
-                    readOnly: true
-                  }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">R$</InputAdornment>
@@ -172,10 +198,6 @@ function FormTributos() {
                   type="number"
                   inputRef={register}
                   control={control}
-                  InputLabelProps={{
-                    shrink: true,
-                    readOnly: true
-                  }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">R$</InputAdornment>
@@ -192,10 +214,6 @@ function FormTributos() {
                   type="number"
                   inputRef={register}
                   control={control}
-                  InputLabelProps={{
-                    shrink: true,
-                    readOnly: true
-                  }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">R$</InputAdornment>
@@ -212,10 +230,6 @@ function FormTributos() {
                   type="number"
                   inputRef={register}
                   control={control}
-                  InputLabelProps={{
-                    shrink: true,
-                    readOnly: true
-                  }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">R$</InputAdornment>
@@ -232,10 +246,6 @@ function FormTributos() {
                   type="number"
                   inputRef={register}
                   control={control}
-                  InputLabelProps={{
-                    shrink: true,
-                    readOnly: true
-                  }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">R$</InputAdornment>
@@ -279,10 +289,6 @@ function FormTributos() {
                       name="irPercente"
                       type="number"
                       inputRef={register}
-                      InputLabelProps={{
-                        shrink: true,
-                        readOnly: true
-                      }}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="start">%</InputAdornment>
@@ -297,10 +303,6 @@ function FormTributos() {
                       name="irValorCalc"
                       type="number"
                       inputRef={register}
-                      InputLabelProps={{
-                        shrink: true,
-                        readOnly: true
-                      }}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">R$</InputAdornment>
@@ -315,10 +317,6 @@ function FormTributos() {
                       name="valorDeducao"
                       type="number"
                       inputRef={register}
-                      InputLabelProps={{
-                        shrink: true,
-                        readOnly: true
-                      }}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">R$</InputAdornment>
@@ -332,10 +330,6 @@ function FormTributos() {
                       label="Valor do IR"
                       type="number"
                       inputRef={register}
-                      InputLabelProps={{
-                        shrink: true,
-                        readOnly: true
-                      }}
                       name="irValorView"
                       InputProps={{
                         startAdornment: (
@@ -373,10 +367,6 @@ function FormTributos() {
                         name="pisPercente"
                         type="number"
                         inputRef={register}
-                        InputLabelProps={{
-                          shrink: true,
-                          readOnly: true
-                        }}
                         endAdornment={
                           <InputAdornment position="start">%</InputAdornment>
                         }
@@ -389,10 +379,6 @@ function FormTributos() {
                         name="pisValor"
                         type="number"
                         inputRef={register}
-                        InputLabelProps={{
-                          shrink: true,
-                          readOnly: true
-                        }}
                         startAdornment={
                           <InputAdornment position="start">R$</InputAdornment>
                         }
@@ -419,10 +405,6 @@ function FormTributos() {
                         name="inssPercente"
                         type="number"
                         inputRef={register}
-                        InputLabelProps={{
-                          shrink: true,
-                          readOnly: true
-                        }}
                         endAdornment={
                           <InputAdornment position="start">%</InputAdornment>
                         }
@@ -435,10 +417,6 @@ function FormTributos() {
                         name="inssValor"
                         type="number"
                         inputRef={register}
-                        InputLabelProps={{
-                          shrink: true,
-                          readOnly: true
-                        }}
                         startAdornment={
                           <InputAdornment position="start">R$</InputAdornment>
                         }
@@ -465,10 +443,6 @@ function FormTributos() {
                         name="confinsPercente"
                         type="number"
                         inputRef={register}
-                        InputLabelProps={{
-                          shrink: true,
-                          readOnly: true
-                        }}
                         endAdornment={
                           <InputAdornment position="start">%</InputAdornment>
                         }
@@ -481,10 +455,6 @@ function FormTributos() {
                         name="confinsValor"
                         type="number"
                         inputRef={register}
-                        InputLabelProps={{
-                          shrink: true,
-                          readOnly: true
-                        }}
                         startAdornment={
                           <InputAdornment position="start">R$</InputAdornment>
                         }
@@ -511,10 +481,6 @@ function FormTributos() {
                         name="csllPercente"
                         type="number"
                         inputRef={register}
-                        InputLabelProps={{
-                          shrink: true,
-                          readOnly: true
-                        }}
                         endAdornment={
                           <InputAdornment position="start">%</InputAdornment>
                         }
@@ -527,10 +493,6 @@ function FormTributos() {
                         name="csllValor"
                         type="number"
                         inputRef={register}
-                        InputLabelProps={{
-                          shrink: true,
-                          readOnly: true
-                        }}
                         startAdornment={
                           <InputAdornment position="start">R$</InputAdornment>
                         }

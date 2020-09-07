@@ -1,17 +1,53 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Typography, Grid, TextField, InputAdornment } from '@material-ui/core';
 
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers';
 
 import { ButtonStep } from '../../../../components';
-import { useInitialDocumentNfsa, useStepNfsa } from '../../../../hooks';
 
 import { documentSchema, mascaraReal } from '../../../../util';
+import { NfsaContext, ACTIONS_NFSA } from '../../../../contexts';
+import { useDocument } from '../../../../hooks/dam/useDocument';
+import { useStepNfsa } from '../../../../hooks';
 
 function FormDocumento() {
-  const [document, setDocument] = useInitialDocumentNfsa();
+  const {
+    state: { document, receitaSeleted, dataNfsa },
+    dispatch
+  } = useContext(NfsaContext);
+
+  const {
+    valorISS,
+    irValor,
+    pisValor,
+    inssValor,
+    confinsValor,
+    csllValor
+  } = dataNfsa;
+
+  const valorPrincipal =
+    Number(valorISS) +
+    Number(irValor) +
+    Number(pisValor) +
+    Number(inssValor) +
+    Number(confinsValor) +
+    Number(csllValor);
+
   const [stepActivity, setStepActivity] = useStepNfsa();
+  const setDocument = useDocument();
+
+  const documentInitial = {
+    emissao: new Date(),
+    receita: receitaSeleted.cod,
+    docOrigem: '',
+    infoAdicionais: '',
+    juros: 0,
+    valorMulta: 0,
+    taxaExp: 5,
+    valorPrincipal
+  };
+  const loadDocument = setDocument({ ...documentInitial, ...document });
 
   const {
     control,
@@ -21,7 +57,7 @@ function FormDocumento() {
     setValue,
     errors
   } = useForm({
-    defaultValues: document,
+    defaultValues: loadDocument,
     resolver: yupResolver(documentSchema)
   });
 
@@ -36,11 +72,16 @@ function FormDocumento() {
     setValue('valorTotal', result.toFixed(2));
   };
 
-  const handlePrevStep = () => setStepActivity(stepActivity - 1);
+  const handlePrevStep = () => {
+    setStepActivity(stepActivity - 1);
+    const requestDocument = setDocument({ ...loadDocument, ...getValues() });
+    dispatch({ type: ACTIONS_NFSA.DOCUMENT, payload: requestDocument });
+  };
 
   const onSubmit = (data) => {
     setStepActivity(stepActivity + 1);
-    setDocument(data);
+    const requestDocument = setDocument({ ...loadDocument, ...data });
+    dispatch({ type: ACTIONS_NFSA.DOCUMENT, payload: requestDocument });
   };
 
   return (

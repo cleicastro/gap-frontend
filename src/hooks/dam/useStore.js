@@ -19,7 +19,6 @@ export const useStoreDam = () => {
       valor_total: valorTotal,
       vencimento
     } = dam;
-
     dispatch({
       type: ACTIONS.DOCUMENT,
       payload: {
@@ -39,9 +38,7 @@ export const useStoreDam = () => {
     });
     dispatch({
       type: ACTIONS.SELECT_RECEITA,
-      payload: {
-        ...receita
-      }
+      payload: { ...receita }
     });
     dispatch({
       type: ACTIONS.SELECT_TAXPAYER,

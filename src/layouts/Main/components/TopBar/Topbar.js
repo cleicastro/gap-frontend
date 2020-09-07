@@ -5,7 +5,8 @@ import {
   Hidden,
   IconButton,
   Badge,
-  Typography
+  Typography,
+  Snackbar
 } from '@material-ui/core';
 import clsx from 'clsx';
 import {
@@ -36,6 +37,7 @@ function TopBar({
   const classes = useStyles();
   const history = useHistory();
   const theme = localStorage.getItem('theme');
+
   function logoutUser() {
     actionLogout();
   }
@@ -54,7 +56,8 @@ function TopBar({
     } else {
       localStorage.setItem('theme', 'dark');
     }
-    document.location.reload();
+    // document.location.reload();
+    history.push('/dashboard');
   };
 
   return (

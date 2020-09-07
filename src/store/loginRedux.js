@@ -101,13 +101,7 @@ export function logout() {
         message: response
       });
     } catch (error) {
-      dispath({
-        type: ACTIONS.ERROR,
-        error: {
-          ...error.response.data,
-          status: error.response.status
-        }
-      });
+      console.log(error);
     }
   };
 }

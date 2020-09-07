@@ -1,69 +1,134 @@
 /* eslint-disable react/no-unused-prop-types */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useCallback } from 'react';
 import {
   Typography,
   List,
   ListItem,
   ListItemText,
   Grid,
-  Divider
+  Divider,
+  Fade,
+  Fab
 } from '@material-ui/core';
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 
-import { NfsaContext } from '../../../../contexts';
+import { NfsaContext, ACTIONS_NFSA } from '../../../../contexts';
 import useStyles from './styles';
 import {
   ButtonStep,
   MenuDocumentEvents,
-  ModalSave
+  ModalSave,
+  AlertShow
 } from '../../../../components';
-
+import { useEdit } from '../../../../hooks/dam/useEdit';
+import { useSave, useEdit as useEditNfsa } from '../../../../hooks/nfsaHooks';
 import {
-  useOpenNewNfsa,
-  usePreviewNfsa,
-  useStepNfsa,
-  useSaveNfsa
-} from '../../../../hooks';
+  messageResponseEdit,
+  messageResponseSave,
+  damStatusEdit
+} from '../../../../util';
+import { useStepNfsa, usePreviewNfsa } from '../../../../hooks';
+import { useSelector } from 'react-redux';
 
 function PreviewNfsa() {
-  const classes = useStyles();
   const {
-    state: { showModalDetails, dataNfsa, editNfsa, document }
+    state: { showModalDetails, dataNfsa, isEdit, document },
+    dispatch
   } = useContext(NfsaContext);
+  const dataPagamento = useSelector((state) => state.datePayment.datePayment);
 
-  const { id, dam } = dataNfsa;
-  const { emissao, vencimento } = document;
+  const classes = useStyles();
   const [openModalMenu, setOpenModalMenu] = useState(false);
-  const setWindowNewNfsa = useOpenNewNfsa();
+  const [message, setMessage] = useState({});
 
   const {
     participantes,
     items,
     tributes,
     valorNF,
-    valorDam
+    valorDam,
+    dam
   } = usePreviewNfsa();
-
   const [stepActivity, setStepActivity] = useStepNfsa();
+  const setEdit = useEdit();
+  const setEditNfsa = useEditNfsa();
+  const setSave = useSave();
 
-  const [
-    statusServer,
-    successRequest,
-    setSave,
-    setEditStatus,
-    setEdit
-  ] = useSaveNfsa();
-  const handlePrevStep = () => setStepActivity(stepActivity - 1);
-  const handleSaveDAM = () => {
+  const handleSaveDAM = useCallback(() => {
+    setMessage({});
     setOpenModalMenu(true);
-    if (!editNfsa) {
-      setSave();
+    if (!isEdit) {
+      setSave(items, dataNfsa, dam).then((response) => {
+        const processMessageDam = messageResponseSave(response);
+        if (response.status === 201) {
+          dispatch({
+            type: ACTIONS_NFSA.ADD,
+            payload: { ...response }
+          });
+        } else {
+          setTimeout(() => {
+            setOpenModalMenu(false);
+          }, 2000);
+        }
+        setMessage(processMessageDam);
+      });
     } else {
-      setEdit(id);
+      setEditNfsa(items, dataNfsa, dam, dataNfsa.id).then(
+        (response) => {
+          const processMessageDam = messageResponseEdit(response);
+          if (response.status === 200) {
+            dispatch({
+              type: ACTIONS_NFSA.UPDATE_NFSA,
+              payload: { ...dataNfsa, ...dam }
+            });
+          } else {
+            setTimeout(() => {
+              setOpenModalMenu(false);
+            }, 2000);
+          }
+          setMessage(processMessageDam);
+        }
+      );
     }
-  };
+  }, [dam, dataNfsa, dispatch, document, isEdit, setEditNfsa, setSave]);
 
-  const handleAlterStatusDAM = (type, param) =>
-    setEditStatus(dam && dam.id, type, param);
+  const handleOpenWindow = useCallback(() => {
+    dispatch({
+      type: ACTIONS_NFSA.MODAL_NEW_NFSA
+    });
+  }, [dispatch]);
+
+  const handleAlterStatusDAM = useCallback(
+    (type, param) => {
+      setOpenModalMenu(true);
+      setMessage({});
+
+      setEdit(dataNfsa.dam.id, param).then((response) => {
+        const processStatusDam = damStatusEdit(response, type);
+        if (response.status === 200) {
+          dispatch({
+            type: ACTIONS_NFSA.UPDATE_NFSA,
+            payload: {
+              ...dataNfsa,
+              dam: {
+                ...dataNfsa.dam,
+                ...processStatusDam.damStatus
+              },
+              dataPagamento
+            }
+          });
+        }
+        setMessage(processStatusDam.message);
+        setTimeout(() => {
+          setOpenModalMenu(false);
+        }, 2000);
+      });
+    },
+    [dataNfsa, dataPagamento, dispatch, setEdit]
+  );
+
+  const handlePrevStep = () => setStepActivity(stepActivity - 1);
+
   return (
     <>
       <Grid container spacing={2} direction="column">
@@ -113,7 +178,7 @@ function PreviewNfsa() {
           </Grid>
           <Grid container justify="space-between">
             <Grid item xs={5}>
-              <Typography>
+              {/* <Typography>
                 {Intl.DateTimeFormat('pt-BR', {
                   year: 'numeric',
                   month: 'numeric',
@@ -122,8 +187,8 @@ function PreviewNfsa() {
                   minute: 'numeric',
                   second: 'numeric',
                   hour12: false
-                }).format(new Date(dam ? dam.emissao : emissao))}
-              </Typography>
+                }).format(new Date(document.emissao))}
+              </Typography> */}
             </Grid>
             <Grid item xs={4} align="center">
               <Typography>
@@ -131,7 +196,7 @@ function PreviewNfsa() {
                   year: 'numeric',
                   month: 'numeric',
                   day: 'numeric'
-                }).format(new Date(dam ? dam.vencimento : vencimento))}
+                }).format(new Date())}
               </Typography>
             </Grid>
             <Grid item xs={3} align="right">
@@ -199,33 +264,34 @@ function PreviewNfsa() {
 
       <ModalSave
         openModalMenu={openModalMenu}
-        statusServer={statusServer}
-        successRequest={successRequest}>
-        <>
-          {!editNfsa && (
-            <Typography variant="subtitle1">
-              {`O Número da sua nota fiscal é #${id}.\n
-                  Selecione um envento para este documento.`}
-            </Typography>
-          )}
-          <MenuDocumentEvents
-            values={{ id_dam: dam && dam.id, id }}
-            handleAlterStatusDAM={handleAlterStatusDAM}
-            handleClose={setWindowNewNfsa}
-            visibleOptions={{
-              imprimir: true,
-              pagar: dam && !dam.pago && dam.status !== 'Cancelado',
-              copiar: showModalDetails,
-              editar: showModalDetails,
-              cancelar: dam && dam.status !== 'Cancelado',
-              nfsa: true,
-              recibo: true,
-              alvara: false,
-              sair: true
-            }}
-          />
-        </>
+        statusServer={message.type}
+        successRequest={message.type}>
+        <MenuDocumentEvents
+          values={{ id_dam: dataNfsa.id_dam }}
+          handleAlterStatusDAM={handleAlterStatusDAM}
+          handleClose={handleOpenWindow}
+          visibleOptions={{
+            imprimir: true,
+            pagar: !dataNfsa?.dam?.pago && dataNfsa?.dam?.status !== 'Cancelado',
+            copiar: showModalDetails,
+            editar: showModalDetails,
+            cancelar: dataNfsa?.dam?.status !== 'Cancelado',
+            nfsa: false,
+            alvara: false,
+            recibo: false,
+            sair: true
+          }}
+        />
+        <div className={classes.container}>
+          <Fade in={!!message.type}>
+            <Fab aria-label="save" className={classes.buttonClassname}>
+              <ThumbUpIcon />
+            </Fab>
+          </Fade>
+          <AlertShow messageProps={message} />
+        </div>
       </ModalSave>
+      <AlertShow messageProps={message} />
     </>
   );
 }

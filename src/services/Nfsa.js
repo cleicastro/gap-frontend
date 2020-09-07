@@ -51,8 +51,6 @@ class Nfsa {
 
   saveNFSA(items, nfsa, dam, cancelToken) {
     const {
-      idPrestador,
-      idTomador,
       aliquotaIss,
       municipio,
       uf,
@@ -73,6 +71,8 @@ class Nfsa {
       irValor
     } = nfsa;
     const {
+      idPrestador,
+      idTomador,
       receita,
       docOrigem,
       infoAdicionais,
@@ -114,7 +114,7 @@ class Nfsa {
           valorDeducao,
           valorISS,
           valorCalculo: baseCalculo,
-          descontoIncodicional,
+          descontoIncodicional: descontoIncodicional || 0,
           pisPercente,
           pisValor,
           confinsPercente,
@@ -144,7 +144,8 @@ class Nfsa {
           ...nfsa,
           aliquotaISS: nfsa.aliquotaIss,
           valorNota: nfsa.valorNF,
-          valorCalculo: nfsa.baseCalculo
+          valorCalculo: nfsa.baseCalculo,
+          descontoIncodicional: nfsa.descontoIncodicional || 0
         },
         items
       },

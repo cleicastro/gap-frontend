@@ -59,7 +59,8 @@ export const alvaraFuncionamentoContextReducer = (state, action) => {
     case ACTIONS.ADD:
       return {
         ...state,
-        listAlvara: [action.payload.data, ...state.listAlvara]
+        listAlvara: [action.payload.data, ...state.listAlvara],
+        dataAlvaraFuncionamento: action.payload.data
       };
     case ACTIONS.UPDATE_ALVARA:
       const { payload } = action;
@@ -136,7 +137,7 @@ export const alvaraFuncionamentoContextReducer = (state, action) => {
         taxpayerSeleted: {},
         document: {
           emissao: new Date(),
-          receita: '',
+          receita: '1121250000',
           docOrigem: '',
           infoAdicionais: '',
           juros: 0,

@@ -53,6 +53,17 @@ const useStyles = makeStyles((theme) => ({
     left: '50%',
     marginTop: -12,
     marginLeft: -12
+  },
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    lineHeight: 10,
+    margin: 10
+  },
+  buttonClassname: {
+    margin: 16
   }
 }));
 

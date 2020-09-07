@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { Grid, TextField } from '@material-ui/core';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers';
@@ -21,24 +21,31 @@ function FormAlvaraFuncionamento() {
   } = useContext(AlvaraFuncionamentoContext);
   const cadastroAlvara = {
     atividadePrincipal:
-      taxpayerSeleted.cadAlvara && taxpayerSeleted.cadAlvara.atividadePrincipal,
+      taxpayerSeleted.cadAlvara &&
+      taxpayerSeleted.cadAlvara.atividade_principal,
     atividadeSecundariaI:
       taxpayerSeleted.cadAlvara &&
-      taxpayerSeleted.cadAlvara.atividadeSecundariaI,
+      taxpayerSeleted.cadAlvara.atividade_secundaria_I,
     atividadeSecundariaII:
       taxpayerSeleted.cadAlvara &&
-      taxpayerSeleted.cadAlvara.cadAlvara.atividadeSecundariaII,
+      taxpayerSeleted.cadAlvara.atividade_secundaria_II,
     inscricaoMunicipal:
-      taxpayerSeleted.cadAlvara &&
-      taxpayerSeleted.cadAlvara.cadAlvara.inscricaoMunicipal
+      taxpayerSeleted.cadAlvara && taxpayerSeleted.cadAlvara.inscricao_municipal
   };
+
+  const dataALvara = dataAlvaraFuncionamento.inscricaoMunicipal
+    ? dataAlvaraFuncionamento
+    : taxpayerSeleted;
 
   const { register, handleSubmit, control, errors, getValues } = useForm({
     resolver: yupResolver(alvaraFuncionamentoSchema),
     defaultValues: {
-      ...taxpayerSeleted,
       ...cadastroAlvara,
-      ...dataAlvaraFuncionamento
+      ...dataALvara,
+      nomeFantasia:
+        dataALvara.nomeFantasia !== ''
+          ? dataALvara.nomeFantasia
+          : dataALvara.nome
     }
   });
 
@@ -61,12 +68,13 @@ function FormAlvaraFuncionamento() {
 
   return (
     <form onSubmit={handleSubmit(handleSetAlvara)}>
-      {!taxpayerSeleted.cadAlvara && (
-        <Alert severity="warning">
-          Este contribuinte não possui cadastro de emissão de alvará, é
-          recomendável atualizar o cadastro.
-        </Alert>
-      )}
+      {!taxpayerSeleted.cadAlvara ||
+        (!dataAlvaraFuncionamento.inscricaoMunicipal && (
+          <Alert severity="warning">
+            Este contribuinte não possui cadastro de emissão de alvará, é
+            recomendável atualizar o cadastro.
+          </Alert>
+        ))}
       <Grid container spacing={3}>
         <Grid item sm={4} xs={12}>
           <TextField

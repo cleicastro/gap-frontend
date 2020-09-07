@@ -16,6 +16,16 @@ const useStyles = makeStyles((theme) => ({
     backgroundSize: 'cover',
     backgroundPosition: 'center'
   },
+  lottie: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor:
+      theme.palette.type === 'light'
+        ? theme.palette.grey[50]
+        : theme.palette.grey[900],
+    backgroundSize: 'cover',
+    backgroundPosition: 'center'
+  },
 
   paper: {
     margin: theme.spacing(4),

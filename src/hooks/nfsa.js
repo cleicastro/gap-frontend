@@ -554,7 +554,7 @@ export const useOpenNewNfsa = () => {
 
   function setWindow() {
     dispatch({
-      type: ACTIONS_NFSA_CONTEXT.MODAL_NEW
+      type: ACTIONS_NFSA_CONTEXT.MODAL_NEW_NFSA
     });
   }
   return setWindow;
@@ -567,6 +567,7 @@ export const usePreviewNfsa = () => {
 
   const { juros, valorMulta, taxaExp, valorPrincipal: valorDam } = document;
   const { prestador, tomador } = taxpayerSeleted;
+
   const {
     valorNF,
     irValor,
@@ -596,7 +597,12 @@ export const usePreviewNfsa = () => {
       { descricao: 'Taxa de Expediente', valor: taxaExp }
     ],
     valorNF,
-    valorDam
+    valorDam,
+    dam: {
+      ...document,
+      idPrestador: prestador?.id,
+      idTomador: tomador?.id
+    }
   };
 };
 
@@ -635,9 +641,9 @@ export const useItemsNfsa = () => {
 
 export const useInitialTributosNfsa = () => {
   const {
-    state: { dataNfsa, dataItemNfsa }
+    state: { dataNfsa, dataItemNfsa, document }
   } = useContext(NfsaContext);
-  const data = dataNfsa.length > 0 ? dataNfsa : initialValuesTributos();
+  const data = dataNfsa;
   const tableIR = useSelector((state) => state.nfsa.tableIR);
 
   const baseCalc = dataItemNfsa.reduce((acc, item) => {

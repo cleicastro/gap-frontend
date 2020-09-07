@@ -13,11 +13,27 @@ import { useDocument } from '../../../../hooks/dam/useDocument';
 
 function FormDocumento() {
   const {
-    state: { document },
+    state: { document, receitaSeleted },
     dispatch
   } = useContext(DamContext);
-  const [stepActivity, setStepActivity] = useStepDam();
   const setDocument = useDocument();
+
+  const documentInitial = {
+    emissao: new Date(),
+    receita: receitaSeleted.cod,
+    docOrigem: '',
+    infoAdicionais: '',
+    juros: 0,
+    valorMulta: 0,
+    taxaExp: Number(receitaSeleted.valor_fixo) > 0 ? 0 : 5,
+    valorPrincipal:
+      Number(receitaSeleted.valor_fixo) > 0
+        ? Number(receitaSeleted.valor_fixo)
+        : document.valorPrincipal || 0
+  };
+
+  const loadDocument = setDocument({ ...document, ...documentInitial });
+  const [stepActivity, setStepActivity] = useStepDam();
 
   const {
     control,
@@ -27,7 +43,7 @@ function FormDocumento() {
     setValue,
     errors
   } = useForm({
-    defaultValues: document,
+    defaultValues: loadDocument,
     resolver: yupResolver(documentSchema)
   });
 
@@ -44,13 +60,13 @@ function FormDocumento() {
 
   const handlePrevStep = () => {
     setStepActivity(stepActivity - 1);
-    const requestDocument = setDocument({ ...document, ...getValues() });
+    const requestDocument = setDocument({ ...loadDocument, ...getValues() });
     dispatch({ type: ACTIONS.DOCUMENT, payload: requestDocument });
   };
 
   const onSubmit = (data) => {
     setStepActivity(stepActivity + 1);
-    const requestDocument = setDocument({ ...document, ...data });
+    const requestDocument = setDocument({ ...loadDocument, ...data });
     dispatch({ type: ACTIONS.DOCUMENT, payload: requestDocument });
   };
 

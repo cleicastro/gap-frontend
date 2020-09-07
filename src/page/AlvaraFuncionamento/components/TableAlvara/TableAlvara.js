@@ -15,8 +15,7 @@ import {
 import InfoIcon from '@material-ui/icons/Info';
 
 import InfiniteScroll from 'react-infinite-scroller';
-import { usePagination } from '@material-ui/lab';
-import { useStore } from 'react-redux';
+import { usePagination, useStore } from '../../../../hooks/alvara';
 import { useStyles, StyledTableCell, StyledTableRow } from './styles';
 import { AlvaraFuncionamentoContext } from '../../../../contexts';
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useContext, useCallback } from 'react';
 
 import {
   TableContainer,
@@ -18,32 +18,37 @@ import InfoIcon from '@material-ui/icons/Info';
 import InfiniteScroll from 'react-infinite-scroller';
 import { StyledTableCell } from '../../../../components/Contribuintes/styles';
 import { StyledTableRow } from '../../../Dam/components/TableDam/styles';
+import { usePagination, useStore } from '../../../../hooks/nfsaHooks';
 
 import useStyles from './styles';
-import { usePaginationNfsa, useStoreNfsa } from '../../../../hooks';
+import { NfsaContext } from '../../../../contexts';
 
 function TableNfsa() {
-  // eslint-disable-next-line no-unused-vars
-  const [listNfsa, valueTotal, setSelecetNfsa] = useStoreNfsa();
-  const [pagination, setPagination] = usePaginationNfsa();
+  const {
+    state: { listNfsa, pagination, paramsQuery }
+  } = useContext(NfsaContext);
 
-  const classes = useStyles();
-
+  const setSelecetNfsa = useStore();
+  const setPagination = usePagination();
   const [order, setOrder] = useState('id');
   const [sort, setSort] = useState(false);
 
+  const classes = useStyles();
+
   const [params, setparams] = useState({
     id: '',
-    prestador: '',
-    tomador: '',
+    receita: '',
     emissao: '',
-    valorCalculo: '',
-    valorNota: 0
+    contribuinte: '',
+    vencimento: '',
+    valorTotal: 0
   });
 
+  const valueTotal = useMemo(() => listNfsa.length, [listNfsa]);
+
   function handleChangeParams(event) {
-    const { name, value } = event.target;
-    setparams((values) => ({ ...values, [name]: value }));
+    const { id, value } = event.target;
+    setparams((values) => ({ ...values, [id]: value }));
   }
 
   function handleOrderSort(campo, isDefaultOrder) {
@@ -55,13 +60,31 @@ function TableNfsa() {
     }
   }
 
-  function handlePagination(currentPage) {
-    setPagination({
+  const handlePagination = useCallback(
+    (currentPage) => {
+      if (pagination.current_page < pagination.last_page) {
+        const set = setPagination({
+          ...paramsQuery,
+          order,
+          sort,
+          page: currentPage + 1
+        });
+        set.then((response) => {
+          if (response.status !== 200) {
+            alert('Falha no carregamento dos dados, favor tente mais tarde!');
+          }
+        });
+      }
+    },
+    [
       order,
-      sort,
-      page: currentPage + 1
-    });
-  }
+      pagination.current_page,
+      pagination.last_page,
+      paramsQuery,
+      setPagination,
+      sort
+    ]
+  );
   return (
     <InfiniteScroll
       useWindow

@@ -10,6 +10,7 @@ import {
   Fab
 } from '@material-ui/core';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+import { useSelector } from 'react-redux';
 
 import {
   ButtonStep,
@@ -33,13 +34,13 @@ import {
   messageResponseEdit,
   messageResponseSave
 } from '../../../../util';
-import dateFormatPTBR from '../../../../util/mascaraReal';
 
 export default function Preview() {
   const {
     state: { showModalDetails, dataAlvaraFuncionamento, isEdit, document },
     dispatch
   } = useContext(AlvaraFuncionamentoContext);
+  const dataPagamento = useSelector((state) => state.datePayment.datePayment);
 
   const classes = useStyles();
   const [openModalMenu, setOpenModalMenu] = useState(false);
@@ -78,7 +79,7 @@ export default function Preview() {
         if (response.status === 200) {
           dispatch({
             type: ACTIONS_ALVARA.UPDATE_ALVARA,
-            payload: { ...dataAlvaraFuncionamento, ...dam }
+            payload: { ...dam, ...document, ...dataAlvaraFuncionamento }
           });
         } else {
           setTimeout(() => {
@@ -98,8 +99,9 @@ export default function Preview() {
 
   const handleAlterStatusDAM = useCallback(
     (type, param) => {
+      setOpenModalMenu(true);
       setMessage({});
-      setEdit(dam.id, param).then((response) => {
+      setEdit(dataAlvaraFuncionamento.id_dam, param).then((response) => {
         const processStatusDam = damStatusEdit(response, type);
         if (response.status === 200) {
           dispatch({
@@ -108,14 +110,15 @@ export default function Preview() {
               ...dataAlvaraFuncionamento, dam: {
                 ...dataAlvaraFuncionamento.dam,
                 ...processStatusDam.damStatus,
-              }
+              },
+              dataPagamento
             }
           });
         }
         setMessage(processStatusDam.message);
       });
     },
-    [dam, dataAlvaraFuncionamento.id_dam, dispatch, setEdit]
+    [dataAlvaraFuncionamento, dataPagamento, dispatch, setEdit]
   );
 
   const handlePrevStep = () => setStepActivity(stepActivity - 1);
@@ -178,9 +181,9 @@ export default function Preview() {
           </Grid>
           <Grid container justify="space-between">
             <Grid item xs={5}>
-              <Typography>
+              {/* <Typography>
                 {document.emissao}
-              </Typography>
+              </Typography> */}
             </Grid>
             <Grid item xs={4} align="center">
               <Typography>

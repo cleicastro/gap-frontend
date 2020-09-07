@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useCallback } from 'react';
 import clsx from 'clsx';
 import {
   Card,
@@ -18,7 +18,8 @@ import {
   useStylesVencido
 } from './styles';
 import { CardSkeletron } from '../../../../components';
-import { useStoreNfsa, usePaginationNfsa } from '../../../../hooks';
+import { usePagination, useStore } from '../../../../hooks/nfsaHooks';
+import { NfsaContext } from '../../../../contexts';
 
 const classValueTotal = (
   status,
@@ -90,20 +91,35 @@ const classCaption = (status, emissao, vencimento, days) => {
 };
 
 function CardNfsa() {
-  // eslint-disable-next-line no-unused-vars
-  const [listNfsa, valueTotal, setSelecetNfsa] = useStoreNfsa();
-  const [pagination, setPagination] = usePaginationNfsa();
+  const {
+    state: { listNfsa, pagination, paramsQuery }
+  } = useContext(NfsaContext);
+
+  const setSelecetNfsa = useStore();
+  const setPagination = usePagination();
 
   const classes = useStyles();
   const classesPago = useStylesPago();
   const classesCancelado = useStylesCancelado();
   const classesVencido = useStylesVencido();
 
-  function handlePagination(currentPage) {
-    setPagination({
-      page: currentPage + 1
-    });
-  }
+  const handlePagination = useCallback(
+    (currentPage) => {
+      if (pagination.current_page < pagination.last_page) {
+        const set = setPagination({
+          ...paramsQuery,
+          page: currentPage + 1
+        });
+        // pra tratar o erro
+        set.then((response) => {
+          if (response.status !== 200) {
+            alert('Falha no carregamento dos dados, favor tente mais tarde!');
+          }
+        });
+      }
+    },
+    [pagination, paramsQuery, setPagination]
+  );
 
   const CardView = () => {
     return (
