@@ -1,16 +1,15 @@
 import api from './api';
 
-// const token = process.env.REACT_APP_TOKEN_API_RECEITAWS;
 class ReceitaWS {
   getReceitaWS(cnpj, cancelToken) {
-    // const token = sessionStorage.getItem('JWT_Token');
+    const token = process.env.REACT_APP_TOKEN_API_RECEITAWS;
     return api.get(
       `https://www.receitaws.com.br/v1/cnpj//${cnpj}`,
       {},
       {
         cancelToken,
         headers: {
-          Authorization: `Bearer 921a58269c1e1dba45673b20925df4189b6ca04c41c601b48eeb098df04c75b8`,
+          Authorization: token,
           'Access-Control-Allow-Origin': '*'
         }
       }
@@ -28,10 +27,11 @@ class ReceitaWS {
   }
 
   getConsultaCNPJA(cnpj, cancelToken) {
+    const token = process.env.REACT_APP_TOKEN_API_CNPJA;
     return api.get(`https://api.cnpja.com.br/companies/${cnpj}`, {
       cancelToken,
       headers: {
-        Authorization: `d6bcf87c-e7aa-4512-bbb4-17c9816d0864-631f6afb-ef35-4205-9f32-fcf9b7df147b`
+        Authorization: token
       }
     });
   }

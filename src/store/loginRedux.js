@@ -63,10 +63,7 @@ export function register(data) {
     } catch (error) {
       dispath({
         type: ACTIONS.ERROR,
-        error: {
-          ...error.response.data,
-          status: error.response.status
-        }
+        error
       });
     }
   };
@@ -83,10 +80,7 @@ export function logar(data) {
     } catch (error) {
       dispath({
         type: ACTIONS.ERROR,
-        error: {
-          ...error.response.data,
-          status: error.response.status
-        }
+        error
       });
     }
   };

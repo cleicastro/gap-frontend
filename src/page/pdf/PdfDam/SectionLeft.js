@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View, Image } from '@react-pdf/renderer';
 
 import logo from '../../../assets/logo.png';
-import { styles, Observacao, TextRed, TitleDam, DocDam } from './styles';
+import { styles, Observacao, TitleDam, DocDam } from './styles';
 
 function SectionLeft({ contribuinte, infoAdicionais }) {
   const {

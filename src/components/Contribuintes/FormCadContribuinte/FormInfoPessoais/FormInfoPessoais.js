@@ -11,7 +11,6 @@ import MuiAlert from '@material-ui/lab/Alert';
 
 import { useFormContext } from 'react-hook-form';
 
-import { NumberFormatCNPJ, NumberFormatCPF } from '../../../NumberFormat';
 import { useSearchCNPJ } from '../../../../hooks';
 
 function Alert(props) {
@@ -33,7 +32,7 @@ function FormInfoPessoais() {
 
   function handlerSearchCNPJ(e) {
     const { value } = e.target;
-    if (watch('tipo') === 'PJ' && value.length === 14) {
+    if (watch('tipo') === 'PJ' && value.length === 18) {
       const responseCNPJ = setSearchCNPJ(value.replace(/[^\d]+/g, ''));
       responseCNPJ.then((response) => {
         if (response.status === 200) {

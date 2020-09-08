@@ -5,8 +5,8 @@ import { useHistory } from 'react-router-dom';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import Lottie from 'react-lottie';
-import * as animationData from './lottie-job.json';
+// import Lottie from 'react-lottie';
+// import * as animationData from './lottie-job.json';
 
 import Copyright from '../../components/Copyright';
 import { logar, cleanMessgeUser } from '../../store/loginRedux';
@@ -67,15 +67,6 @@ const Login = ({
     }
     setLoad(false);
   }, [history, user, error]);
-
-  const defaultOptions = {
-    loop: true,
-    autoplay: true,
-    animationData,
-    rendererSettings: {
-      preserveAspectRatio: 'xMidYMid slice'
-    }
-  };
 
   return (
     <Grid container component="main" className={classes.root}>

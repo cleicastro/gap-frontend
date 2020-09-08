@@ -5,8 +5,7 @@ import {
   Hidden,
   IconButton,
   Badge,
-  Typography,
-  Snackbar
+  Typography
 } from '@material-ui/core';
 import clsx from 'clsx';
 import {

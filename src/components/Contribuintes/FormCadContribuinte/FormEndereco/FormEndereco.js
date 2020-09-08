@@ -2,7 +2,6 @@ import React from 'react';
 
 import { Grid, TextField } from '@material-ui/core';
 import { useFormContext } from 'react-hook-form';
-import { NumberFormatCEP } from '../../../NumberFormat';
 
 function FormEndereco() {
   const { control, register, errors, watch } = useFormContext();
