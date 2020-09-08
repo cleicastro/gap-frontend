@@ -127,7 +127,7 @@ function ModalDetails() {
             cancelar:
               dataAlvaraFuncionamento?.dam?.status !== 'Cancelado',
             nfsa: false,
-            alvara: false,
+            alvara: true,
             recibo: false,
             sair: true
           }}

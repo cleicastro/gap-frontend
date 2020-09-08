@@ -267,7 +267,7 @@ function PreviewNfsa() {
         statusServer={message.type}
         successRequest={message.type}>
         <MenuDocumentEvents
-          values={{ id_dam: dataNfsa.id_dam }}
+          values={{ id_dam: dataNfsa.dam.id, id: dataNfsa.id }}
           handleAlterStatusDAM={handleAlterStatusDAM}
           handleClose={handleOpenWindow}
           visibleOptions={{
@@ -276,9 +276,9 @@ function PreviewNfsa() {
             copiar: showModalDetails,
             editar: showModalDetails,
             cancelar: dataNfsa?.dam?.status !== 'Cancelado',
-            nfsa: false,
+            nfsa: true,
             alvara: false,
-            recibo: false,
+            recibo: true,
             sair: true
           }}
         />

@@ -237,7 +237,7 @@ export default function Preview() {
             cancelar:
               dataAlvaraFuncionamento?.dam?.status !== 'Cancelado',
             nfsa: false,
-            alvara: false,
+            alvara: true,
             recibo: false,
             sair: true
           }}

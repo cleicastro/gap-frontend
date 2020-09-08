@@ -69,16 +69,12 @@ function Teste({ alvara }) {
             <TextValues style={{ textAlign: 'justify' }}>
               Atividade Principal: {atividadePrincipal}
             </TextValues>
-            {atividadeSecundariaI && (
-              <TextValues style={{ textAlign: 'justify' }}>
-                Atividade Secundária I: {atividadeSecundariaI}
-              </TextValues>
-            )}
-            {atividadeSecundariaII && (
-              <TextValues style={{ textAlign: 'justify' }}>
-                Atividade Secundária II: {atividadeSecundariaII}
-              </TextValues>
-            )}
+            <TextValues style={{ textAlign: 'justify' }}>
+              Atividade Secundária I: {atividadeSecundariaI}
+            </TextValues>
+            <TextValues style={{ textAlign: 'justify' }}>
+              Atividade Secundária II: {atividadeSecundariaII}
+            </TextValues>
             <TextValues style={{ textAlign: 'justify' }}>
               Inscrição Municipal: {inscricaoMunicipal}
             </TextValues>
