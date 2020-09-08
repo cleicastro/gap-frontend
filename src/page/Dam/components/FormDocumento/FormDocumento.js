@@ -98,6 +98,7 @@ function FormDocumento() {
             label="Data de emissão"
             fullWidth
             type="datetime-local"
+            disableds
             InputLabelProps={{
               shrink: true
             }}

@@ -1,10 +1,9 @@
 # PENDÊNCIAS NO GERAL
 Pendências:
-    ☐ Melhorar o campo de autocomplete do contribuinte
-    ☐ Atalho para adicionar um novo contribuinte carregando o dado digitado do autocomplete
-    ☐ Atalho para editar o contribuinte selecionado
-    ☐ Manter os dados no input do filtro
-
+    ✔ Melhorar o campo de autocomplete do contribuinte @done(20-09-08 14:27)
+    ✔ Atalho para adicionar um novo contribuinte carregando o dado digitado do autocomplete @done(20-09-08 14:27)
+    ✔ Atalho para editar o contribuinte selecionado @done(20-09-08 14:27)
+    ✔ Manter os dados no input do filtro @done(20-09-08 14:27)
 
 # DAM
 Funcionalidades:
@@ -52,6 +51,7 @@ Ajustes:
     ☐ Corrigir as data de emissão no Preview do DAM, Alvará e NFSA
     ☐ Ajustar o autofocus nos campos do prestador/tomador da NFSA
     ☐ Ajustar o valor iSS quando insentar o IR da NFSA
+    ☐ Desabilitar a data de emissão da nfsa
     
 
 

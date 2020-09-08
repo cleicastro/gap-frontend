@@ -179,6 +179,7 @@ function TableNfsa() {
                   size="small"
                   id="emissao"
                   name="emissao"
+                  disabled
                   value={params.emissao}
                 />
               </TableCell>
