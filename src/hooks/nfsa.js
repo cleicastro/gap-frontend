@@ -565,8 +565,13 @@ export const usePreviewNfsa = () => {
     state: { document, taxpayerSeleted, dataNfsa, dataItemNfsa }
   } = useContext(NfsaContext);
 
-  const { juros, valorMulta, taxaExp, valorPrincipal: valorDam } = document;
+  const { juros, valorMulta, taxaExp, valorPrincipal } = document;
   const { prestador, tomador } = taxpayerSeleted;
+  const valorDam =
+    Number(juros) +
+    Number(valorMulta) +
+    Number(taxaExp) +
+    Number(valorPrincipal);
 
   const {
     valorNF,

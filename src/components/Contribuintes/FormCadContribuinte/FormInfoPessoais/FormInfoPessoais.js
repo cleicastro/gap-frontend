@@ -4,14 +4,18 @@ import {
   TextField,
   RadioGroup,
   FormControlLabel,
-  Radio
+  Radio,
+  Button,
+  CircularProgress
 } from '@material-ui/core';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import AccountCircle from '@material-ui/icons/AccountCircle';
 
 import { useFormContext } from 'react-hook-form';
 
 import { useSearchCNPJ } from '../../../../hooks';
+import { NumberFormatCNPJ, NumberFormatCPF } from '../../../NumberFormat';
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -20,20 +24,21 @@ function Alert(props) {
 function FormInfoPessoais() {
   const [open, setOpen] = useState(false);
   const [messageError, setMessageError] = useState('');
+  const [load, setLoad] = useState(false);
   const { control, register, setValue, errors, watch } = useFormContext();
   const setSearchCNPJ = useSearchCNPJ();
 
-  const handleClose = (event, reason) => {
+  const handleClosed = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
     setOpen(false);
   };
 
-  function handlerSearchCNPJ(e) {
-    const { value } = e.target;
-    if (watch('tipo') === 'PJ' && value.length === 18) {
-      const responseCNPJ = setSearchCNPJ(value.replace(/[^\d]+/g, ''));
+  function handlerSearchCNPJ() {
+    setLoad(true);
+    if (watch('tipo') === 'PJ' && watch('doc').length === 18) {
+      const responseCNPJ = setSearchCNPJ(watch('doc').replace(/[^\d]+/g, ''));
       responseCNPJ.then((response) => {
         if (response.status === 200) {
           const dataCnpj = response.data;
@@ -58,6 +63,7 @@ function FormInfoPessoais() {
           setValue('cidade', dataCnpj.address.city);
           setValue('numero', dataCnpj.address.number);
           setValue('bairro', dataCnpj.address.neighborhood);
+          setLoad(false);
         } else {
           setMessageError(
             `${response.message}\n
@@ -65,6 +71,7 @@ function FormInfoPessoais() {
               message:  ${response.error.response.data.message}\n`
           );
           setOpen(true);
+          setLoad(false);
         }
       });
     }
@@ -78,8 +85,8 @@ function FormInfoPessoais() {
 
   return (
     <Grid container spacing={3}>
-      <Snackbar open={open} autoHideDuration={8000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="warning">
+      <Snackbar open={open} autoHideDuration={8000} onClose={handleClosed}>
+        <Alert onClose={handleClosed} severity="warning">
           {messageError}
         </Alert>
       </Snackbar>
@@ -103,25 +110,45 @@ function FormInfoPessoais() {
           />
         </RadioGroup>
       </Grid>
-      <Grid item xs={12} sm={3}>
-        <TextField
-          onChange={handlerSearchCNPJ}
-          inputRef={register}
-          control={control}
-          fullWidth
-          label={watch('tipo') === 'PF' ? 'CPF' : 'CNPJ'}
-          name="doc"
-          InputProps={
-            {
-              // inputComponent:
-              //   watch('tipo') === 'PF' ? NumberFormatCPF : NumberFormatCNPJ
-            }
-          }
-          error={!!errors.doc}
-          helperText={errors.doc && errors.doc.message}
-        />
+      <Grid item xs={12} sm={watch('tipo') === 'PJ' ? 4 : 3}>
+        <Grid container spacing={1} alignItems="flex-end">
+          <Grid item>
+            <TextField
+              value={watch('doc')}
+              inputRef={register}
+              control={control}
+              fullWidth
+              label={watch('tipo') === 'PF' ? 'CPF' : 'CNPJ'}
+              name="doc"
+              InputProps={{
+                inputComponent:
+                  watch('tipo') === 'PF' ? NumberFormatCPF : NumberFormatCNPJ
+              }}
+              error={!!errors.doc}
+              helperText={errors.doc && errors.doc.message}
+            />
+          </Grid>
+          {watch('tipo') === 'PJ' && (
+            <Grid item>
+              <Button
+                onClick={handlerSearchCNPJ}
+                variant="contained"
+                color="primary"
+                component="span"
+                endIcon={
+                  load ? (
+                    <CircularProgress color="inherit" size={20} />
+                  ) : (
+                      <AccountCircle />
+                    )
+                }>
+                Buscar na RF
+              </Button>
+            </Grid>
+          )}
+        </Grid>
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={watch('tipo') === 'PJ' ? 5 : 6}>
         <TextField
           inputRef={register}
           control={control}
@@ -131,6 +158,9 @@ function FormInfoPessoais() {
           label="Nome"
           error={!!errors.nome}
           helperText={errors.nome && errors.nome.message}
+          InputLabelProps={{
+            shrink: true
+          }}
         />
       </Grid>
       <Grid item xs={12} sm={3}>
@@ -173,6 +203,9 @@ function FormInfoPessoais() {
           name="telefone"
           error={!!errors.telefone}
           helperText={errors.telefone && errors.telefone.message}
+          InputLabelProps={{
+            shrink: true
+          }}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -185,6 +218,9 @@ function FormInfoPessoais() {
           type="email"
           error={!!errors.email}
           helperText={errors.email && errors.email.message}
+          InputLabelProps={{
+            shrink: true
+          }}
         />
       </Grid>
     </Grid>

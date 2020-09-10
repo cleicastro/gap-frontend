@@ -61,17 +61,17 @@ export default function Sidebar({
           icon: <RegisterIcon />
         }
       ]
-    },
-    {
-      title: 'Relatórios',
-      href: '/relatorio',
-      icon: <RelatorioIcon />
-    },
-    {
-      title: 'Configurações',
-      href: '/settings',
-      icon: <SettingsIcon />
     }
+    // {
+    //   title: 'Relatórios',
+    //   href: '/relatorio',
+    //   icon: <RelatorioIcon />
+    // }
+    // {
+    //   title: 'Configurações',
+    //   href: '/settings',
+    //   icon: <SettingsIcon />
+    // }
   ];
 
   return (

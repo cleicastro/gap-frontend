@@ -16,14 +16,14 @@ import { useDocument } from '../../../../hooks/dam/useDocument';
 
 function FormDocumento() {
   const {
-    state: { document, receitaSeleted },
+    state: { document, receitaSeleted, isEdit },
     dispatch
   } = useContext(AlvaraFuncionamentoContext);
   const [stepActivity, setStepActivity] = useStepAlvara();
   const setDocument = useDocument();
 
   const documentInitial = {
-    emissao: new Date(),
+    emissao: isEdit ? document.emissao : new Date().toISOString(),
     receita: receitaSeleted.cod,
     docOrigem: '',
     infoAdicionais: '',
@@ -33,7 +33,11 @@ function FormDocumento() {
     valorPrincipal: 0
   };
 
-  const loadDocument = setDocument({ ...documentInitial, ...document });
+  const loadDocument = setDocument({
+    ...document,
+    ...documentInitial,
+    emissao: isEdit ? document.emissao : documentInitial.emissao
+  });
 
   const {
     control,
@@ -59,15 +63,23 @@ function FormDocumento() {
   };
 
   const handlePrevStep = () => {
-    setStepActivity(stepActivity - 1);
-    const requestDocument = setDocument({ ...loadDocument, ...getValues() });
+    const requestDocument = setDocument({
+      ...loadDocument,
+      ...getValues(),
+      emissao: loadDocument.emissao
+    });
     dispatch({ type: ACTIONS_ALVARA.DOCUMENT, payload: requestDocument });
+    setStepActivity(stepActivity - 1);
   };
 
   const onSubmit = (data) => {
-    setStepActivity(stepActivity + 1);
-    const requestDocument = setDocument({ ...loadDocument, ...data });
+    const requestDocument = setDocument({
+      ...loadDocument,
+      ...data,
+      emissao: loadDocument.emissao
+    });
     dispatch({ type: ACTIONS_ALVARA.DOCUMENT, payload: requestDocument });
+    setStepActivity(stepActivity + 1);
   };
 
   return (
@@ -95,7 +107,6 @@ function FormDocumento() {
             control={control}
             id="emissao"
             name="emissao"
-            error={!!errors.emissao}
             label="Data de emissão"
             fullWidth
             type="datetime-local"

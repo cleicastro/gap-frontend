@@ -13,7 +13,7 @@ import { AlvaraFuncionamentoProvider } from '../../contexts';
 
 function AlvaraFuncionamento() {
   const classes = useStyles();
-  const [viewTable, setViewTable] = useState(false);
+  const [viewTable, setViewTable] = useState(true);
   // eslint-disable-next-line no-unused-vars
   const [openFilter, setOpenFilter] = useState(false);
 
@@ -36,7 +36,7 @@ function AlvaraFuncionamento() {
             </Box>
           </Grid>
           <Grid item xs={12}>
-            {!viewTable ? <CardAlvara /> : <TableAlvara />}
+            {viewTable ? <TableAlvara /> : <CardAlvara />}
           </Grid>
         </Grid>
       </div>

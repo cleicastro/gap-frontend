@@ -14,7 +14,8 @@ import {
   CircularProgress,
   List,
   ListItem,
-  ListItemText
+  ListItemText,
+  Paper
 } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 

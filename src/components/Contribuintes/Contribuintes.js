@@ -28,7 +28,7 @@ import {
 } from '@material-ui/core';
 
 import InfiniteScroll from 'react-infinite-scroller';
-import { useStyles, StyledTableCell } from './styles';
+import { useStyles, StyledTableCell, StyledTableRow } from './styles';
 
 import { ContribuinteContext } from '../../contexts';
 import FormCadContribuinte from './FormCadContribuinte/FormCadContribuinte';
@@ -92,7 +92,7 @@ function Contribuintes(props) {
                 <CircularProgress color="primary" />
               </div>
             }>
-            <TableContainer>
+            <TableContainer component={Paper}>
               <Table
                 className={classes.table}
                 size="small"
@@ -179,7 +179,7 @@ function Contribuintes(props) {
                 </TableHead>
                 <TableBody>
                   {listContribuinte.map((value) => (
-                    <TableRow key={value.id}>
+                    <StyledTableRow key={value.id}>
                       <TableCell align="center">
                         <Button
                           onClick={() => handleSelectedContribuinte(value)}
@@ -212,11 +212,16 @@ function Contribuintes(props) {
                           {value.cidade} | {value.bairro} | {value.endereco}
                         </Typography>
                       </TableCell>
-                    </TableRow>
+                    </StyledTableRow>
                   ))}
                 </TableBody>
               </Table>
             </TableContainer>
+            <div className={classes.loader}>
+              {listContribuinte.length === 0 && (
+                <CircularProgress color="primary" />
+              )}
+            </div>
           </InfiniteScroll>
         </Box>
       </Zoom>

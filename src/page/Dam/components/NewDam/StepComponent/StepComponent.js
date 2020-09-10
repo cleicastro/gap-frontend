@@ -43,7 +43,7 @@ function StepComponent() {
       <main className={classes.layout}>
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
-            Emissão de Nota Fiscal Avulsa de Serviço
+            Emissão de DAM
           </Typography>
 
           <Stepper activeStep={activeStep} className={classes.stepper}>

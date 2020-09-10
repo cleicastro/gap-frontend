@@ -12,5 +12,6 @@ export {
   NumberFormatCNPJ,
   NumberFormatCEP,
   NumberFormatCPF,
-  NumberFormatTelefone
+  NumberFormatTelefone,
+  NumberFormatIM
 } from './NumberFormat';

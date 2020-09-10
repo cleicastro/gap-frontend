@@ -13,7 +13,6 @@ class Dam {
       year: 'numeric',
       month: '2-digit'
     }).format(new Date(emissao));
-    this.dateTimeFormat = this.convertDateTimerFR(new Date(emissao));
     this.emissao = this.dateEmissao(new Date(emissao));
     this.vencimento = this.dateVencimento(new Date(emissao));
     this.receita = receita;
@@ -39,7 +38,7 @@ class Dam {
     } else if (weekDay === 2) {
       diasVencer = 6;
     }
-    const newdate = new Date(Date(emissao));
+    const newdate = emissao;
     const dateVencimentoAux = newdate.setDate(newdate.getDate() + diasVencer);
 
     return Intl.DateTimeFormat('fr-CA', {
@@ -50,18 +49,13 @@ class Dam {
   }
 
   dateEmissao(emissao) {
-    const dateValue = new Date(`${emissao.toString().split('GMT')[0]} UTC`)
-      .toISOString()
-      .split('.')[0];
-    return dateValue;
-  }
-
-  convertDateTimerFR(emissao) {
-    const dateValue = new Date(`${emissao.toString().split('GMT')[0]} UTC`)
-      .toISOString()
-      .split('.')[0]
-      .replace('T', ' ');
-    return dateValue;
+    if (emissao) {
+      const dateValue = new Date(`${emissao.toString().split('GMT')[0]} UTC`)
+        .toISOString()
+        .split('.')[0];
+      return dateValue;
+    }
+    return new Date();
   }
 
   calcValorTotal(juros, valorMulta, valorPrincipal, taxaExp) {

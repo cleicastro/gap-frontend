@@ -62,6 +62,7 @@ function FormParticipantes() {
             Preecha o Nome, CPF ou CNPJ para buscar o prestador.
           </Typography>
           <FormCompleteContribuinte
+            autoFocus
             className="formTomadorNFSA"
             selectOption={handleInputPrestador}
             selectOptionEdit={handleInputEditContribuinte}
@@ -74,6 +75,7 @@ function FormParticipantes() {
             Preecha o Nome, CPF ou CNPJ para buscar o tomador.
           </Typography>
           <FormCompleteContribuinte
+            autoFocus={false}
             className="formPrestadorNFSA"
             selectOption={handleInputTomador}
             selectOptionEdit={handleInputEditContribuinte}

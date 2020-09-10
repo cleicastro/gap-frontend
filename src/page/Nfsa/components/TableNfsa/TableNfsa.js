@@ -273,6 +273,9 @@ function TableNfsa() {
           </TableFooter>
         </Table>
       </TableContainer>
+      <div className={classes.loader}>
+        {listNfsa.length === 0 && <CircularProgress color="primary" />}
+      </div>
     </InfiniteScroll>
   );
 }

@@ -67,17 +67,21 @@ export const nfsaContextReducer = (state, action) => {
     case ACTIONS.UPDATE_NFSA:
       const { payload } = action;
       const { listNfsa } = state;
-
       const newList = listNfsa.map((nfsa) => {
         if (nfsa.id === payload.id) {
-          return payload;
+          const newValues = {
+            ...payload,
+            valor_calculo: payload.baseCalculo,
+            valor_nota: payload.valorNF
+          };
+          return newValues;
         }
         return nfsa;
       });
       return {
         ...state,
         listNfsa: newList,
-        dataNfsa: action.payload
+        dataNfsa: payload
       };
 
     case ACTIONS.SELECT_TAXPAYER:
@@ -142,8 +146,10 @@ export const nfsaContextReducer = (state, action) => {
       return {
         ...state,
         taxpayerSeleted: {},
+        dataItemNfsa: [],
         document: {
           emissao: new Date(),
+          vencimento: new Date(),
           receita: '1113050101',
           docOrigem: '',
           infoAdicionais: '',

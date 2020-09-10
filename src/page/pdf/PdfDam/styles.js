@@ -18,10 +18,9 @@ const useStyles = makeStyles((theme) => ({
 // Create styles from PDF
 const styles = StyleSheet.create({
   container: {
-    margin: -10,
-    height: '100%',
-    position: 'fixed',
-    width: '100%'
+    height: '100vh',
+    width: '100vw',
+    position: 'fixed'
   },
   page: {
     flexDirection: 'column',

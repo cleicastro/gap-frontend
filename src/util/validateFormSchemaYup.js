@@ -5,7 +5,7 @@ yup.setLocale(ptBR);
 
 export const documentSchema = yup.object().shape({
   referencia: yup.string().required(),
-  emissao: yup.date().required(),
+  // emissao: yup.date().required(),
   vencimento: yup
     .date()
     .required()

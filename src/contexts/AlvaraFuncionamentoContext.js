@@ -68,14 +68,22 @@ export const alvaraFuncionamentoContextReducer = (state, action) => {
 
       const newList = listAlvara.map((alvara) => {
         if (alvara.id_dam === payload.id_dam) {
-          return payload;
+          const newAlvara = {
+            ...payload,
+            dam: {
+              ...payload.dam,
+              valor_principal: payload.valorPrincipal,
+              valor_total: payload.valorTotal
+            }
+          };
+          return newAlvara;
         }
         return alvara;
       });
       return {
         ...state,
         listAlvara: newList,
-        dataAlvaraFuncionamento: action.payload
+        dataAlvaraFuncionamento: payload
       };
 
     case ACTIONS.SELECT_TAXPAYER:
@@ -134,9 +142,9 @@ export const alvaraFuncionamentoContextReducer = (state, action) => {
     case ACTIONS.CLEAN_DATA_ALVARA:
       return {
         ...state,
-        taxpayerSeleted: {},
         document: {
           emissao: new Date(),
+          vencimento: new Date(),
           receita: '1121250000',
           docOrigem: '',
           infoAdicionais: '',
@@ -146,13 +154,14 @@ export const alvaraFuncionamentoContextReducer = (state, action) => {
           valorPrincipal: 0
         },
         dataAlvaraFuncionamento: {},
+        taxpayerSeleted: {},
         activeStep: 0,
-        showModalNewDam: false,
+        isEdit: false,
+        showModalNewAlvaraFuncionamento: false,
         showModalDetails: false,
         openWindowContribuinte: false,
         paramsQuery: {},
-        cadastroContribuinte: {},
-        isEdit: false
+        cadastroContribuinte: {}
       };
     default:
       return state;

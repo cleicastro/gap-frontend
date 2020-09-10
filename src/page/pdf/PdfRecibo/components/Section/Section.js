@@ -199,7 +199,7 @@ function Teste({ nfsa }) {
             </TextTitle>
             <TextTitle>{prestador.nome} </TextTitle>
             <TextTitle>{prestador.doc}</TextTitle>
-            <TextTitle>{`${prestador.banco} Ag.: ${prestador.agencia} ${prestador.tipoConta} ${prestador.conta}`}</TextTitle>
+            <TextTitle>{`${prestador.banco} Ag.: ${prestador.agencia} ${prestador.tipoConta} Conta: ${prestador.conta}`}</TextTitle>
           </Column>
         </Row>
       </View>

@@ -1,5 +1,6 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useContext } from 'react';
-import { Grid, TextField } from '@material-ui/core';
+import { Grid, TextField, Link, Typography } from '@material-ui/core';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers';
 
@@ -19,33 +20,25 @@ function FormAlvaraFuncionamento() {
     state: { taxpayerSeleted, dataAlvaraFuncionamento },
     dispatch
   } = useContext(AlvaraFuncionamentoContext);
+  const { cadAlvara } = taxpayerSeleted;
   const cadastroAlvara = {
-    atividadePrincipal:
-      taxpayerSeleted.cadAlvara &&
-      taxpayerSeleted.cadAlvara.atividade_principal,
-    atividadeSecundariaI:
-      taxpayerSeleted.cadAlvara &&
-      taxpayerSeleted.cadAlvara.atividade_secundaria_I,
-    atividadeSecundariaII:
-      taxpayerSeleted.cadAlvara &&
-      taxpayerSeleted.cadAlvara.atividade_secundaria_II,
+    atividadePrincipal: cadAlvara && cadAlvara.atividade_principal,
+    atividadeSecundariaI: cadAlvara && cadAlvara.atividade_secundaria_I,
+    atividadeSecundariaII: cadAlvara && cadAlvara.atividade_secundaria_II,
     inscricaoMunicipal:
-      taxpayerSeleted.cadAlvara && taxpayerSeleted.cadAlvara.inscricao_municipal
+      cadAlvara &&
+      `${cadAlvara.inscricao_municipal}.${new Date().getFullYear()}`
   };
-
-  const dataALvara = dataAlvaraFuncionamento.inscricaoMunicipal
-    ? dataAlvaraFuncionamento
-    : taxpayerSeleted;
 
   const { register, handleSubmit, control, errors, getValues } = useForm({
     resolver: yupResolver(alvaraFuncionamentoSchema),
     defaultValues: {
       ...cadastroAlvara,
-      ...dataALvara,
-      nomeFantasia:
-        dataALvara.nomeFantasia !== ''
-          ? dataALvara.nomeFantasia
-          : dataALvara.nome
+      ...taxpayerSeleted,
+      ...dataAlvaraFuncionamento,
+      nomeFantasia: taxpayerSeleted.nomeFantasia
+        ? taxpayerSeleted.nomeFantasia
+        : taxpayerSeleted.nome
     }
   });
 
@@ -66,13 +59,27 @@ function FormAlvaraFuncionamento() {
     setStepActivity(stepActivity + 1);
   };
 
+  const handleOpenEditTaxpayerSeleted = () => {
+    dispatch({
+      type: ACTIONS_ALVARA.MODAL_CONTRIBUINTES,
+      payload: taxpayerSeleted
+    });
+  };
+
   return (
     <form onSubmit={handleSubmit(handleSetAlvara)}>
-      {!taxpayerSeleted.cadAlvara ||
+      {!!taxpayerSeleted.cadAlvara ||
         (!dataAlvaraFuncionamento.inscricaoMunicipal && (
           <Alert severity="warning">
-            Este contribuinte não possui cadastro de emissão de alvará, é
-            recomendável atualizar o cadastro.
+            <Typography>
+              Este contribuinte não possui cadastro de emissão de alvará,{' '}
+              <Link
+                component="button"
+                variant="body2"
+                onClick={handleOpenEditTaxpayerSeleted}>
+                clique aqui para atualizar.
+              </Link>
+            </Typography>
           </Alert>
         ))}
       <Grid container spacing={3}>
@@ -87,6 +94,9 @@ function FormAlvaraFuncionamento() {
             helperText={
               errors.inscricaoMunicipal && errors.inscricaoMunicipal.message
             }
+            InputProps={{
+              readOnly: true
+            }}
           />
         </Grid>
         <Grid item sm={8} xs={12}>

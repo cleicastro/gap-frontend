@@ -52,8 +52,13 @@ function FormCadContribuinte({ closeWindow, contribuinteSelected }) {
   const { setValue } = methods;
 
   useEffect(() => {
-    if (contribuinteSelected) {
+    if (contribuinteSelected.doc) {
       const { cadAlvara } = contribuinteSelected;
+      const docFormated =
+        contribuinteSelected.doc &&
+        contribuinteSelected.doc.replace(/[^\d]+/g, '');
+
+      setValue('doc', docFormated);
       setValue('agencia', contribuinteSelected.agencia);
       setValue('bairro', contribuinteSelected.bairro);
       setValue('banco', contribuinteSelected.banco);
@@ -62,7 +67,6 @@ function FormCadContribuinte({ closeWindow, contribuinteSelected }) {
       setValue('cidade', contribuinteSelected.cidade);
       setValue('complemento', contribuinteSelected.complemento);
       setValue('conta', contribuinteSelected.conta);
-      setValue('doc', contribuinteSelected.doc);
       setValue('docEmissao', contribuinteSelected.docEmissao);
       setValue('docEstadual', contribuinteSelected.docEstadual);
       setValue('docOrgao', contribuinteSelected.docOrgao);
@@ -149,9 +153,13 @@ function FormCadContribuinte({ closeWindow, contribuinteSelected }) {
           type: 'success'
         });
       } else if (response.error) {
+        const { status, data: value } = response.error.response;
         const messageResponse = response.message;
-        const statusCode = `status code:  ${response.error.response.status}`;
-        const mesError = response.error.response.data.erro.errorInfo.join(', ');
+        const statusCode = `status code:  ${status}`;
+        const mesError = value.erro
+          ? value.erro.errorInfo.join(', ')
+          : value.message;
+
         setMessage({
           message: `${messageResponse}: ${statusCode} - message:  ${mesError}`,
           type: 'error'
@@ -166,10 +174,15 @@ function FormCadContribuinte({ closeWindow, contribuinteSelected }) {
           message: 'Contribuinte alterado com sucesso!',
           type: 'success'
         });
-      } else if (response.error) {
+      }
+      if (response.error) {
+        const { status, data: value } = response.error.response;
         const messageResponse = response.message;
-        const statusCode = `status code:  ${response.error.response.status}`;
-        const mesError = response.error.response.data.erro.errorInfo.join(', ');
+        const statusCode = `status code:  ${status}`;
+        const mesError = value.erro
+          ? value.erro.errorInfo.join(', ')
+          : value.message;
+
         setMessage({
           message: `${messageResponse}: ${statusCode} - message:  ${mesError}`,
           type: 'error'
@@ -253,7 +266,7 @@ function FormCadContribuinte({ closeWindow, contribuinteSelected }) {
                 color="secondary"
                 size="small"
                 className={classes.button}>
-                Sair
+                Tabela de contribuintes
               </Button>
             </div>
           </div>

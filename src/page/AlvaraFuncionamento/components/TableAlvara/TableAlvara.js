@@ -293,6 +293,9 @@ function TableAlvara() {
           </TableFooter>
         </Table>
       </TableContainer>
+      <div className={classes.loader}>
+        {listAlvara.length === 0 && <CircularProgress color="primary" />}
+      </div>
     </InfiniteScroll>
   );
 }

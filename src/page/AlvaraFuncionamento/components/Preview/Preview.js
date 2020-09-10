@@ -95,6 +95,9 @@ export default function Preview() {
     dispatch({
       type: ACTIONS_ALVARA.MODAL_NEW_ALVARA
     });
+    dispatch({
+      type: ACTIONS_ALVARA.CLEAN_DATA_ALVARA
+    });
   }, [dispatch]);
 
   const handleAlterStatusDAM = useCallback(
@@ -181,16 +184,22 @@ export default function Preview() {
           </Grid>
           <Grid container justify="space-between">
             <Grid item xs={5}>
-              {/* <Typography>
-                {document.emissao}
-              </Typography> */}
+              <Typography>
+                {Intl.DateTimeFormat('pt-BR', {
+                  year: 'numeric',
+                  month: 'numeric',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: 'numeric',
+                  second: 'numeric',
+                  hour12: false
+                }).format(new Date(document.emissao))}
+              </Typography>
             </Grid>
             <Grid item xs={4} align="center">
               <Typography>
                 {Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' }).format(
-                  new Date(
-                    document.vencimento || new Date()
-                  )
+                  new Date(document.vencimento)
                 )}
               </Typography>
             </Grid>

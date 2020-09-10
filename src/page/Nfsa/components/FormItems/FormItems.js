@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Grid,
   TableContainer,
@@ -15,6 +15,7 @@ import {
 } from '@material-ui/core';
 
 import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
 import AddIcon from '@material-ui/icons/Save';
 import { useForm } from 'react-hook-form';
 import { ButtonStep } from '../../../../components';
@@ -38,7 +39,10 @@ const useStyles = makeStyles((theme) => ({
 function FormItems() {
   const classes = useStyles();
 
-  const { dispatch } = useContext(NfsaContext);
+  const {
+    state: { isEdit },
+    dispatch
+  } = useContext(NfsaContext);
 
   const {
     control,
@@ -51,6 +55,7 @@ function FormItems() {
   } = useForm();
   const [items, totalItems, setAddItem, setRemoveItem] = useItemsNfsa();
   const [stepActivity, setStepActivity] = useStepNfsa();
+  const [idItem, setIdItem] = useState();
 
   const handleMaskValue = (event) => {
     const { name, value } = event.target;
@@ -76,9 +81,21 @@ function FormItems() {
   const handleAdditem = () => {
     const { valor, quantidade } = getValues();
     if (Number(valor) > 0 && Number(quantidade) > 0) {
-      setAddItem(getValues());
+      if (idItem > 0) {
+        setAddItem({ ...getValues(), id: idItem });
+      } else {
+        setAddItem(getValues());
+      }
       reset();
     }
+  };
+
+  const handleEditItem = (item, key) => {
+    setRemoveItem(key);
+    setIdItem(item.id);
+    setValue('descricao', item.descricao);
+    setValue('quantidade', item.quantidade);
+    setValue('valor', item.valor);
   };
 
   return (
@@ -181,9 +198,20 @@ function FormItems() {
                       }).format(Number(item.valor * item.quantidade))}
                     </TableCell>
                     <TableCell>
-                      <Button type="button" onClick={() => setRemoveItem(key)}>
-                        <DeleteIcon size={24} />
-                      </Button>
+                      {!isEdit && (
+                        <Button
+                          type="button"
+                          onClick={() => setRemoveItem(key)}>
+                          <DeleteIcon size={24} />
+                        </Button>
+                      )}
+                      {isEdit && (
+                        <Button
+                          type="button"
+                          onClick={() => handleEditItem(item, key)}>
+                          <EditIcon size={24} />
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

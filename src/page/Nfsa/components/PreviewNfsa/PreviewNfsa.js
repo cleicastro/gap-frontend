@@ -96,6 +96,9 @@ function PreviewNfsa() {
     dispatch({
       type: ACTIONS_NFSA.MODAL_NEW_NFSA
     });
+    dispatch({
+      type: ACTIONS_NFSA.CLEAN_DATA_NFSA
+    });
   }, [dispatch]);
 
   const handleAlterStatusDAM = useCallback(
@@ -178,7 +181,7 @@ function PreviewNfsa() {
           </Grid>
           <Grid container justify="space-between">
             <Grid item xs={5}>
-              {/* <Typography>
+              <Typography>
                 {Intl.DateTimeFormat('pt-BR', {
                   year: 'numeric',
                   month: 'numeric',
@@ -188,15 +191,13 @@ function PreviewNfsa() {
                   second: 'numeric',
                   hour12: false
                 }).format(new Date(document.emissao))}
-              </Typography> */}
+              </Typography>
             </Grid>
             <Grid item xs={4} align="center">
               <Typography>
-                {Intl.DateTimeFormat('pt-BR', {
-                  year: 'numeric',
-                  month: 'numeric',
-                  day: 'numeric'
-                }).format(new Date())}
+                {Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' }).format(
+                  new Date(document.vencimento)
+                )}
               </Typography>
             </Grid>
             <Grid item xs={3} align="right">
@@ -267,7 +268,7 @@ function PreviewNfsa() {
         statusServer={message.type}
         successRequest={message.type}>
         <MenuDocumentEvents
-          values={{ id_dam: dataNfsa.dam.id, id: dataNfsa.id }}
+          values={{ id_dam: dataNfsa.dam?.id, id: dataNfsa.id }}
           handleAlterStatusDAM={handleAlterStatusDAM}
           handleClose={handleOpenWindow}
           visibleOptions={{

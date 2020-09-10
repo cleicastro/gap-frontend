@@ -13,10 +13,7 @@ function FormAlvara() {
           name="inscricaoMunicipal"
           inputRef={register}
           control={control}
-          error={!!errors.inscricaoMunicipal}
-          helperText={
-            errors.inscricaoMunicipal && errors.inscricaoMunicipal.message
-          }
+          disabled
         />
       </Grid>
       <Grid item sm={8} xs={12}>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
 import {
   Grid,
   TextField,
@@ -23,7 +24,13 @@ function requestContribuinteSelect(taxpayer, tokenContribuinte) {
 
 function FormCompleteContribuinte(props) {
   const timerToClearSomewhere = useRef(false);
-  const { selectOption, selectOptionEdit, selectedInitial, className } = props;
+  const {
+    selectOption,
+    selectOptionEdit,
+    selectedInitial,
+    className,
+    autoFocus
+  } = props;
 
   const [loading, setLoading] = useState(false);
   const [contribuinte, setContribuinte] = useState([
@@ -42,15 +49,16 @@ function FormCompleteContribuinte(props) {
 
   useEffect(() => {
     const token = Axios.CancelToken.source();
+
     const setTaxpayer = async () => {
-      setLoading(false);
       const response = await requestContribuinteSelect(param, token);
       if (response.data.data.length > 0) {
         setContribuinte(response.data.data);
       }
+      setLoading(false);
     };
     timerToClearSomewhere.current = setTimeout(() => {
-      if (param.length > 0 && param.length > 5) {
+      if (param.length > 0 && param.length > 4) {
         setLoading(true);
         setTaxpayer();
       }
@@ -97,7 +105,7 @@ function FormCompleteContribuinte(props) {
             renderInput={(params) => (
               <TextField
                 {...params}
-                autoFocus
+                autoFocus={autoFocus}
                 variant="outlined"
                 value={formContribuinte.nome || ''}
                 onChange={(event) => setParam(event.target.value)}
@@ -237,5 +245,12 @@ function FormCompleteContribuinte(props) {
     </>
   );
 }
+
+FormCompleteContribuinte.defaultProps = {
+  autoFocus: true
+};
+FormCompleteContribuinte.propTypes = {
+  autoFocus: PropTypes.bool
+};
 
 export default FormCompleteContribuinte;

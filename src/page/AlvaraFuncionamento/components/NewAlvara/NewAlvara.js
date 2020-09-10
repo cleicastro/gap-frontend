@@ -39,18 +39,31 @@ function NewAlvara() {
     dispatch
   } = useContext(AlvaraFuncionamentoContext);
 
-  const setWindow = useOpenNewAlvara();
-
   const handleOpoenWindowContribuinte = () => {
     dispatch({
       type: ACTIONS_ALVARA.MODAL_CONTRIBUINTES
     });
   };
 
+  const handleOpenWindowNewAlvara = () => {
+    dispatch({
+      type: ACTIONS_ALVARA.MODAL_NEW_ALVARA
+    });
+    if (showModalNewAlvaraFuncionamento) {
+      dispatch({
+        type: ACTIONS_ALVARA.CLEAN_DATA_ALVARA
+      });
+    }
+  };
+
   return (
     <>
       <Box displayPrint="none" className={classes.fab}>
-        <Fab color="primary" size="medium" aria-label="add" onClick={setWindow}>
+        <Fab
+          color="primary"
+          size="medium"
+          aria-label="add"
+          onClick={handleOpenWindowNewAlvara}>
           <AddIcon />
         </Fab>
       </Box>
@@ -64,7 +77,7 @@ function NewAlvara() {
             <IconButton
               edge="start"
               color="inherit"
-              onClick={setWindow}
+              onClick={handleOpenWindowNewAlvara}
               aria-label="close">
               <CloseIcon />
             </IconButton>

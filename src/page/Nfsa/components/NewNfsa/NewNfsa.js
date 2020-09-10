@@ -44,6 +44,11 @@ function NewNfsa() {
     dispatch({
       type: ACTIONS_NFSA.MODAL_NEW_NFSA
     });
+    if (showModalNewNfsa) {
+      dispatch({
+        type: ACTIONS_NFSA.CLEAN_DATA_NFSA
+      });
+    }
   };
 
   return (

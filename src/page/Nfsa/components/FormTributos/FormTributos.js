@@ -14,15 +14,21 @@ import {
 import { useForm } from 'react-hook-form';
 
 import { ButtonStep } from '../../../../components';
+// eslint-disable-next-line import/named
 import { useStepNfsa } from '../../../../hooks';
 import useTributos from '../../../../hooks/nfsaHooks/useTributos';
 import { NfsaContext, ACTIONS_NFSA } from '../../../../contexts';
 
-function removeIRR(baseCalculo, valorIr) {
-  return (Number(baseCalculo) - Number(valorIr)).toFixed(2);
+function removeIRR(baseCalculo, valorISS, taxaExp) {
+  return (Number(baseCalculo) - Number(valorISS) - Number(taxaExp)).toFixed(2);
 }
-function addIRR(baseCalculo, valorIr) {
-  return (Number(baseCalculo) + Number(valorIr)).toFixed(2);
+function addIRR(baseCalculo, valorIr, valorISS, taxaExp) {
+  return (
+    Number(baseCalculo) -
+    Number(valorIr) -
+    Number(valorISS) -
+    Number(taxaExp)
+  ).toFixed(2);
 }
 
 function FormTributos() {
@@ -74,6 +80,7 @@ function FormTributos() {
       setValue('valorNF', resultConverted.valorNF);
       setValue('baseCalculo', resultConverted.baseCalculo);
       setValue('valorISS', resultConverted.valorISS);
+      setValue('irValorView', resultConverted.irValor);
     } else {
       setValue('valorDeducao', tributos.valorDeducao);
       setValue('irPercente', tributos.irPercente);
@@ -82,6 +89,7 @@ function FormTributos() {
       setValue('valorNF', tributos.valorNF);
       setValue('valorISS', tributos.valorISS);
       setValue('baseCalculo', tributos.baseCalculo);
+      setValue('irValorView', tributos.irValor);
     }
   };
 
@@ -92,15 +100,28 @@ function FormTributos() {
       setValue('irPercente', tributos.irPercente);
       setValue('irValorCalc', tributos.irValorCalc);
       setValue('irValor', tributos.irValor);
-      setValue('valorNF', addIRR(tributos.valorNF, tributos.irValor));
+      setValue('irValorView', tributos.irValor);
+      setValue(
+        'valorNF',
+        addIRR(
+          tributos.baseCalculo,
+          tributos.irValor,
+          tributos.valorISS,
+          tributos.taxaExp
+        )
+      );
     } else {
       setValue('valorDeducao', 0);
       setValue('irPercente', 0);
       setValue('irValorCalc', 0);
       setValue('irValor', 0);
+      setValue('irValorView', 0);
       setValue('baseCalculo', tributos.baseCalculo);
       setValue('valorISS', tributos.valorISS);
-      setValue('valorNF', removeIRR(tributos.baseCalculo, tributos.irValor));
+      setValue(
+        'valorNF',
+        removeIRR(tributos.baseCalculo, tributos.valorISS, tributos.taxaExp)
+      );
     }
   };
 
@@ -135,6 +156,9 @@ function FormTributos() {
                   name="aliquotaIss"
                   label="Alíquota do ISS: (%)"
                   fullWidth
+                  InputProps={{
+                    readOnly: true
+                  }}
                 />
               </Grid>
               <Grid item xs={6} sm={4}>
@@ -145,6 +169,9 @@ function FormTributos() {
                   name="uf"
                   label="UF"
                   fullWidth
+                  InputProps={{
+                    readOnly: true
+                  }}
                 />
               </Grid>
               <Grid item xs={12} sm={4}>
@@ -155,6 +182,9 @@ function FormTributos() {
                   name="municipio"
                   label="Município"
                   fullWidth
+                  InputProps={{
+                    readOnly: true
+                  }}
                 />
               </Grid>
             </Grid>
@@ -185,7 +215,8 @@ function FormTributos() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">R$</InputAdornment>
-                    )
+                    ),
+                    readOnly: true
                   }}
                   required
                   name="baseCalculo"
@@ -201,7 +232,8 @@ function FormTributos() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">R$</InputAdornment>
-                    )
+                    ),
+                    readOnly: true
                   }}
                   required
                   name="irValor"
@@ -217,7 +249,8 @@ function FormTributos() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">R$</InputAdornment>
-                    )
+                    ),
+                    readOnly: true
                   }}
                   required
                   name="valorISS"
@@ -233,7 +266,8 @@ function FormTributos() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">R$</InputAdornment>
-                    )
+                    ),
+                    readOnly: true
                   }}
                   required
                   name="taxaExp"
@@ -249,7 +283,8 @@ function FormTributos() {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">R$</InputAdornment>
-                    )
+                    ),
+                    readOnly: true
                   }}
                   required
                   name="valorNF"
@@ -292,7 +327,8 @@ function FormTributos() {
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="start">%</InputAdornment>
-                        )
+                        ),
+                        readOnly: true
                       }}
                     />
                   </Grid>
@@ -306,7 +342,8 @@ function FormTributos() {
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">R$</InputAdornment>
-                        )
+                        ),
+                        readOnly: true
                       }}
                     />
                   </Grid>
@@ -320,7 +357,8 @@ function FormTributos() {
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">R$</InputAdornment>
-                        )
+                        ),
+                        readOnly: true
                       }}
                     />
                   </Grid>
@@ -334,7 +372,8 @@ function FormTributos() {
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">R$</InputAdornment>
-                        )
+                        ),
+                        readOnly: true
                       }}
                     />
                   </Grid>
@@ -364,6 +403,7 @@ function FormTributos() {
                   <Grid item xs={6} sm={6}>
                     <FormControl>
                       <Input
+                        readOnly
                         name="pisPercente"
                         type="number"
                         inputRef={register}
@@ -376,6 +416,7 @@ function FormTributos() {
                   <Grid item xs={6} sm={6}>
                     <FormControl>
                       <Input
+                        readOnly
                         name="pisValor"
                         type="number"
                         inputRef={register}
@@ -402,6 +443,7 @@ function FormTributos() {
                   <Grid item xs={6} sm={6}>
                     <FormControl>
                       <Input
+                        readOnly
                         name="inssPercente"
                         type="number"
                         inputRef={register}
@@ -414,6 +456,7 @@ function FormTributos() {
                   <Grid item xs={6} sm={6}>
                     <FormControl>
                       <Input
+                        readOnly
                         name="inssValor"
                         type="number"
                         inputRef={register}
@@ -440,6 +483,7 @@ function FormTributos() {
                   <Grid item xs={6} sm={6}>
                     <FormControl>
                       <Input
+                        readOnly
                         name="confinsPercente"
                         type="number"
                         inputRef={register}
@@ -452,6 +496,7 @@ function FormTributos() {
                   <Grid item xs={6} sm={6}>
                     <FormControl>
                       <Input
+                        readOnly
                         name="confinsValor"
                         type="number"
                         inputRef={register}
@@ -478,6 +523,7 @@ function FormTributos() {
                   <Grid item xs={6} sm={6}>
                     <FormControl>
                       <Input
+                        readOnly
                         name="csllPercente"
                         type="number"
                         inputRef={register}
@@ -490,6 +536,7 @@ function FormTributos() {
                   <Grid item xs={6} sm={6}>
                     <FormControl>
                       <Input
+                        readOnly
                         name="csllValor"
                         type="number"
                         inputRef={register}

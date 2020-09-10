@@ -1,11 +1,11 @@
-import React, { memo, useEffect } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import {
   AppBar,
   Toolbar,
   Hidden,
   IconButton,
   Badge,
-  Typography
+  CircularProgress
 } from '@material-ui/core';
 import clsx from 'clsx';
 import {
@@ -36,15 +36,17 @@ function TopBar({
   const classes = useStyles();
   const history = useHistory();
   const theme = localStorage.getItem('theme');
+  const [load, setLoad] = useState(false);
 
   function logoutUser() {
+    setLoad(true);
     actionLogout();
   }
 
   useEffect(() => {
     if (logoutMsg) {
       localStorage.clear();
-      alert(logoutMsg.message);
+      setLoad(false);
       history.push('/');
     }
   }, [history, logoutMsg]);
@@ -55,36 +57,36 @@ function TopBar({
     } else {
       localStorage.setItem('theme', 'dark');
     }
-    // document.location.reload();
-    history.push('/dashboard');
+    document.location.reload();
   };
 
   return (
     <AppBar {...rest} className={clsx(classes.root, className)}>
       <Toolbar>
+        {/* <img alt="Logo" src="/images/logos/logo--white.svg" /> */}
         <Link to="/">
-          {/* <img alt="Logo" src="/images/logos/logo--white.svg" /> */}
-          <Typography color="secondary">GAP Ryatec</Typography>
+          <img alt="Logo" src="/images/logos/logo--white.svg" />
         </Link>
         <div className={classes.flexGrow} />
-        <IconButton color="inherit" onClick={handleSelectTheme}>
-          <Badge badgeContent={0} color="secondary">
-            {theme === 'dark' ? <IconLight /> : <IconDark />}
-          </Badge>
-        </IconButton>
         <Hidden mdDown>
+          <IconButton color="inherit" onClick={handleSelectTheme}>
+            <Badge badgeContent={0} color="secondary">
+              {theme === 'dark' ? <IconLight /> : <IconDark />}
+            </Badge>
+          </IconButton>
           <IconButton color="inherit">
             <Badge badgeContent={0} color="secondary">
               <NotificarionIcon />
             </Badge>
           </IconButton>
-          <IconButton
-            className={classes.signOutButton}
-            color="inherit"
-            onClick={logoutUser}>
-            <InputIcon />
-          </IconButton>
         </Hidden>
+        <IconButton
+          className={classes.signOutButton}
+          color="inherit"
+          onClick={logoutUser}>
+          {load && <CircularProgress size={24} color="inherit" />}
+          {!load && <InputIcon />}
+        </IconButton>
         <Hidden lgUp>
           <IconButton color="inherit" onClick={onSidebarOpen}>
             <MenuIcon />

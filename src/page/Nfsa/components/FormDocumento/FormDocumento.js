@@ -9,11 +9,12 @@ import { ButtonStep } from '../../../../components';
 import { documentSchema, mascaraReal } from '../../../../util';
 import { NfsaContext, ACTIONS_NFSA } from '../../../../contexts';
 import { useDocument } from '../../../../hooks/dam/useDocument';
+// eslint-disable-next-line import/named
 import { useStepNfsa } from '../../../../hooks';
 
 function FormDocumento() {
   const {
-    state: { document, receitaSeleted, dataNfsa },
+    state: { document, receitaSeleted, dataNfsa, isEdit },
     dispatch
   } = useContext(NfsaContext);
 
@@ -38,7 +39,7 @@ function FormDocumento() {
   const setDocument = useDocument();
 
   const documentInitial = {
-    emissao: new Date(),
+    emissao: isEdit ? document.emissao : new Date().toISOString(),
     receita: receitaSeleted.cod,
     docOrigem: '',
     infoAdicionais: '',
@@ -47,7 +48,11 @@ function FormDocumento() {
     taxaExp: 5,
     valorPrincipal
   };
-  const loadDocument = setDocument({ ...documentInitial, ...document });
+  const loadDocument = setDocument({
+    ...document,
+    ...documentInitial,
+    emissao: isEdit ? document.emissao : documentInitial.emissao
+  });
 
   const {
     control,
@@ -73,15 +78,23 @@ function FormDocumento() {
   };
 
   const handlePrevStep = () => {
-    setStepActivity(stepActivity - 1);
-    const requestDocument = setDocument({ ...loadDocument, ...getValues() });
+    const requestDocument = setDocument({
+      ...loadDocument,
+      ...getValues(),
+      emissao: loadDocument.emissao
+    });
     dispatch({ type: ACTIONS_NFSA.DOCUMENT, payload: requestDocument });
+    setStepActivity(stepActivity - 1);
   };
 
   const onSubmit = (data) => {
-    setStepActivity(stepActivity + 1);
-    const requestDocument = setDocument({ ...loadDocument, ...data });
+    const requestDocument = setDocument({
+      ...loadDocument,
+      ...data,
+      emissao: loadDocument.emissao
+    });
     dispatch({ type: ACTIONS_NFSA.DOCUMENT, payload: requestDocument });
+    setStepActivity(stepActivity + 1);
   };
 
   return (
@@ -108,7 +121,6 @@ function FormDocumento() {
             control={control}
             id="emissao"
             name="emissao"
-            error={!!errors.emissao}
             label="Data de emissão"
             fullWidth
             type="datetime-local"
@@ -139,7 +151,7 @@ function FormDocumento() {
             inputRef={register}
             control={control}
             multiline
-            label="Descrição"
+            label="Informações adicionais"
             name="infoAdicionais"
             fullWidth
             // error={!!errors.infoAdicionais}
@@ -153,7 +165,9 @@ function FormDocumento() {
             id="receita"
             name="receita"
             InputLabelProps={{
-              shrink: true,
+              shrink: true
+            }}
+            InputProps={{
               readOnly: true
             }}
             label="Receita"
@@ -171,7 +185,9 @@ function FormDocumento() {
             label="Documento de origem"
             fullWidth
             InputLabelProps={{
-              shrink: true,
+              shrink: true
+            }}
+            InputProps={{
               readOnly: true
             }}
           />
@@ -183,7 +199,8 @@ function FormDocumento() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">R$</InputAdornment>
-              )
+              ),
+              readOnly: true
             }}
             type="number"
             id="valorPrincipal"
@@ -193,8 +210,7 @@ function FormDocumento() {
             fullWidth
             onChange={calcTotal}
             InputLabelProps={{
-              shrink: true,
-              readOnly: true
+              shrink: true
             }}
             helperText={errors.valorPrincipal && errors.valorPrincipal.message}
           />
@@ -206,7 +222,8 @@ function FormDocumento() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">R$</InputAdornment>
-              )
+              ),
+              readOnly: true
             }}
             id="juros"
             name="juros"
@@ -217,8 +234,7 @@ function FormDocumento() {
             fullWidth
             onChange={calcTotal}
             InputLabelProps={{
-              shrink: true,
-              readOnly: true
+              shrink: true
             }}
             helperText={errors.juros && errors.juros.message}
           />
@@ -230,7 +246,8 @@ function FormDocumento() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">R$</InputAdornment>
-              )
+              ),
+              readOnly: true
             }}
             id="taxaExp"
             name="taxaExp"
@@ -241,8 +258,7 @@ function FormDocumento() {
             fullWidth
             onChange={calcTotal}
             InputLabelProps={{
-              shrink: true,
-              readOnly: true
+              shrink: true
             }}
             helperText={errors.taxaExp && errors.taxaExp.message}
           />
@@ -254,7 +270,8 @@ function FormDocumento() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">R$</InputAdornment>
-              )
+              ),
+              readOnly: true
             }}
             name="valorTotal"
             type="number"
@@ -263,8 +280,7 @@ function FormDocumento() {
             error={!!errors.valorTotal}
             fullWidth
             InputLabelProps={{
-              shrink: true,
-              readOnly: true
+              shrink: true
             }}
             helperText={errors.valorTotal && errors.valorTotal.message}
           />

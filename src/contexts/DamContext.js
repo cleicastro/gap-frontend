@@ -62,14 +62,19 @@ export const damContextReducer = (state, action) => {
 
       const newList = listDam.map((dam) => {
         if (dam.id === payload.id) {
-          return payload;
+          const newDam = {
+            ...payload,
+            valor_principal: payload.valorPrincipal,
+            valor_total: payload.valorTotal
+          };
+          return newDam;
         }
         return dam;
       });
       return {
         ...state,
         listDam: newList,
-        dataDam: action.payload
+        dataDam: payload
       };
 
     case ACTIONS.SELECT_RECEITA:

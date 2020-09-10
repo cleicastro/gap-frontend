@@ -292,6 +292,9 @@ function TableDam() {
           </TableFooter>
         </Table>
       </TableContainer>
+      <div className={classes.loader}>
+        {listDam.length === 0 && <CircularProgress color="primary" />}
+      </div>
     </InfiniteScroll>
   );
 }

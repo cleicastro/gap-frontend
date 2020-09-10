@@ -92,6 +92,9 @@ export default function PreviewDam() {
     dispatch({
       type: ACTIONS.MODAL_NEW_DAM
     });
+    dispatch({
+      type: ACTIONS.CLEAN_DATA
+    });
   }, [dispatch]);
 
   const handlePrevStep = () => setStepActivity(stepActivity - 1);
@@ -155,7 +158,7 @@ export default function PreviewDam() {
           </Grid>
           <Grid container justify="space-between">
             <Grid item xs={5}>
-              {/* <Typography>
+              <Typography>
                 {Intl.DateTimeFormat('pt-BR', {
                   year: 'numeric',
                   month: 'numeric',
@@ -164,13 +167,13 @@ export default function PreviewDam() {
                   minute: 'numeric',
                   second: 'numeric',
                   hour12: false
-                }).format(new Date(dam.emissao))}
-              </Typography> */}
+                }).format(document.emissao)}
+              </Typography>
             </Grid>
             <Grid item xs={4} align="center">
               <Typography>
                 {Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' }).format(
-                  new Date(dam.vencimento ? dam.vencimento : new Date())
+                  document.vencimento
                 )}
               </Typography>
             </Grid>

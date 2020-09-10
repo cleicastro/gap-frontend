@@ -16,7 +16,7 @@ import { useNfsa } from '../../hooks';
 const Nfsa = () => {
   useNfsa();
   const classes = useStyles();
-  const [viewTable, setViewTable] = useState(false);
+  const [viewTable, setViewTable] = useState(true);
   // eslint-disable-next-line no-unused-vars
   const [openFilter, setOpenFilter] = useState(false);
 
@@ -46,7 +46,7 @@ const Nfsa = () => {
             </Box>
           </Grid>
           <Grid item xs={12}>
-            {!viewTable ? <CardNfsa /> : <TableNfsa />}
+            {viewTable ? <TableNfsa /> : <CardNfsa />}
           </Grid>
         </Grid>
         <ModalDetailsNfsa />

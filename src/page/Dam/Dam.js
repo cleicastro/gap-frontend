@@ -17,7 +17,7 @@ import { useRequestReceita } from '../../hooks';
 const Dam = () => {
   useRequestReceita();
   const classes = useStyles();
-  const [viewTable, setViewTable] = useState(false);
+  const [viewTable, setViewTable] = useState(true);
   const [openFilter, setOpenFilter] = useState(false);
 
   const handleViewTable = useCallback(() => setViewTable((prev) => !prev), []);
@@ -39,7 +39,7 @@ const Dam = () => {
             </Box>
           </Grid>
           <Grid item xs={12}>
-            {!viewTable ? <CardDam /> : <TableDam />}
+            {viewTable ? <TableDam /> : <CardDam />}
           </Grid>
         </Grid>
       </div>

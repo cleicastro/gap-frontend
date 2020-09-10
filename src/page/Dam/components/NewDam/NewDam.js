@@ -40,6 +40,11 @@ function NewDam() {
     dispatch({
       type: ACTIONS.MODAL_NEW_DAM
     });
+    if (showModalNewDam) {
+      dispatch({
+        type: ACTIONS.CLEAN_DATA
+      });
+    }
   };
 
   return (
@@ -78,7 +83,7 @@ function NewDam() {
             </Button>
           </Toolbar>
         </AppBar>
-        {/* component new DAM */}
+        {/* component DAM */}
         <StepComponent />
       </Dialog>
       {/* Cadastro do contribuinte */}

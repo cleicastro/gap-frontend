@@ -13,13 +13,13 @@ import { useDocument } from '../../../../hooks/dam/useDocument';
 
 function FormDocumento() {
   const {
-    state: { document, receitaSeleted },
+    state: { document, receitaSeleted, isEdit },
     dispatch
   } = useContext(DamContext);
   const setDocument = useDocument();
 
   const documentInitial = {
-    emissao: new Date(),
+    emissao: isEdit ? document.emissao : new Date().toISOString(),
     receita: receitaSeleted.cod,
     docOrigem: '',
     infoAdicionais: '',
@@ -32,7 +32,14 @@ function FormDocumento() {
         : document.valorPrincipal || 0
   };
 
-  const loadDocument = setDocument({ ...document, ...documentInitial });
+  const documentAux =
+    document.valorTotal > 5 && !documentInitial.valorPrincipal > 0
+      ? document
+      : documentInitial;
+  const loadDocument = setDocument({
+    ...documentAux,
+    emissao: isEdit ? document.emissao : documentInitial.emissao
+  });
   const [stepActivity, setStepActivity] = useStepDam();
 
   const {
@@ -59,15 +66,23 @@ function FormDocumento() {
   };
 
   const handlePrevStep = () => {
-    setStepActivity(stepActivity - 1);
-    const requestDocument = setDocument({ ...loadDocument, ...getValues() });
+    const requestDocument = setDocument({
+      ...loadDocument,
+      ...getValues(),
+      emissao: loadDocument.emissao
+    });
     dispatch({ type: ACTIONS.DOCUMENT, payload: requestDocument });
+    setStepActivity(stepActivity - 1);
   };
 
   const onSubmit = (data) => {
-    setStepActivity(stepActivity + 1);
-    const requestDocument = setDocument({ ...loadDocument, ...data });
+    const requestDocument = setDocument({
+      ...loadDocument,
+      ...data,
+      emissao: loadDocument.emissao
+    });
     dispatch({ type: ACTIONS.DOCUMENT, payload: requestDocument });
+    setStepActivity(stepActivity + 1);
   };
 
   return (
@@ -94,11 +109,10 @@ function FormDocumento() {
             control={control}
             id="emissao"
             name="emissao"
-            error={!!errors.emissao}
             label="Data de emissão"
             fullWidth
             type="datetime-local"
-            disableds
+            disabled
             InputLabelProps={{
               shrink: true
             }}

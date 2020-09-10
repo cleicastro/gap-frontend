@@ -1,4 +1,4 @@
-import { makeStyles, TableCell } from '@material-ui/core';
+import { makeStyles, TableCell, TableRow } from '@material-ui/core';
 import { withStyles } from '@material-ui/styles';
 import { green } from '@material-ui/core/colors';
 
@@ -59,12 +59,22 @@ const useStyles = makeStyles((theme) => ({
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
-    backgroundColor: theme.palette.common.light, // theme.palette.common.black,
-    color: theme.palette.primary.main,
-    fontSize: 14,
-    fontWeight: 'bold',
+    backgroundColor: theme.palette.primary.main, // theme.palette.common.black,
+    color: theme.palette.common.white,
+    fontSize: 12,
     cursor: 'pointer'
+  },
+  body: {
+    fontSize: 11
   }
 }))(TableCell);
 
-export { useStyles, StyledTableCell };
+const StyledTableRow = withStyles((theme) => ({
+  root: {
+    '&:nth-of-type(odd)': {
+      backgroundColor: theme.palette.action.hover
+    }
+  }
+}))(TableRow);
+
+export { useStyles, StyledTableCell, StyledTableRow };
