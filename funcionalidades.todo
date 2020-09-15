@@ -43,15 +43,14 @@ Ajustes:
     ✔ Corrigir o card do Dam que não atualiza logo após o update @done(20-09-06 16:54)
     ✔ Corrigir a conversão do bruto para o liquido da NFSA @done(20-09-07 18:08)
     ✔ Atualizar o preço do item quando for aplicado a insenção ou conversão do valor da NFSA @done(20-09-07 18:08)
-    ☐ No campo da Descrição do dam deverá copiar o item da nota fiscal
-    ☐ Adicionar o campo informações adicionais na tela de cadastro do item
-    ☐ Adicionar o botão para pré visualizar entre o voltar e salvar em todas funcionalidades
-    ☐ Permanecer o negrito nos campos do DAM
-    ☐ Ao sair de todas as janelas de novo cadastro os dados deverão ser limpados.
-    ☐ Corrigir as data de emissão no Preview do DAM, Alvará e NFSA
-    ☐ Ajustar o autofocus nos campos do prestador/tomador da NFSA
-    ☐ Ajustar o valor iSS quando insentar o IR da NFSA
-    ☐ Desabilitar a data de emissão da nfsa
+    ✔ Ao sair de todas as janelas de novo cadastro os dados deverão ser limpados. @done(20-09-10 21:03)
+    ✔ Corrigir as data de emissão no Preview do DAM, Alvará e NFSA @done(20-09-10 21:03)
+    ✔ Ajustar o autofocus nos campos do prestador/tomador da NFSA @done(20-09-10 21:03)
+    ✔ Ajustar o valor iSS quando inserir o IR da NFSA @done(20-09-10 21:03)
+    ✔ Desabilitar a data de emissão da nfsa @done(20-09-10 21:03)
+    ✔ Permanecer o negrito nos campos do DAM @done(20-09-12 23:07)
+    ✔ Verificar o formato dos valores depois que atualiza os dados da NFSA. @done(20-09-14 20:16)
+    ☐ Adicionar o botão para pré visualizar entre o voltar e salvar em todas funcionalidades.
     
 
 

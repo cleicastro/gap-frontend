@@ -23,6 +23,32 @@ import { usePagination, useStore } from '../../../../hooks/nfsaHooks';
 import useStyles from './styles';
 import { NfsaContext } from '../../../../contexts';
 
+const classButton = (status, classes) => {
+  switch (status) {
+    case 'Pago':
+      return classes.btnPago;
+    case 'Cancelado':
+      return classes.btnCancelado;
+    case 'Inadimplente':
+      return classes.btnInadimplente;
+    default:
+      return classes.btnPrimary;
+  }
+};
+
+const classCaption = (status, days) => {
+  switch (status) {
+    case 'Pago':
+      return `Pago`;
+    case 'Cancelado':
+      return `Cancelado`;
+    case 'Inadimplente':
+      return `${days} dia(s) de atraso`;
+    default:
+      return days > 0 ? `${days} dia(s) para vencer` : `Vence hoje`;
+  }
+};
+
 function TableNfsa() {
   const {
     state: { listNfsa, pagination, paramsQuery }
@@ -114,7 +140,7 @@ function TableNfsa() {
               <StyledTableCell
                 align="left"
                 onClick={() => handleOrderSort('emissao', false)}>
-                Tomadaor
+                Tomador
               </StyledTableCell>
               <StyledTableCell
                 align="left"
@@ -243,11 +269,7 @@ function TableNfsa() {
                 <StyledTableCell align="left">
                   <IconButton
                     onClick={() => setSelecetNfsa(nfsa)}
-                    className={
-                      nfsa.dam.status
-                        ? classes.btnPrimary
-                        : classes.btnCancelado
-                    }
+                    className={classButton(nfsa.dam.status, classes)}
                     aria-label="info"
                     size="small">
                     <InfoIcon fontSize="inherit" />

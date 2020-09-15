@@ -61,7 +61,7 @@ export default function Preview() {
         if (response.status === 201) {
           dispatch({
             type: ACTIONS_ALVARA.ADD,
-            payload: { ...response }
+            payload: { data: { ...dam, ...document, ...dataAlvaraFuncionamento, ...response.data } }
           });
         } else {
           setTimeout(() => {
@@ -246,7 +246,7 @@ export default function Preview() {
             cancelar:
               dataAlvaraFuncionamento?.dam?.status !== 'Cancelado',
             nfsa: false,
-            alvara: true,
+            alvara: !!dataAlvaraFuncionamento?.dam?.pago,
             recibo: false,
             sair: true
           }}

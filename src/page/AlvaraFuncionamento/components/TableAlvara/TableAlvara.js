@@ -131,7 +131,7 @@ function TableAlvara() {
               <StyledTableCell
                 align="left"
                 onClick={() => handleOrderSort('receita', false)}>
-                Receita
+                Insc. Municipal
               </StyledTableCell>
               <StyledTableCell
                 align="left"
@@ -267,7 +267,7 @@ function TableAlvara() {
                     className={classButton(alvara.dam.status, classes)}
                     aria-label="info"
                     size="small"
-                    onClick={() => setSelecetAlvara(alvara.dam)}>
+                    onClick={() => setSelecetAlvara(alvara)}>
                     <InfoIcon fontSize="inherit" />
                   </IconButton>
                 </StyledTableCell>

@@ -69,7 +69,6 @@ const useTributos = () => {
     ...tributosInitial,
     ...tributos
   });
-
   function setTributos(data) {
     const tributsConverted = auxCalcTributs(data, tableIR);
 
@@ -88,7 +87,7 @@ const useTributos = () => {
         { ...data, baseCalculo: newValorBase },
         tableIR
       );
-      return { ...data, ...newTributs };
+      return { ...data, ...newTributs, baseCalculo: newValorBase };
     }
     return { ...data, ...tributsConverted };
   }

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useCallback } from 'react';
 import {
   Dialog,
   AppBar,
@@ -22,7 +22,6 @@ import {
 } from '../../../../contexts';
 import { Contribuintes } from '../../../../components';
 import StepComponent from './StepComponent';
-import { useOpenNewAlvara } from '../../../../hooks';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -34,7 +33,8 @@ function NewAlvara() {
     state: {
       showModalNewAlvaraFuncionamento,
       openWindowContribuinte,
-      cadastroContribuinte
+      cadastroContribuinte,
+      dataAlvaraFuncionamento
     },
     dispatch
   } = useContext(AlvaraFuncionamentoContext);
@@ -55,6 +55,17 @@ function NewAlvara() {
       });
     }
   };
+
+  const handleUpdateContribuinte = useCallback(
+    (data) => {
+      dispatch({ type: ACTIONS_ALVARA.SELECT_TAXPAYER, payload: data });
+      dispatch({
+        type: ACTIONS_ALVARA.SELECT_ALVARA_FUNCIONAMENTO,
+        payload: { ...dataAlvaraFuncionamento, ...data }
+      });
+    },
+    [dataAlvaraFuncionamento, dispatch]
+  );
 
   return (
     <>
@@ -113,7 +124,11 @@ function NewAlvara() {
           </Toolbar>
         </AppBar>
         <ContribuinteProvier>
-          <Contribuintes contribuinte={cadastroContribuinte} />
+          <Contribuintes
+            contribuinte={cadastroContribuinte}
+            closedWindowContribuinte={handleOpoenWindowContribuinte}
+            updateContribuinte={handleUpdateContribuinte}
+          />
         </ContribuinteProvier>
       </Dialog>
     </>

@@ -16,8 +16,8 @@ const useStyles = makeStyles((theme) => ({
 // Create styles from PDF
 const styles = StyleSheet.create({
   container: {
-    margin: -10,
-    height: '100%',
+    // margin: -10,
+    height: '100vh',
     position: 'fixed',
     width: '100%'
   },

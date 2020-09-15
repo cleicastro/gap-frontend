@@ -20,6 +20,7 @@ function FormAlvaraFuncionamento() {
     state: { taxpayerSeleted, dataAlvaraFuncionamento },
     dispatch
   } = useContext(AlvaraFuncionamentoContext);
+
   const { cadAlvara } = taxpayerSeleted;
   const cadastroAlvara = {
     atividadePrincipal: cadAlvara && cadAlvara.atividade_principal,

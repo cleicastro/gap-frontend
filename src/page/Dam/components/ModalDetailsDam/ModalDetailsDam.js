@@ -77,6 +77,7 @@ function ModalDetailsDam() {
             type: ACTIONS.UPDATE_DAM,
             payload: {
               ...dataDam,
+              valorTotal: dataDam.valor_total,
               ...processStatusDam.damStatus,
               dataPagamento
             }

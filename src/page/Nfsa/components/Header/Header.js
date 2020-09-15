@@ -62,7 +62,7 @@ function Header({ handleViewTable, handleViewFilter }) {
               name="fastSearch"
               value={params}
               onChange={(event) => setParams(event.target.value)}
-              placeholder="Buscar o pretador pelo Nome, CNPJ ou CPF"
+              placeholder="Buscar o prestador pelo Nome, CNPJ ou CPF"
               classes={{
                 root: classes.inputRoot,
                 input: classes.inputInput

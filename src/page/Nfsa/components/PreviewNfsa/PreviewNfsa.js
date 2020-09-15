@@ -29,6 +29,7 @@ import {
 } from '../../../../util';
 import { useStepNfsa, usePreviewNfsa } from '../../../../hooks';
 import { useSelector } from 'react-redux';
+import useStoreNfsa from '../../../../hooks/nfsaHooks/useStore';
 
 function PreviewNfsa() {
   const {
@@ -53,6 +54,7 @@ function PreviewNfsa() {
   const setEdit = useEdit();
   const setEditNfsa = useEditNfsa();
   const setSave = useSave();
+  const setSelecetNfsa = useStoreNfsa();
 
   const handleSaveDAM = useCallback(() => {
     setMessage({});
@@ -63,7 +65,7 @@ function PreviewNfsa() {
         if (response.status === 201) {
           dispatch({
             type: ACTIONS_NFSA.ADD,
-            payload: { ...response }
+            payload: { data: { ...dataNfsa, ...dam, ...response.data } }
           });
         } else {
           setTimeout(() => {
@@ -122,9 +124,6 @@ function PreviewNfsa() {
           });
         }
         setMessage(processStatusDam.message);
-        setTimeout(() => {
-          setOpenModalMenu(false);
-        }, 2000);
       });
     },
     [dataNfsa, dataPagamento, dispatch, setEdit]

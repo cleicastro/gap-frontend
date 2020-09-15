@@ -13,7 +13,6 @@ const INITIAL_STATE = {
 export const datePaymentDam = (state = INITIAL_STATE, action) => {
   switch (action) {
     case ACTION.DATE_PAY:
-      console.log(action.payload);
       return {
         datePayment: action.payload
       };

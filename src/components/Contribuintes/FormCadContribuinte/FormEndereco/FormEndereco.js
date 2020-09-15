@@ -2,27 +2,31 @@ import React from 'react';
 
 import { Grid, TextField } from '@material-ui/core';
 import { useFormContext } from 'react-hook-form';
-import { NumberFormatCEP } from '../../../NumberFormat';
+import { mascaraCEP } from '../../../../util';
 
 function FormEndereco() {
-  const { control, register, errors, watch } = useFormContext();
+  const { control, register, errors, setValue } = useFormContext();
+
+  const handleMaskCep = (event) => {
+    const { value } = event.target;
+    if (value.length > 0) {
+      setValue('cep', mascaraCEP(value));
+    }
+  };
 
   return (
     <Grid container spacing={3}>
       <Grid item xs={6} sm={3}>
         <TextField
-          value={watch('cep')}
+          onChange={handleMaskCep}
           fullWidth
           label="CEP"
           name="cep"
           control={control}
-          defaultValue={watch('cep')}
           inputRef={register}
-          InputProps={{
-            inputComponent: NumberFormatCEP
-          }}
           error={!!errors.cep}
           helperText={errors.cep && errors.cep.message}
+          inputProps={{ maxLength: 9 }}
         />
       </Grid>
       <Grid item xs={6} sm={3}>

@@ -42,7 +42,7 @@ function FormContribuinte() {
   return (
     <form onSubmit={handleSubmit(handleSelectContribuinte)}>
       <Typography variant="h6" gutterBottom>
-        Preecha o Nome, CPF ou CNPJ para buscar o contribuinte.
+        Preencha o Nome, CPF ou CNPJ para buscar o contribuinte.
       </Typography>
       <FormCompleteContribuinte
         className="formContribuinteNFSA"

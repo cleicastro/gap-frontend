@@ -59,7 +59,7 @@ function FormParticipantes() {
       <Grid container justify="space-between" direction="row" spacing={4}>
         <Grid item xs={6} sm={6}>
           <Typography variant="h6" gutterBottom>
-            Preecha o Nome, CPF ou CNPJ para buscar o prestador.
+            Preencha o Nome, CPF ou CNPJ para buscar o prestador.
           </Typography>
           <FormCompleteContribuinte
             autoFocus
@@ -72,7 +72,7 @@ function FormParticipantes() {
 
         <Grid item xs={6} sm={6}>
           <Typography variant="h6" gutterBottom>
-            Preecha o Nome, CPF ou CNPJ para buscar o tomador.
+            Preencha o Nome, CPF ou CNPJ para buscar o tomador.
           </Typography>
           <FormCompleteContribuinte
             autoFocus={false}

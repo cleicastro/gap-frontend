@@ -87,6 +87,7 @@ function ModalDetails() {
                 ...dataAlvaraFuncionamento.dam,
                 ...processStatusDam.damStatus,
               },
+              valorTotal: dataAlvaraFuncionamento.dam.valor_total,
               dataPagamento
             }
           });
@@ -127,7 +128,7 @@ function ModalDetails() {
             cancelar:
               dataAlvaraFuncionamento?.dam?.status !== 'Cancelado',
             nfsa: false,
-            alvara: true,
+            alvara: !!dataAlvaraFuncionamento?.dam?.pago,
             recibo: false,
             sair: true
           }}

@@ -15,7 +15,7 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import { useFormContext } from 'react-hook-form';
 
 import { useSearchCNPJ } from '../../../../hooks';
-import { NumberFormatCNPJ, NumberFormatCPF } from '../../../NumberFormat';
+import { mascaraCPF, mascaraCNPJ } from '../../../../util';
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -25,7 +25,14 @@ function FormInfoPessoais() {
   const [open, setOpen] = useState(false);
   const [messageError, setMessageError] = useState('');
   const [load, setLoad] = useState(false);
-  const { control, register, setValue, errors, watch } = useFormContext();
+  const {
+    control,
+    register,
+    setValue,
+    errors,
+    getValues,
+    watch
+  } = useFormContext();
   const setSearchCNPJ = useSearchCNPJ();
 
   const handleClosed = (event, reason) => {
@@ -37,8 +44,10 @@ function FormInfoPessoais() {
 
   function handlerSearchCNPJ() {
     setLoad(true);
-    if (watch('tipo') === 'PJ' && watch('doc').length === 18) {
-      const responseCNPJ = setSearchCNPJ(watch('doc').replace(/[^\d]+/g, ''));
+    if (getValues('tipo') === 'PJ' && getValues('doc').length === 18) {
+      const responseCNPJ = setSearchCNPJ(
+        getValues('doc').replace(/[^\d]+/g, '')
+      );
       responseCNPJ.then((response) => {
         if (response.status === 200) {
           const dataCnpj = response.data;
@@ -83,6 +92,17 @@ function FormInfoPessoais() {
     }
   }
 
+  const handleMaskDoc = (event) => {
+    const { value } = event.target;
+    if (value.length > 0) {
+      if (getValues('tipo') === 'PF') {
+        setValue('doc', mascaraCPF(value));
+      } else if (getValues('tipo') === 'PJ') {
+        setValue('doc', mascaraCNPJ(value));
+      }
+    }
+  };
+
   return (
     <Grid container spacing={3}>
       <Snackbar open={open} autoHideDuration={8000} onClose={handleClosed}>
@@ -114,18 +134,15 @@ function FormInfoPessoais() {
         <Grid container spacing={1} alignItems="flex-end">
           <Grid item>
             <TextField
-              value={watch('doc')}
+              onChange={handleMaskDoc}
               inputRef={register}
               control={control}
               fullWidth
               label={watch('tipo') === 'PF' ? 'CPF' : 'CNPJ'}
               name="doc"
-              InputProps={{
-                inputComponent:
-                  watch('tipo') === 'PF' ? NumberFormatCPF : NumberFormatCNPJ
-              }}
               error={!!errors.doc}
               helperText={errors.doc && errors.doc.message}
+              inputProps={{ maxLength: watch('tipo') === 'PJ' ? 18 : 14 }}
             />
           </Grid>
           {watch('tipo') === 'PJ' && (

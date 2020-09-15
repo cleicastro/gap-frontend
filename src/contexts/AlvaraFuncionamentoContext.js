@@ -100,10 +100,7 @@ export const alvaraFuncionamentoContextReducer = (state, action) => {
     case ACTIONS.SELECT_ALVARA_FUNCIONAMENTO:
       return {
         ...state,
-        dataAlvaraFuncionamento: {
-          ...state.dataAlvaraFuncionamento,
-          ...action.payload
-        }
+        dataAlvaraFuncionamento: action.payload
       };
     case ACTIONS.EDIT_OPERATION:
       return {

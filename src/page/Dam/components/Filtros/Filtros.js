@@ -128,7 +128,6 @@ function Filtros({ className, handleSair, showFiltro, ...rest }) {
     const filter = { ...data, receitaFilter: right.join(',') };
     setFilter(filter);
     handleSair();
-    console.log(data);
   };
 
   return (

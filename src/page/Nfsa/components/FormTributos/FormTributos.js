@@ -72,7 +72,6 @@ function FormTributos() {
         ...tributos,
         baseCalculo: tributos.convertedToLiquid
       });
-
       setValue('valorDeducao', resultConverted.valorDeducao);
       setValue('irPercente', resultConverted.irPercente);
       setValue('irValorCalc', resultConverted.irValorCalc);
@@ -320,7 +319,7 @@ function FormTributos() {
                   <Grid item xs={6} sm={3}>
                     <TextField
                       fullWidth
-                      label="Alíquota do ISS: (%)"
+                      label="Alíquota do IRRF: (%)"
                       name="irPercente"
                       type="number"
                       inputRef={register}

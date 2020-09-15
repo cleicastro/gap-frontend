@@ -83,7 +83,8 @@ function ModalDetailsNfsa() {
               ...dataNfsa,
               dam: {
                 ...dataNfsa.dam,
-                ...processStatusDam.damStatus
+                ...processStatusDam.damStatus,
+                valor_calculo: Number(processStatusDam.valor_calculo)
               },
               dataPagamento
             }
@@ -97,7 +98,6 @@ function ModalDetailsNfsa() {
     },
     [dataNfsa, dataPagamento, dispatch, setEdit]
   );
-
   return (
     <Dialog
       fullScreen={fullScreenModal}
@@ -108,7 +108,7 @@ function ModalDetailsNfsa() {
         <MenuDocumentEvents
           values={{
             id: dataNfsa && dataNfsa.id,
-            id_dam: dataNfsa && dataNfsa?.dam?.id_dam
+            id_dam: dataNfsa && dataNfsa.dam?.id
           }}
           handleAlterStatusDAM={handleAlterStatusDAM}
           handleCopy={handleCopyDam}

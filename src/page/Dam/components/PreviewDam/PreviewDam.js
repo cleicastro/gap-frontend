@@ -52,7 +52,7 @@ export default function PreviewDam() {
         if (response.status === 201) {
           dispatch({
             type: ACTIONS.ADD,
-            payload: { ...response }
+            payload: { data: { ...dataDam, ...dam, ...response.data } }
           });
         }
         setMessage(processMessageDam);
@@ -71,22 +71,19 @@ export default function PreviewDam() {
     }
   }, [dam, dataDam, dispatch, isEdit, setEdit, setSave]);
 
-  const handleAlterStatusDAM = useCallback(
-    (type, param) => {
-      setMessage({});
-      setEdit(dataDam.id, param).then((response) => {
-        const processStatusDam = damStatusEdit(response, type);
-        if (response.status === 200) {
-          dispatch({
-            type: ACTIONS.UPDATE_DAM,
-            payload: { ...dam, ...processStatusDam.damStatus }
-          });
-        }
-        setMessage(processStatusDam.message);
-      });
-    },
-    [dam, dataDam.id, dispatch, setEdit]
-  );
+  const handleAlterStatusDAM = (type, param) => {
+    setMessage({});
+    setEdit(dataDam.id, param).then((response) => {
+      const processStatusDam = damStatusEdit(response, type);
+      if (response.status === 200) {
+        dispatch({
+          type: ACTIONS.UPDATE_DAM,
+          payload: { ...dam, ...processStatusDam.damStatus }
+        });
+      }
+      setMessage(processStatusDam.message);
+    });
+  };
 
   const handleOpenWindow = useCallback(() => {
     dispatch({
@@ -202,12 +199,12 @@ export default function PreviewDam() {
         statusServer={message.type}
         successRequest={message.type}>
         <MenuDocumentEvents
-          values={{ id_dam: dataDam.id }}
+          values={{ id_dam: dataDam?.id }}
           handleAlterStatusDAM={handleAlterStatusDAM}
           handleClose={handleOpenWindow}
           visibleOptions={{
             imprimir: true,
-            pagar: !dataDam.pago && dataDam.status !== 'Cancelado',
+            pagar: !dataDam.pago && dataDam?.status !== 'Cancelado',
             copiar: showModalDetails,
             editar: showModalDetails,
             cancelar: dataDam.status !== 'Cancelado',

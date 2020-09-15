@@ -105,12 +105,13 @@ function Teste({ alvara }) {
         <View>
           <Column>
             <TextTitle
-              style={{ textAlign: 'justify', fontSize: 8, marginTop: 10 }}>
+              style={{ textAlign: 'justify', fontSize: 9, marginTop: 10 }}>
               OBS: Funcionar dentro das normas estabelecidas por Lei Municipal
               Nº 240/00.
             </TextTitle>
             <Row>
-              <TextTitle style={{ textAlign: 'justify', marginTop: 10 }}>
+              <TextTitle
+                style={{ textAlign: 'justify', fontSize: 9, marginTop: 10 }}>
                 Recomenda-se aos senhores proprietários de sons automotivos,
                 bares e outras fontes sonoras, atendam aos limites da emissão
                 sonora, de acordo com a lei nº 351/2011, sob pena de incorrer em

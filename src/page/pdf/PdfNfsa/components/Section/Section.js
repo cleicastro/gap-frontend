@@ -93,7 +93,7 @@ function Teste({ nfsa }) {
             <View>
               <Row>
                 <Column style={{ borderRight: 1, padding: 0, minHeight: 30 }}>
-                  <TextTitle>Cód. Verififcação:</TextTitle>
+                  <TextTitle>Cód. Verificação:</TextTitle>
                   <TextValues />
                 </Column>
                 <Column style={{ padding: 0, minHeight: 30 }}>

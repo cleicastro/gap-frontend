@@ -8,7 +8,7 @@ export const useEdit = () => {
     } catch (error) {
       return {
         error,
-        message: 'Falha ao atualizar este Alvará'
+        message: 'Falha ao atualizar esta NFSA'
       };
     }
   }

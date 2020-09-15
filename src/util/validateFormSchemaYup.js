@@ -27,7 +27,7 @@ export const alvaraFuncionamentoSchema = yup.object().shape({
     .required()
     .matches(/^[\d.?!]+$/, 'O formato da inscrição municipal está incorreto')
     .min(5),
-  nomeFantasia: yup.string().required().min(5),
+  nomeFantasia: yup.string().required().min(3),
   cep: yup
     .string()
     .required()

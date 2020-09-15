@@ -34,7 +34,7 @@ import { ContribuinteContext } from '../../contexts';
 import FormCadContribuinte from './FormCadContribuinte/FormCadContribuinte';
 
 function Contribuintes(props) {
-  const { contribuinte } = props;
+  const { contribuinte, closedWindowContribuinte, updateContribuinte } = props;
   const {
     handleOrderSort,
     setPagination,
@@ -63,7 +63,16 @@ function Contribuintes(props) {
   const handleOpenNew = useCallback(() => {
     setContribuinteSelected({});
     setChecked((value) => !value);
-  }, []);
+    if (contribuinte) {
+      updateContribuinte(contribuinteSelected);
+      closedWindowContribuinte();
+    }
+  }, [
+    closedWindowContribuinte,
+    contribuinte,
+    contribuinteSelected,
+    updateContribuinte
+  ]);
 
   const handleSelectedContribuinte = useCallback((data) => {
     setContribuinteSelected(data);

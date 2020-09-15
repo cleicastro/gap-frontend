@@ -54,9 +54,7 @@ function FormCadContribuinte({ closeWindow, contribuinteSelected }) {
   useEffect(() => {
     if (contribuinteSelected.doc) {
       const { cadAlvara } = contribuinteSelected;
-      const docFormated =
-        contribuinteSelected.doc &&
-        contribuinteSelected.doc.replace(/[^\d]+/g, '');
+      const docFormated = contribuinteSelected.doc && contribuinteSelected.doc;
 
       setValue('doc', docFormated);
       setValue('agencia', contribuinteSelected.agencia);
@@ -266,7 +264,7 @@ function FormCadContribuinte({ closeWindow, contribuinteSelected }) {
                 color="secondary"
                 size="small"
                 className={classes.button}>
-                Tabela de contribuintes
+                Sair
               </Button>
             </div>
           </div>
