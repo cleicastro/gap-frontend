@@ -30,7 +30,7 @@ function Header({ handleViewTable, handleViewFilter }) {
   } = useContext(NfsaContext);
 
   useEffect(() => {
-    if (params.length > 0 && params.length > 5) {
+    if (params.length > 0 && params.length > 4) {
       timerToClearSomewhere.current = setTimeout(() => {
         setFilter({ contribuinte: params });
       }, 500);

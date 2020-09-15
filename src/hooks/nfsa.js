@@ -445,13 +445,17 @@ export const useFilterNfsa = () => {
   function setFilter(params) {
     setStatusServer(null);
     requestNfsa(params).then((response) => {
-      dispatch(initialNfsaAction(response.data));
+      dispatch({ type: ACTIONS_NFSA_CONTEXT.LIST_INITIAL, payload: response.data });
+      dispatch({
+        type: ACTIONS_NFSA_CONTEXT.PARAMS_QUERY,
+        payload: params
+      });
       setStatusServer(response.status);
     });
-    dispatchNfsa({
-      type: ACTIONS_NFSA_CONTEXT.PARAMS_QUERY,
-      payload: params
-    });
+    // dispatchNfsa({
+    //   type: ACTIONS_NFSA_CONTEXT.PARAMS_QUERY,
+    //   payload: params
+    // });
 
     return () => {
       tokenNfsa.cancel('Request cancell');

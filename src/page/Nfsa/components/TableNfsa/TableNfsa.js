@@ -1,4 +1,10 @@
-import React, { useState, useMemo, useContext, useCallback } from 'react';
+import React, {
+  useState,
+  useMemo,
+  useContext,
+  useCallback,
+  useEffect
+} from 'react';
 
 import {
   TableContainer,
@@ -21,7 +27,13 @@ import { StyledTableRow } from '../../../Dam/components/TableDam/styles';
 import { usePagination, useStore } from '../../../../hooks/nfsaHooks';
 
 import useStyles from './styles';
-import { NfsaContext } from '../../../../contexts';
+import { NfsaContext, ACTIONS_NFSA } from '../../../../contexts';
+import { Nfsa } from '../../../../services';
+
+async function requestNFSA(params) {
+  const response = await Nfsa.getNfsa({ ...params });
+  return response;
+}
 
 const classButton = (status, classes) => {
   switch (status) {
@@ -51,7 +63,8 @@ const classCaption = (status, days) => {
 
 function TableNfsa() {
   const {
-    state: { listNfsa, pagination, paramsQuery }
+    state: { listNfsa, pagination, paramsQuery },
+    dispatch
   } = useContext(NfsaContext);
 
   const setSelecetNfsa = useStore();
@@ -71,6 +84,16 @@ function TableNfsa() {
   });
 
   const valueTotal = useMemo(() => listNfsa.length, [listNfsa]);
+
+  useEffect(() => {
+    requestNFSA(params).then((response) => {
+      dispatch({
+        type: ACTIONS_NFSA.PARAMS_QUERY,
+        payload: params
+      });
+      dispatch({ type: ACTIONS_NFSA.LIST_INITIAL, payload: response.data });
+    });
+  }, [dispatch, params]);
 
   function handleChangeParams(event) {
     const { id, value } = event.target;
@@ -182,9 +205,9 @@ function TableNfsa() {
                   type="text"
                   className={classes.searchReceita}
                   size="small"
-                  id="prestador"
-                  name="prestador"
-                  value={params.prestador}
+                  id="contribuinte"
+                  name="contribuinte"
+                  value={params.contribuinte}
                 />
               </TableCell>
               <TableCell>
