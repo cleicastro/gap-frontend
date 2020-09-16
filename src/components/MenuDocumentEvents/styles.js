@@ -8,6 +8,9 @@ const useStyles = makeStyles((theme) => ({
   containerVencimento: {
     margin: 10,
     maxWidth: 300
+  },
+  btnLinkPrint: {
+    minWidth: 100
   }
 }));
 

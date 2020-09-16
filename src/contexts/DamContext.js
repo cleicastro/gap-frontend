@@ -1,6 +1,5 @@
 /* eslint-disable no-case-declarations */
-import React, { createContext, useReducer, useEffect } from 'react';
-import { Dam } from '../services';
+import React, { createContext, useReducer } from 'react';
 
 export const DamContext = createContext();
 
@@ -155,26 +154,8 @@ export const damContextReducer = (state, action) => {
       return state;
   }
 };
-
-async function requestDam(params) {
-  const response = await Dam.getDam({ ...params });
-  return response;
-}
-function initialDamsAction(dam) {
-  return {
-    type: ACTIONS.LIST_INITIAL,
-    payload: dam
-  };
-}
 export default function DamProvider({ children }) {
   const [state, dispatch] = useReducer(damContextReducer, STATE_INITIAL);
-
-  useEffect(() => {
-    const params = { page: 1 };
-    requestDam(params).then((response) => {
-      dispatch(initialDamsAction(response.data));
-    });
-  }, []);
 
   return (
     <DamContext.Provider value={{ state, dispatch }}>

@@ -3,7 +3,8 @@ import React, {
   useMemo,
   useContext,
   useCallback,
-  useEffect
+  useEffect,
+  useRef
 } from 'react';
 
 import {
@@ -27,13 +28,8 @@ import { StyledTableRow } from '../../../Dam/components/TableDam/styles';
 import { usePagination, useStore } from '../../../../hooks/nfsaHooks';
 
 import useStyles from './styles';
-import { NfsaContext, ACTIONS_NFSA } from '../../../../contexts';
-import { Nfsa } from '../../../../services';
-
-async function requestNFSA(params) {
-  const response = await Nfsa.getNfsa({ ...params });
-  return response;
-}
+import { NfsaContext } from '../../../../contexts';
+import useFilterNfsa from '../../../../hooks';
 
 const classButton = (status, classes) => {
   switch (status) {
@@ -63,8 +59,7 @@ const classCaption = (status, days) => {
 
 function TableNfsa() {
   const {
-    state: { listNfsa, pagination, paramsQuery },
-    dispatch
+    state: { listNfsa, pagination, paramsQuery }
   } = useContext(NfsaContext);
 
   const setSelecetNfsa = useStore();
@@ -73,27 +68,47 @@ function TableNfsa() {
   const [sort, setSort] = useState(false);
 
   const classes = useStyles();
+  const timerToClearSomewhere = useRef(false);
 
   const [params, setparams] = useState({
     id: '',
     receita: '',
     emissao: '',
     contribuinte: '',
+    nameTomadorFilter: '',
     vencimento: '',
-    valorTotal: 0
+    valorCalculo: ''
   });
-
-  const valueTotal = useMemo(() => listNfsa.length, [listNfsa]);
+  const valueTotal = useMemo(
+    () =>
+      listNfsa.reduce((acc, nfsa) => {
+        return acc + Number(nfsa.valor_calculo);
+      }, 0),
+    [listNfsa]
+  );
+  // eslint-disable-next-line no-unused-vars
+  const [statusServer, setFilter] = useFilterNfsa();
 
   useEffect(() => {
-    requestNFSA(params).then((response) => {
-      dispatch({
-        type: ACTIONS_NFSA.PARAMS_QUERY,
-        payload: params
-      });
-      dispatch({ type: ACTIONS_NFSA.LIST_INITIAL, payload: response.data });
-    });
-  }, [dispatch, params]);
+    if (
+      params.id !== '' ||
+      params.receita !== '' ||
+      params.contribuinte !== '' ||
+      params.nameTomadorFilter !== '' ||
+      params.vencimento !== '' ||
+      params.valorCalculo !== ''
+    ) {
+      timerToClearSomewhere.current = setTimeout(() => {
+        setFilter(params);
+      }, 500);
+    } else {
+      setFilter({ page: 1 });
+    }
+    return () => {
+      clearTimeout(timerToClearSomewhere.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
 
   function handleChangeParams(event) {
     const { id, value } = event.target;
@@ -215,9 +230,9 @@ function TableNfsa() {
                   onChange={handleChangeParams}
                   className={classes.searchEmitido}
                   size="small"
-                  id="tomador"
-                  name="tomador"
-                  value={params.tomador}
+                  id="nameTomadorFilter"
+                  name="nameTomadorFilter"
+                  value={params.nameTomadorFilter}
                 />
               </TableCell>
               <TableCell>
@@ -235,6 +250,7 @@ function TableNfsa() {
               <TableCell />
               <TableCell>
                 <TextField
+                  type="number"
                   onChange={handleChangeParams}
                   className={classes.searchVencimento}
                   size="small"
@@ -244,7 +260,7 @@ function TableNfsa() {
                 />
               </TableCell>
               <TableCell>
-                <TextField
+                {/* <TextField
                   onChange={handleChangeParams}
                   type="number"
                   className={classes.searchValor}
@@ -252,7 +268,7 @@ function TableNfsa() {
                   id="valorNota"
                   name="valorNota"
                   value={params.valorNota}
-                />
+                /> */}
               </TableCell>
               <TableCell />
             </TableRow>
@@ -275,7 +291,7 @@ function TableNfsa() {
                   )}
                 </StyledTableCell>
                 <StyledTableCell align="right">
-                  {nfsa.dam.status}
+                  {classCaption(nfsa.dam.status, nfsa.dam.dias_vencimento)}
                 </StyledTableCell>
                 <StyledTableCell align="center">
                   {new Intl.NumberFormat('pt-BR', {

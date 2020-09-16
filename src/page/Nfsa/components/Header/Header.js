@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useRef, useContext, useEffect, useState } from 'react';
+import React, { useRef, useContext, useEffect, useState, useMemo } from 'react';
 import {
   Grid,
   Typography,
@@ -15,7 +15,7 @@ import {
 } from '@material-ui/icons';
 
 import useStyles from './styles';
-import { useStoreNfsa, useFilterNfsa, useNfsa } from '../../../../hooks';
+import { useStoreNfsa, useFilterNfsa } from '../../../../hooks';
 import { NfsaContext } from '../../../../contexts';
 
 function Header({ handleViewTable, handleViewFilter }) {
@@ -23,7 +23,18 @@ function Header({ handleViewTable, handleViewFilter }) {
   const timerToClearSomewhere = useRef(false);
   const [params, setParams] = useState('');
 
-  const [listNfsa, valueTotal] = useStoreNfsa();
+  const {
+    state: { listNfsa }
+  } = useContext(NfsaContext);
+
+  const valueTotal = useMemo(
+    () =>
+      listNfsa.reduce((acc, nfsa) => {
+        return acc + Number(nfsa.valor_calculo);
+      }, 0),
+    [listNfsa]
+  );
+
   const [statusServer, setFilter] = useFilterNfsa();
   const {
     state: { paramsQuery }

@@ -1,6 +1,5 @@
 /* eslint-disable no-case-declarations */
-import React, { createContext, useReducer, useEffect } from 'react';
-import { AlvaraFuncionamento } from '../services';
+import React, { createContext, useReducer } from 'react';
 
 export const AlvaraFuncionamentoContext = createContext();
 
@@ -165,30 +164,11 @@ export const alvaraFuncionamentoContextReducer = (state, action) => {
   }
 };
 
-async function requestAlvara(params) {
-  const response = await AlvaraFuncionamento.getAlvara({ ...params });
-  return response;
-}
-
-function initialAlvaraAction(alvara) {
-  return {
-    type: ACTIONS.LIST_INITIAL,
-    payload: alvara
-  };
-}
-
 export default function AlvaraFuncionamentoProvider({ children }) {
   const [state, dispatch] = useReducer(
     alvaraFuncionamentoContextReducer,
     STATE_INITIAL
   );
-
-  useEffect(() => {
-    const params = { page: 1 };
-    requestAlvara(params).then((response) => {
-      dispatch(initialAlvaraAction(response.data));
-    });
-  }, []);
 
   return (
     <AlvaraFuncionamentoContext.Provider value={{ state, dispatch }}>

@@ -1,4 +1,11 @@
-import React, { useState, useCallback, useContext, useMemo } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useContext,
+  useMemo,
+  useEffect,
+  useRef
+} from 'react';
 import {
   TableContainer,
   Paper,
@@ -19,6 +26,7 @@ import { useStyles, StyledTableCell, StyledTableRow } from './styles';
 import { usePaginationDam } from '../../../../hooks/dam/usePagination';
 import { useStoreDam } from '../../../../hooks/dam/useStore';
 import { DamContext } from '../../../../contexts';
+import { useFilterDam } from '../../../../hooks';
 
 const classButton = (status, classes) => {
   switch (status) {
@@ -48,11 +56,14 @@ const classCaption = (status, days) => {
 
 function TableDam() {
   const classes = useStyles();
+  const timerToClearSomewhere = useRef(false);
   const {
     state: { listDam, pagination, paramsQuery }
   } = useContext(DamContext);
   const setSelecetDam = useStoreDam();
   const setPagination = usePaginationDam();
+  // eslint-disable-next-line no-unused-vars
+  const [statusServer, setFilter] = useFilterDam();
 
   const [order, setOrder] = useState('id');
   const [sort, setSort] = useState(false);
@@ -63,10 +74,37 @@ function TableDam() {
     emissao: '',
     contribuinte: '',
     vencimento: '',
-    valorTotal: 0
+    valorTotal: ''
   });
 
-  const valueTotal = useMemo(() => listDam.length, [listDam]);
+  const valueTotal = useMemo(
+    () =>
+      listDam.reduce((acc, dam) => {
+        return acc + Number(dam.valor_total);
+      }, 0),
+    [listDam]
+  );
+
+  useEffect(() => {
+    if (
+      params.id !== '' ||
+      params.receita !== '' ||
+      params.emissao !== '' ||
+      params.contribuinte !== '' ||
+      params.vencimento !== '' ||
+      params.valorTotal !== ''
+    ) {
+      timerToClearSomewhere.current = setTimeout(() => {
+        setFilter(params);
+      }, 500);
+    } else {
+      setFilter({ page: 1 });
+    }
+    return () => {
+      clearTimeout(timerToClearSomewhere.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
 
   function handleChangeParams(event) {
     const { id, value } = event.target;

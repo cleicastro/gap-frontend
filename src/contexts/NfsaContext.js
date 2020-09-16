@@ -1,6 +1,5 @@
 /* eslint-disable no-case-declarations */
-import React, { createContext, useReducer, useEffect } from 'react';
-import { Nfsa } from '../services';
+import React, { createContext, useReducer } from 'react';
 
 export const NfsaContext = createContext();
 
@@ -172,27 +171,8 @@ export const nfsaContextReducer = (state, action) => {
   }
 };
 
-async function requestNFSA(params) {
-  const response = await Nfsa.getNfsa({ ...params });
-  return response;
-}
-
-function initialNfsaAction(nfsa) {
-  return {
-    type: ACTIONS.LIST_INITIAL,
-    payload: nfsa
-  };
-}
-
 export default function NfsaProvider({ children }) {
   const [state, dispatch] = useReducer(nfsaContextReducer, STATE_INITIAL);
-
-  useEffect(() => {
-    const params = { page: 1 };
-    requestNFSA(params).then((response) => {
-      dispatch(initialNfsaAction(response.data));
-    });
-  }, []);
 
   return (
     <NfsaContext.Provider value={{ state, dispatch }}>

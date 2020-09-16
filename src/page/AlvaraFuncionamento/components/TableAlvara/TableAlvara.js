@@ -1,4 +1,11 @@
-import React, { useState, useContext, useCallback, useMemo } from 'react';
+import React, {
+  useState,
+  useContext,
+  useCallback,
+  useMemo,
+  useRef,
+  useEffect
+} from 'react';
 import {
   TableContainer,
   Paper,
@@ -18,6 +25,7 @@ import InfiniteScroll from 'react-infinite-scroller';
 import { usePagination, useStore } from '../../../../hooks/alvara';
 import { useStyles, StyledTableCell, StyledTableRow } from './styles';
 import { AlvaraFuncionamentoContext } from '../../../../contexts';
+import { useFilterAlvara } from '../../../../hooks';
 
 const classButton = (status, classes) => {
   switch (status) {
@@ -47,6 +55,7 @@ const classCaption = (status, days) => {
 
 function TableAlvara() {
   const classes = useStyles();
+  const timerToClearSomewhere = useRef(false);
   const {
     state: { listAlvara, pagination, paramsQuery }
   } = useContext(AlvaraFuncionamentoContext);
@@ -55,17 +64,46 @@ function TableAlvara() {
   const setPagination = usePagination();
   const [order, setOrder] = useState('id');
   const [sort, setSort] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [statusServer, setFilter] = useFilterAlvara();
 
   const [params, setparams] = useState({
-    id: '',
+    id_dam: '',
     receita: '',
     emissao: '',
     contribuinte: '',
     vencimento: '',
-    valorTotal: 0
+    valorTotal: ''
   });
 
-  const valueTotal = useMemo(() => listAlvara.length, [listAlvara]);
+  const valueTotal = useMemo(
+    () =>
+      listAlvara.reduce((acc, dam) => {
+        return acc + Number(dam.dam.valor_total);
+      }, 0),
+    [listAlvara]
+  );
+
+  useEffect(() => {
+    if (
+      params.id_dam !== '' ||
+      params.receita !== '' ||
+      params.emissao !== '' ||
+      params.contribuinte !== '' ||
+      params.vencimento !== '' ||
+      params.valorTotal !== ''
+    ) {
+      timerToClearSomewhere.current = setTimeout(() => {
+        setFilter(params);
+      }, 500);
+    } else {
+      setFilter({ page: 1 });
+    }
+    return () => {
+      clearTimeout(timerToClearSomewhere.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
 
   function handleChangeParams(event) {
     const { id, value } = event.target;
@@ -166,9 +204,9 @@ function TableAlvara() {
                   type="number"
                   className={classes.searchNDam}
                   size="small"
-                  id="id"
+                  id="id_dam"
                   onChange={handleChangeParams}
-                  value={params.id}
+                  value={params.id_dam}
                 />
               </TableCell>
               <TableCell>

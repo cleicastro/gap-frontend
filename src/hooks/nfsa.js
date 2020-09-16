@@ -287,12 +287,6 @@ export const useNfsa = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const params = { page: 1 };
-    requestNfsa(params).then((response) => {
-      dispatch(initialNfsaAction(response.data));
-      setStatusServer(response.status);
-    });
-
     requestTableIR().then((response) => {
       dispatch(tableIrAction(response.data));
       if (response.status !== 201) {
@@ -445,17 +439,13 @@ export const useFilterNfsa = () => {
   function setFilter(params) {
     setStatusServer(null);
     requestNfsa(params).then((response) => {
-      dispatch({ type: ACTIONS_NFSA_CONTEXT.LIST_INITIAL, payload: response.data });
-      dispatch({
+      dispatchNfsa({ type: ACTIONS_NFSA_CONTEXT.LIST_INITIAL, payload: response.data });
+      dispatchNfsa({
         type: ACTIONS_NFSA_CONTEXT.PARAMS_QUERY,
         payload: params
       });
       setStatusServer(response.status);
     });
-    // dispatchNfsa({
-    //   type: ACTIONS_NFSA_CONTEXT.PARAMS_QUERY,
-    //   payload: params
-    // });
 
     return () => {
       tokenNfsa.cancel('Request cancell');

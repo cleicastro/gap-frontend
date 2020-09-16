@@ -114,32 +114,48 @@ function MenuDocumentEvents(props) {
           TransitionComponent={Fade}>
           {nfsa && (
             <MenuItem onClick={() => setAnchorElPrint(null)}>
-              <Link to={`pdf/nfsa/${values.id}`} target="_blank">
+              <Button
+                className={classes.btnLinkPrint}
+                variant="outlined"
+                color="primary"
+                href={`pdf/nfsa/${values.id}`}
+                target="_blank">
                 NFSA
-              </Link>
+              </Button>
             </MenuItem>
           )}
           <MenuItem onClick={() => setAnchorElPrint(null)}>
-            <Link
-              to={`pdf/dam/${values.id_dam ? values.id_dam : values.id}`}
+            <Button
+              className={classes.btnLinkPrint}
+              variant="outlined"
+              color="primary"
+              href={`pdf/dam/${values.id_dam ? values.id_dam : values.id}`}
               target="_blank">
               DAM
-            </Link>
+            </Button>
           </MenuItem>
           {recibo && (
             <MenuItem onClick={() => setAnchorElPrint(null)}>
-              <Link to={`pdf/recibo/${values.id}`} target="_blank">
+              <Button
+                className={classes.btnLinkPrint}
+                variant="outlined"
+                color="primary"
+                href={`pdf/recibo/${values.id}`}
+                target="_blank">
                 Recibo
-              </Link>
+              </Button>
             </MenuItem>
           )}
           {alvara && (
             <MenuItem onClick={() => setAnchorElPrint(null)}>
-              <Link
-                to={`pdf/alvara/${values.id_dam ? values.id_dam : values.id}`}
+              <Button
+                className={classes.btnLinkPrint}
+                variant="outlined"
+                color="primary"
+                href={`pdf/alvara/${values.id_dam ? values.id_dam : values.id}`}
                 target="_blank">
                 Alvará
-              </Link>
+              </Button>
             </MenuItem>
           )}
         </Menu>
