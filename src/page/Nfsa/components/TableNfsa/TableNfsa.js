@@ -29,7 +29,7 @@ import { usePagination, useStore } from '../../../../hooks/nfsaHooks';
 
 import useStyles from './styles';
 import { NfsaContext } from '../../../../contexts';
-import useFilterNfsa from '../../../../hooks';
+import { useFilterNfsa } from '../../../../hooks';
 
 const classButton = (status, classes) => {
   switch (status) {
