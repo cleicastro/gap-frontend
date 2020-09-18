@@ -1,12 +1,14 @@
+/* eslint-disable import/no-unresolved */
 import React, { useEffect, useState } from 'react';
-
-import { Grid, Typography, CircularProgress } from '@material-ui/core';
+import { PDFViewer, Page, Document } from '@react-pdf/renderer';
+import { CircularProgress, Grid, Typography } from '@material-ui/core';
 import Axios from 'axios';
-import { Nfsa } from '../../../services';
-import { A4, useStyles, Text, TitleContribuinte, MarcaDAgua } from './styles';
-import ContainerNFSA from './Section';
 
-function PdfNfsa() {
+import { Nfsa } from '../../../services';
+import { styles, useStyles } from './styles';
+import { Section } from './components';
+
+const PdfNfsa = () => {
   const classes = useStyles();
   const path = window.location.pathname.split('/');
   const id = Number(path[3]);
@@ -22,6 +24,7 @@ function PdfNfsa() {
         setLoad(false);
       } catch (error) {
         setLoad(false);
+
       }
     }
     requestNFSA();
@@ -58,25 +61,14 @@ function PdfNfsa() {
   }
 
   return (
-    <div className={classes.root}>
-      <A4>
-        {nfsa.dam.status === 'Pago' && (
-          <MarcaDAgua>
-            <TitleContribuinte style={{ fontSize: 42 }}>Pago</TitleContribuinte>
-            <Text>em: {nfsa.dam.data_pagamento}</Text>
-          </MarcaDAgua>
-        )}
-        {nfsa.dam.status === 'Cancelado' && (
-          <MarcaDAgua>
-            <TitleContribuinte style={{ fontSize: 42 }}>
-              Cancelado
-            </TitleContribuinte>
-          </MarcaDAgua>
-        )}
-        <ContainerNFSA nfsa={nfsa} />
-      </A4>
-    </div>
+    <PDFViewer style={styles.container}>
+      <Document>
+        <Page size="A4" style={classes.page}>
+          <Section nfsa={nfsa} />
+        </Page>
+      </Document>
+    </PDFViewer>
   );
-}
+};
 
 export default PdfNfsa;
