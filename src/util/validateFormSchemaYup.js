@@ -14,10 +14,10 @@ export const documentSchema = yup.object().shape({
   //   message: 'Contém caracteres incorretos'
   // }),
   receita: yup.string().required(),
-  valorPrincipal: yup.number().required().min(5),
+  valorPrincipal: yup.number().required(),
   juros: yup.number().required(),
   taxaExp: yup.number().required(),
-  valorTotal: yup.number().required().min(5)
+  valorTotal: yup.number().required()
 });
 
 export const alvaraFuncionamentoSchema = yup.object().shape({

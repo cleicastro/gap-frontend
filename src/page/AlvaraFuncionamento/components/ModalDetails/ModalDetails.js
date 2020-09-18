@@ -123,7 +123,7 @@ function ModalDetails() {
               dataAlvaraFuncionamento?.dam?.status !== 'Cancelado',
 
             pagar:
-              !dataAlvaraFuncionamento?.dam?.pago &&
+              dataAlvaraFuncionamento?.dam?.pago !== '1' &&
               dataAlvaraFuncionamento?.dam?.status !== 'Cancelado',
             cancelar:
               dataAlvaraFuncionamento?.dam?.status !== 'Cancelado',

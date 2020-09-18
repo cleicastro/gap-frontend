@@ -242,7 +242,8 @@ function FormDocumento() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">R$</InputAdornment>
-              )
+              ),
+              readOnly: true
             }}
             name="valorTotal"
             type="number"
@@ -251,8 +252,7 @@ function FormDocumento() {
             error={!!errors.valorTotal}
             fullWidth
             InputLabelProps={{
-              shrink: true,
-              readOnly: true
+              shrink: true
             }}
             helperText={errors.valorTotal && errors.valorTotal.message}
           />

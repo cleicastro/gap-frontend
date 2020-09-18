@@ -120,31 +120,28 @@ function TableDam() {
     }
   }
 
-  const handlePagination = useCallback(
-    (currentPage) => {
-      if (pagination.current_page < pagination.last_page) {
-        const set = setPagination({
-          ...paramsQuery,
-          order,
-          sort,
-          page: currentPage + 1
-        });
-        set.then((response) => {
-          if (response.status !== 200) {
-            alert('Falha no carregamento dos dados, favor tente mais tarde!');
-          }
-        });
-      }
-    },
-    [
-      order,
-      pagination.current_page,
-      pagination.last_page,
-      paramsQuery,
-      setPagination,
-      sort
-    ]
-  );
+  const handlePagination = useCallback(() => {
+    if (pagination.current_page < pagination.last_page) {
+      const set = setPagination({
+        ...paramsQuery,
+        order,
+        sort,
+        page: pagination.current_page + 1
+      });
+      set.then((response) => {
+        if (response.status !== 200) {
+          alert('Falha no carregamento dos dados, favor tente mais tarde!');
+        }
+      });
+    }
+  }, [
+    order,
+    pagination.current_page,
+    pagination.last_page,
+    paramsQuery,
+    setPagination,
+    sort
+  ]);
 
   return (
     <InfiniteScroll

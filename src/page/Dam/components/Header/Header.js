@@ -29,7 +29,7 @@ function Header({ handleViewTable, handleViewFilter }) {
   } = useContext(DamContext);
 
   useEffect(() => {
-    if (params.length > 0 && params.length > 5) {
+    if (params.length > 0 && params.length > 4) {
       timerToClearSomewhere.current = setTimeout(() => {
         setFilter({ contribuinte: params });
       }, 500);

@@ -110,8 +110,8 @@ function ModalDetailsDam() {
             copiar: showModalDetails,
             editar:
               showModalDetails && dataDam && dataDam.status !== 'Cancelado',
-
-            pagar: dataDam && !dataDam.pago && dataDam.status !== 'Cancelado',
+            pagar:
+              dataDam && dataDam.pago !== '1' && dataDam.status !== 'Cancelado',
             cancelar: dataDam && dataDam.status !== 'Cancelado',
             nfsa: false,
             alvara: false,

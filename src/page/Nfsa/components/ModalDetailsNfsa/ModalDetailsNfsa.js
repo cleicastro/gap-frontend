@@ -118,7 +118,7 @@ function ModalDetailsNfsa() {
             imprimir: true,
             pagar:
               dataNfsa?.dam &&
-              !dataNfsa.dam.pago &&
+              dataNfsa.dam.pago !== '1' &&
               dataNfsa.dam.status !== 'Cancelado',
             copiar: showModalDetails,
             editar:

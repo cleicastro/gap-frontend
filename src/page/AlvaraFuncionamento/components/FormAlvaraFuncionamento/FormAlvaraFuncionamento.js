@@ -47,7 +47,7 @@ function FormAlvaraFuncionamento() {
   const handlePrevStep = () => {
     dispatch({
       type: ACTIONS_ALVARA.SELECT_ALVARA_FUNCIONAMENTO,
-      payload: getValues()
+      payload: { ...dataAlvaraFuncionamento, ...getValues() }
     });
     setStepActivity(stepActivity - 1);
   };
@@ -55,7 +55,7 @@ function FormAlvaraFuncionamento() {
   const handleSetAlvara = (values) => {
     dispatch({
       type: ACTIONS_ALVARA.SELECT_ALVARA_FUNCIONAMENTO,
-      payload: values
+      payload: { ...dataAlvaraFuncionamento, ...values }
     });
     setStepActivity(stepActivity + 1);
   };
