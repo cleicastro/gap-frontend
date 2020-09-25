@@ -207,27 +207,22 @@ function TableAlvara() {
                   id="id_dam"
                   onChange={handleChangeParams}
                   value={params.id_dam}
+                  variant="outlined"
+                  autoComplete="off"
                 />
               </TableCell>
+              <TableCell />
               <TableCell>
                 <TextField
-                  type="text"
-                  className={classes.searchReceita}
-                  size="small"
-                  receita="receita"
-                  id="receita"
-                  onChange={handleChangeParams}
-                  value={params.receita}
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
+                  disabled
                   type="date"
                   className={classes.searchEmitido}
                   size="small"
                   id="emissao"
                   onChange={handleChangeParams}
                   value={params.emissao}
+                  variant="outlined"
+                  autoComplete="off"
                 />
               </TableCell>
               <TableCell>
@@ -237,6 +232,8 @@ function TableAlvara() {
                   id="contribuinte"
                   onChange={handleChangeParams}
                   value={params.contribuinte}
+                  variant="outlined"
+                  autoComplete="off"
                 />
               </TableCell>
               <TableCell />
@@ -248,6 +245,8 @@ function TableAlvara() {
                   id="vencimento"
                   onChange={handleChangeParams}
                   value={params.vencimento}
+                  variant="outlined"
+                  autoComplete="off"
                 />
               </TableCell>
               <TableCell>
@@ -258,6 +257,8 @@ function TableAlvara() {
                   id="valorTotal"
                   onChange={handleChangeParams}
                   value={params.valorTotal}
+                  variant="outlined"
+                  autoComplete="off"
                 />
               </TableCell>
               <TableCell />

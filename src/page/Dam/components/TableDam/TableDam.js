@@ -205,6 +205,8 @@ function TableDam() {
                   id="id"
                   onChange={handleChangeParams}
                   value={params.id}
+                  variant="outlined"
+                  autoComplete="off"
                 />
               </TableCell>
               <TableCell>
@@ -216,16 +218,21 @@ function TableDam() {
                   id="receita"
                   onChange={handleChangeParams}
                   value={params.receita}
+                  variant="outlined"
+                  autoComplete="off"
                 />
               </TableCell>
               <TableCell>
                 <TextField
+                  disabled
                   type="date"
                   className={classes.searchEmitido}
                   size="small"
                   id="emissao"
                   onChange={handleChangeParams}
                   value={params.emissao}
+                  variant="outlined"
+                  autoComplete="off"
                 />
               </TableCell>
               <TableCell>
@@ -235,6 +242,8 @@ function TableDam() {
                   id="contribuinte"
                   onChange={handleChangeParams}
                   value={params.contribuinte}
+                  variant="outlined"
+                  autoComplete="off"
                 />
               </TableCell>
               <TableCell />
@@ -246,6 +255,8 @@ function TableDam() {
                   id="vencimento"
                   onChange={handleChangeParams}
                   value={params.vencimento}
+                  variant="outlined"
+                  autoComplete="off"
                 />
               </TableCell>
               <TableCell>
@@ -256,6 +267,8 @@ function TableDam() {
                   id="valorTotal"
                   onChange={handleChangeParams}
                   value={params.valorTotal}
+                  variant="outlined"
+                  autoComplete="off"
                 />
               </TableCell>
               <TableCell />

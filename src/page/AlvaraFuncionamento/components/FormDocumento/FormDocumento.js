@@ -26,11 +26,11 @@ function FormDocumento() {
     emissao: isEdit ? document.emissao : new Date().toISOString(),
     receita: receitaSeleted.cod,
     docOrigem: '',
-    infoAdicionais: '',
+    infoAdicionais: isEdit ? document.infoAdicionais : '',
     juros: 0,
     valorMulta: 0,
     taxaExp: 5,
-    valorPrincipal: 0
+    valorPrincipal: isEdit ? document.valorPrincipal : 0
   };
 
   const loadDocument = setDocument({

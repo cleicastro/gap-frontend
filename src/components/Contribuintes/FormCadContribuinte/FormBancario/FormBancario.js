@@ -13,7 +13,7 @@ function FormBancario() {
   const { control, register, setValue, watch } = useFormContext();
 
   const [isDisabledConta, setisDisabledConta] = useState(
-    watch('tipoConta') === ''
+    watch('tipoConta') !== ''
   );
 
   function onChangeHandler(e) {

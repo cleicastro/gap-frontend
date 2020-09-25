@@ -141,6 +141,7 @@ function Contribuintes(props) {
                         id="id"
                         onChange={handleParams}
                         variant="outlined"
+                        autoComplete="off"
                       />
                     </TableCell>
                     <TableCell>
@@ -151,6 +152,7 @@ function Contribuintes(props) {
                         id="doc"
                         onChange={handleParams}
                         variant="outlined"
+                        autoComplete="off"
                       />
                     </TableCell>
                     <TableCell>
@@ -160,8 +162,9 @@ function Contribuintes(props) {
                         size="small"
                         id="nome"
                         onChange={handleParams}
-                        variant="outlined"
                         fullWidth
+                        variant="outlined"
+                        autoComplete="off"
                       />
                     </TableCell>
                     <TableCell>
@@ -170,8 +173,9 @@ function Contribuintes(props) {
                         size="small"
                         id="tipo"
                         onChange={handleParams}
-                        variant="outlined"
                         fullWidth
+                        variant="outlined"
+                        autoComplete="off"
                       />
                     </TableCell>
                     <TableCell>
@@ -180,8 +184,9 @@ function Contribuintes(props) {
                         size="small"
                         id="enderecoCidade"
                         onChange={handleParams}
-                        variant="outlined"
                         fullWidth
+                        variant="outlined"
+                        autoComplete="off"
                       />
                     </TableCell>
                   </TableRow>

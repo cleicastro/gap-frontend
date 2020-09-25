@@ -15,7 +15,7 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import { useFormContext } from 'react-hook-form';
 
 import { useSearchCNPJ } from '../../../../hooks';
-import { mascaraCPF, mascaraCNPJ } from '../../../../util';
+import { mascaraCPF, mascaraCNPJ, mascaraCEP } from '../../../../util';
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -67,7 +67,7 @@ function FormInfoPessoais() {
           );
 
           setValue('endereco', dataCnpj.address.street);
-          setValue('cep', dataCnpj.address.zip);
+          setValue('cep', mascaraCEP(dataCnpj.address.zip));
           setValue('uf', dataCnpj.address.state);
           setValue('cidade', dataCnpj.address.city);
           setValue('numero', dataCnpj.address.number);
@@ -117,7 +117,9 @@ function FormInfoPessoais() {
           name="tipo"
           onChange={onChangeHandlerTypeAcount}>
           <FormControlLabel
-            control={<Radio checked={watch('tipo') === 'PF'} />}
+            control={
+              <Radio checked={watch('tipo') === 'PF' || watch('tipo') === ''} />
+            }
             value="PF"
             label="CPF"
             inputRef={register}

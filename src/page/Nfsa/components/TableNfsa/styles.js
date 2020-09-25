@@ -5,18 +5,15 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 700
   },
   searchNDam: {
-    width: '5ch'
+    width: '8ch'
   },
-  searchReceita: {
-    width: '10ch'
+  searchTomador: {
+    width: '30ch'
   },
-  searchEmitido: {
-    width: '16ch'
+  searchPrestador: {
+    width: '30ch'
   },
-  searchContribuinte: {
-    width: '18ch'
-  },
-  searchVencimento: {
+  searchEmissao: {
     width: '16ch'
   },
   searchValor: {
@@ -27,6 +24,7 @@ const useStyles = makeStyles((theme) => ({
     border: 0,
     boxShadow: 'none'
   },
+
   btnCancelado: {
     color: theme.palette.disable.main,
     border: 0,

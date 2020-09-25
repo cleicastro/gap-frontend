@@ -10,16 +10,16 @@ const useStyles = makeStyles((theme) => ({
     width: '5ch'
   },
   searchReceita: {
-    width: '10ch'
+    width: '15ch'
   },
   searchEmitido: {
     width: '16ch'
   },
   searchContribuinte: {
-    width: '18ch'
+    width: '30ch'
   },
   searchVencimento: {
-    width: '16ch'
+    width: '20ch'
   },
   searchValor: {
     width: '7ch'

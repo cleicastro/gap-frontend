@@ -203,39 +203,47 @@ function TableNfsa() {
                   id="id"
                   name="id"
                   value={params.id}
+                  variant="outlined"
+                  autoComplete="off"
                 />
               </TableCell>
               <TableCell>
                 <TextField
                   onChange={handleChangeParams}
                   type="text"
-                  className={classes.searchReceita}
+                  className={classes.searchPrestador}
                   size="small"
                   id="contribuinte"
                   name="contribuinte"
                   value={params.contribuinte}
+                  variant="outlined"
+                  autoComplete="off"
                 />
               </TableCell>
               <TableCell>
                 <TextField
                   onChange={handleChangeParams}
-                  className={classes.searchEmitido}
+                  className={classes.searchTomador}
                   size="small"
                   id="nameTomadorFilter"
                   name="nameTomadorFilter"
                   value={params.nameTomadorFilter}
+                  variant="outlined"
+                  autoComplete="off"
                 />
               </TableCell>
               <TableCell>
                 <TextField
                   onChange={handleChangeParams}
                   type="date"
-                  className={classes.searchContribuinte}
+                  className={classes.searchEmissao}
                   size="small"
                   id="emissao"
                   name="emissao"
                   disabled
                   value={params.emissao}
+                  variant="outlined"
+                  autoComplete="off"
                 />
               </TableCell>
               <TableCell />
@@ -243,11 +251,13 @@ function TableNfsa() {
                 <TextField
                   type="number"
                   onChange={handleChangeParams}
-                  className={classes.searchVencimento}
+                  className={classes.searchValor}
                   size="small"
                   id="valorCalculo"
                   name="valorCalculo"
                   value={params.valorCalculo}
+                  variant="outlined"
+                  autoComplete="off"
                 />
               </TableCell>
               <TableCell>

@@ -7,19 +7,16 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 700
   },
   searchNDam: {
-    width: '5ch'
-  },
-  searchReceita: {
-    width: '10ch'
+    width: '8ch'
   },
   searchEmitido: {
-    width: '16ch'
+    width: '21ch'
   },
   searchContribuinte: {
-    width: '18ch'
+    width: '30ch'
   },
   searchVencimento: {
-    width: '16ch'
+    width: '21ch'
   },
   searchValor: {
     width: '7ch'

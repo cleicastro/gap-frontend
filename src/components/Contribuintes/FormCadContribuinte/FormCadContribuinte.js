@@ -45,11 +45,11 @@ function FormCadContribuinte({ closeWindow, contribuinteSelected }) {
   const saveContribuinte = useSaveContribuinte();
   const editContribuinte = useEditContribuinte();
   const methods = useForm({
-    defaultValues: contribuinteSelected || { tipo: 'PF', tipoConta: '' },
+    defaultValues: contribuinteSelected,
     resolver: yupResolver(contribuinteSchemma)
   });
 
-  const { setValue } = methods;
+  const { setValue, reset } = methods;
 
   useEffect(() => {
     if (contribuinteSelected.doc) {
@@ -195,6 +195,13 @@ function FormCadContribuinte({ closeWindow, contribuinteSelected }) {
     }
   };
 
+  const handleCloseFormContribuinte = () => {
+    reset();
+    closeWindow();
+    setActiveStep(0);
+    setMessage({});
+  };
+
   return (
     <div className={classes.root}>
       <AlertShow messageProps={message} />
@@ -259,7 +266,7 @@ function FormCadContribuinte({ closeWindow, contribuinteSelected }) {
               <Button
                 disabled={loading}
                 type="button"
-                onClick={closeWindow}
+                onClick={handleCloseFormContribuinte}
                 variant="contained"
                 color="secondary"
                 size="small"

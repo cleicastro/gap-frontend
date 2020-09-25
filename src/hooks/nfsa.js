@@ -93,34 +93,6 @@ function initialTributosNfsa() {
   };
 }
 
-function initialValuesTributos() {
-  return {
-    aliquotaIss: 5,
-    uf: 'PA',
-    municipio: 'Irituia',
-    converterIRRF: false,
-    irRetido: true,
-    baseCalculo: 0,
-    valorDeducao: 0,
-    irPercente: 0,
-    pisPercente: 0,
-    inssPercente: 0,
-    confinsPercente: 0,
-    csllPercente: 0,
-
-    taxaExp: 5,
-    valorISS: 0,
-    irValorCalc: 0,
-    irValor: 0,
-    pisValor: 0,
-    inssValor: 0,
-    confinsValor: 0,
-    csllValor: 0,
-    descontoIncodicional: 0,
-    valorNF: 0
-  };
-}
-
 function calcTributsNfsa(baseCalc, data, tableIR) {
   const {
     irRetido,
@@ -255,12 +227,6 @@ function tableIrAction(table) {
   return {
     type: ACTIONS_NFSA.TABLE_IR,
     payload: table
-  };
-}
-function initialNfsaAction(nfsa) {
-  return {
-    type: ACTIONS_NFSA.LIST_INITIAL,
-    payload: nfsa
   };
 }
 function addNfsaAction(nfsa) {
@@ -433,7 +399,6 @@ export const usePaginationNfsa = () => {
 
 export const useFilterNfsa = () => {
   const [statusServer, setStatusServer] = useState(null);
-  const dispatch = useDispatch();
   const { dispatch: dispatchNfsa } = useContext(NfsaContext);
 
   function setFilter(params) {
@@ -640,7 +605,7 @@ export const useItemsNfsa = () => {
 
 export const useInitialTributosNfsa = () => {
   const {
-    state: { dataNfsa, dataItemNfsa, document }
+    state: { dataNfsa, dataItemNfsa }
   } = useContext(NfsaContext);
   const data = dataNfsa;
   const tableIR = useSelector((state) => state.nfsa.tableIR);

@@ -29,7 +29,6 @@ import {
 } from '../../../../util';
 import { useStepNfsa, usePreviewNfsa } from '../../../../hooks';
 import { useSelector } from 'react-redux';
-import useStoreNfsa from '../../../../hooks/nfsaHooks/useStore';
 
 function PreviewNfsa() {
   const {
@@ -54,7 +53,6 @@ function PreviewNfsa() {
   const setEdit = useEdit();
   const setEditNfsa = useEditNfsa();
   const setSave = useSave();
-  const setSelecetNfsa = useStoreNfsa();
 
   const handleSaveDAM = useCallback(() => {
     setMessage({});
