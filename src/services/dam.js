@@ -19,11 +19,7 @@ class Dam {
       nameContribuinteFilter,
       receitaFilter,
       valorTotalFilter,
-      all,
-      cancelado,
-      inadimplente,
-      pago,
-      vencer,
+      situacaoFilter,
       order,
       sort,
       page
@@ -46,9 +42,7 @@ class Dam {
           docContribuinteFilter,
           nameContribuinteFilter,
           receitaFilter,
-          situacaoFilter: all
-            ? `${all},${pago},${vencer},${inadimplente},${cancelado}`
-            : null,
+          situacaoFilter,
           valorTotalFilter,
           sort: order ? `${order},${sort ? 'asc' : 'desc'}` : null,
           page

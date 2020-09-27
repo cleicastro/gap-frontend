@@ -201,14 +201,15 @@ export const usePaginationAlvara = () => {
 };
 
 export const useFilterAlvara = () => {
-  const [statusServer, setStatusServer] = useState(null);
   const { dispatch } = useContext(AlvaraFuncionamentoContext);
 
   function setParams(params) {
-    setStatusServer(null);
+    dispatch({
+      type: ACTIONS_ALVARA.LIST_INITIAL,
+      payload: { data: [], meta: {} }
+    });
     requestAlvara(params).then((response) => {
       dispatch(initialAlvaraAction(response.data));
-      setStatusServer(response.status);
     });
     dispatch({
       type: ACTIONS_ALVARA.PARAMS_QUERY,
@@ -219,7 +220,7 @@ export const useFilterAlvara = () => {
       tokenAlvara.cancel('Request cancell');
     };
   }
-  return [statusServer, setParams];
+  return setParams;
 };
 
 export const useSaveAlvara = () => {

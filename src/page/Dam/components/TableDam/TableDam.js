@@ -3,8 +3,7 @@ import React, {
   useCallback,
   useContext,
   useMemo,
-  useEffect,
-  useRef
+  useEffect
 } from 'react';
 import {
   TableContainer,
@@ -15,8 +14,6 @@ import {
   TableBody,
   TableFooter,
   IconButton,
-  TableCell,
-  TextField,
   CircularProgress
 } from '@material-ui/core';
 import InfoIcon from '@material-ui/icons/Info';
@@ -56,26 +53,16 @@ const classCaption = (status, days) => {
 
 function TableDam() {
   const classes = useStyles();
-  const timerToClearSomewhere = useRef(false);
   const {
     state: { listDam, pagination, paramsQuery }
   } = useContext(DamContext);
   const setSelecetDam = useStoreDam();
   const setPagination = usePaginationDam();
   // eslint-disable-next-line no-unused-vars
-  const [statusServer, setFilter] = useFilterDam();
+  const setFilter = useFilterDam();
 
   const [order, setOrder] = useState('id');
   const [sort, setSort] = useState(false);
-
-  const [params, setparams] = useState({
-    id: '',
-    receita: '',
-    emissao: '',
-    contribuinte: '',
-    vencimento: '',
-    valorTotal: ''
-  });
 
   const valueTotal = useMemo(
     () =>
@@ -86,30 +73,9 @@ function TableDam() {
   );
 
   useEffect(() => {
-    if (
-      params.id !== '' ||
-      params.receita !== '' ||
-      params.emissao !== '' ||
-      params.contribuinte !== '' ||
-      params.vencimento !== '' ||
-      params.valorTotal !== ''
-    ) {
-      timerToClearSomewhere.current = setTimeout(() => {
-        setFilter(params);
-      }, 500);
-    } else {
-      setFilter({ page: 1 });
-    }
-    return () => {
-      clearTimeout(timerToClearSomewhere.current);
-    };
+    setFilter({ page: 1 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params]);
-
-  function handleChangeParams(event) {
-    const { id, value } = event.target;
-    setparams((values) => ({ ...values, [id]: value }));
-  }
+  }, []);
 
   function handleOrderSort(campo, isDefaultOrder) {
     if (campo === order) {
@@ -195,83 +161,6 @@ function TableDam() {
                 Valor
               </StyledTableCell>
               <StyledTableCell align="right" />
-            </TableRow>
-            <TableRow>
-              <TableCell>
-                <TextField
-                  type="number"
-                  className={classes.searchNDam}
-                  size="small"
-                  id="id"
-                  onChange={handleChangeParams}
-                  value={params.id}
-                  variant="outlined"
-                  autoComplete="off"
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  type="text"
-                  className={classes.searchReceita}
-                  size="small"
-                  receita="receita"
-                  id="receita"
-                  onChange={handleChangeParams}
-                  value={params.receita}
-                  variant="outlined"
-                  autoComplete="off"
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  disabled
-                  type="date"
-                  className={classes.searchEmitido}
-                  size="small"
-                  id="emissao"
-                  onChange={handleChangeParams}
-                  value={params.emissao}
-                  variant="outlined"
-                  autoComplete="off"
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  className={classes.searchContribuinte}
-                  size="small"
-                  id="contribuinte"
-                  onChange={handleChangeParams}
-                  value={params.contribuinte}
-                  variant="outlined"
-                  autoComplete="off"
-                />
-              </TableCell>
-              <TableCell />
-              <TableCell>
-                <TextField
-                  type="date"
-                  className={classes.searchVencimento}
-                  size="small"
-                  id="vencimento"
-                  onChange={handleChangeParams}
-                  value={params.vencimento}
-                  variant="outlined"
-                  autoComplete="off"
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  type="number"
-                  className={classes.searchValor}
-                  size="small"
-                  id="valorTotal"
-                  onChange={handleChangeParams}
-                  value={params.valorTotal}
-                  variant="outlined"
-                  autoComplete="off"
-                />
-              </TableCell>
-              <TableCell />
             </TableRow>
           </TableHead>
           <TableBody>

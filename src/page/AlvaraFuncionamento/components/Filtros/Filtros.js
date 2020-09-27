@@ -23,7 +23,7 @@ function Filtros({ handleSair, showFiltro }) {
   } = useContext(AlvaraFuncionamentoContext);
 
   // eslint-disable-next-line no-unused-vars
-  const [statusServer, setFilter] = useFilterAlvara();
+  const setFilter = useFilterAlvara();
 
   const methods = useForm();
 
@@ -33,7 +33,8 @@ function Filtros({ handleSair, showFiltro }) {
   const handleClearFilter = useCallback(() => {
     setFilter({});
     methods.reset();
-  }, [methods, setFilter]);
+    handleSair();
+  }, [handleSair, methods, setFilter]);
 
   const setParams = (data) => {
     const filter = { ...data, receitaFilter: receitaSeleted.cod };

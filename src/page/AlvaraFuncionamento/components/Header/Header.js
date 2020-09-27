@@ -9,9 +9,10 @@ import {
 } from '@material-ui/core';
 import {
   Print as PrintIcon,
-  FilterList as FilterListIcon,
+  PeopleAltRounded as FilterListIcon,
   ViewList as ViewListIcon,
-  Search as SearchIcon
+  Search as SearchIcon,
+  FindReplace as ClearIcon
 } from '@material-ui/icons';
 
 import useStyles from './styles';
@@ -23,7 +24,7 @@ function Header({ handleViewTable, handleViewFilter }) {
   const timerToClearSomewhere = useRef(false);
   const [listAlvara, valueTotal] = useStoreAlvara();
   const [params, setParams] = useState('');
-  const [statusServer, setFilter] = useFilterAlvara();
+  const setFilter = useFilterAlvara();
   const {
     state: { paramsQuery }
   } = useContext(AlvaraFuncionamentoContext);
@@ -31,7 +32,7 @@ function Header({ handleViewTable, handleViewFilter }) {
   useEffect(() => {
     if (params.length > 0 && params.length > 5) {
       timerToClearSomewhere.current = setTimeout(() => {
-        setFilter({ contribuinte: params });
+        setFilter({ ...paramsQuery, contribuinte: params });
       }, 500);
     } else if (Object.keys(paramsQuery).length > 0 && params === '') {
       setFilter({});
@@ -41,6 +42,11 @@ function Header({ handleViewTable, handleViewFilter }) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
+
+  const handleClearFilters = () => {
+    setFilter({});
+    setParams('');
+  };
 
   return (
     <Paper className={classes.paper} justify="space-between">
@@ -54,7 +60,7 @@ function Header({ handleViewTable, handleViewFilter }) {
         <Grid item>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
-              <SearchIcon />
+              <FilterListIcon />
             </div>
             <InputBase
               id="fastSearch"
@@ -76,7 +82,14 @@ function Header({ handleViewTable, handleViewFilter }) {
             size="small"
             aria-label="Filtros"
             className={classes.iconMenu}>
-            <FilterListIcon />
+            <SearchIcon />
+          </IconButton>
+          <IconButton
+            onClick={handleClearFilters}
+            size="small"
+            aria-label="Clean Filter"
+            className={classes.iconMenu}>
+            <ClearIcon />
           </IconButton>
           <IconButton
             onClick={handleViewTable}

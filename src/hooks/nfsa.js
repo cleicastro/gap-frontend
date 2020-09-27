@@ -398,25 +398,26 @@ export const usePaginationNfsa = () => {
 };
 
 export const useFilterNfsa = () => {
-  const [statusServer, setStatusServer] = useState(null);
   const { dispatch: dispatchNfsa } = useContext(NfsaContext);
 
   function setFilter(params) {
-    setStatusServer(null);
+    dispatchNfsa({
+      type: ACTIONS_NFSA_CONTEXT.LIST_INITIAL,
+      payload: { data: [], meta: {} }
+    });
     requestNfsa(params).then((response) => {
       dispatchNfsa({ type: ACTIONS_NFSA_CONTEXT.LIST_INITIAL, payload: response.data });
       dispatchNfsa({
         type: ACTIONS_NFSA_CONTEXT.PARAMS_QUERY,
         payload: params
       });
-      setStatusServer(response.status);
     });
 
     return () => {
       tokenNfsa.cancel('Request cancell');
     };
   }
-  return [statusServer, setFilter];
+  return setFilter;
 };
 
 export const useSaveNfsa = () => {

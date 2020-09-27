@@ -4,7 +4,6 @@ import React, {
   useContext,
   useCallback,
   useEffect,
-  useRef
 } from 'react';
 
 import {
@@ -12,8 +11,6 @@ import {
   Table,
   TableHead,
   TableRow,
-  TableCell,
-  TextField,
   TableBody,
   IconButton,
   TableFooter,
@@ -68,17 +65,7 @@ function TableNfsa() {
   const [sort, setSort] = useState(false);
 
   const classes = useStyles();
-  const timerToClearSomewhere = useRef(false);
 
-  const [params, setparams] = useState({
-    id: '',
-    receita: '',
-    emissao: '',
-    contribuinte: '',
-    nameTomadorFilter: '',
-    vencimento: '',
-    valorCalculo: ''
-  });
   const valueTotal = useMemo(
     () =>
       listNfsa.reduce((acc, nfsa) => {
@@ -87,33 +74,12 @@ function TableNfsa() {
     [listNfsa]
   );
   // eslint-disable-next-line no-unused-vars
-  const [statusServer, setFilter] = useFilterNfsa();
+  const setFilter = useFilterNfsa();
 
   useEffect(() => {
-    if (
-      params.id !== '' ||
-      params.receita !== '' ||
-      params.contribuinte !== '' ||
-      params.nameTomadorFilter !== '' ||
-      params.vencimento !== '' ||
-      params.valorCalculo !== ''
-    ) {
-      timerToClearSomewhere.current = setTimeout(() => {
-        setFilter({ ...params });
-      }, 500);
-    } else {
-      setFilter({ page: 1 });
-    }
-    return () => {
-      clearTimeout(timerToClearSomewhere.current);
-    };
+    setFilter({ page: 1 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params]);
-
-  function handleChangeParams(event) {
-    const { id, value } = event.target;
-    setparams((values) => ({ ...values, [id]: value }));
-  }
+  }, []);
 
   function handleOrderSort(campo, isDefaultOrder) {
     if (campo === order) {
@@ -192,86 +158,6 @@ function TableNfsa() {
                 Valor da NF
               </StyledTableCell>
               <StyledTableCell align="right" />
-            </TableRow>
-            <TableRow>
-              <TableCell>
-                <TextField
-                  onChange={handleChangeParams}
-                  type="number"
-                  className={classes.searchNDam}
-                  size="small"
-                  id="id"
-                  name="id"
-                  value={params.id}
-                  variant="outlined"
-                  autoComplete="off"
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  onChange={handleChangeParams}
-                  type="text"
-                  className={classes.searchPrestador}
-                  size="small"
-                  id="contribuinte"
-                  name="contribuinte"
-                  value={params.contribuinte}
-                  variant="outlined"
-                  autoComplete="off"
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  onChange={handleChangeParams}
-                  className={classes.searchTomador}
-                  size="small"
-                  id="nameTomadorFilter"
-                  name="nameTomadorFilter"
-                  value={params.nameTomadorFilter}
-                  variant="outlined"
-                  autoComplete="off"
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  onChange={handleChangeParams}
-                  type="date"
-                  className={classes.searchEmissao}
-                  size="small"
-                  id="emissao"
-                  name="emissao"
-                  disabled
-                  value={params.emissao}
-                  variant="outlined"
-                  autoComplete="off"
-                />
-              </TableCell>
-              <TableCell />
-              <TableCell>
-                <TextField
-                  type="number"
-                  onChange={handleChangeParams}
-                  className={classes.searchValor}
-                  size="small"
-                  id="valorCalculo"
-                  name="valorCalculo"
-                  value={params.valorCalculo}
-                  variant="outlined"
-                  autoComplete="off"
-                />
-              </TableCell>
-              <TableCell>
-                {/* <TextField
-                  onChange={handleChangeParams}
-                  type="number"
-                  className={classes.searchValor}
-                  size="small"
-                  id="valorNota"
-                  name="valorNota"
-                  value={params.valorNota}
-                /> */}
-              </TableCell>
-              <TableCell />
             </TableRow>
           </TableHead>
           <TableBody>

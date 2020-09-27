@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useContext } from 'react';
 
 import Axios from 'axios';
 import { Dam } from '../services';
@@ -18,14 +18,15 @@ function initialDamsAction(dam) {
 }
 
 export const useFilterDam = () => {
-  const [statusServer, setStatusServer] = useState(null);
   const { dispatch } = useContext(DamContext);
 
   function setParams(params) {
-    setStatusServer(null);
+    dispatch({
+      type: ACTIONS_DAM_CONTEXT.LIST_INITIAL,
+      payload: { data: [], meta: {} }
+    });
     requestDam(params).then((response) => {
       dispatch(initialDamsAction(response.data));
-      setStatusServer(response.status);
     });
     dispatch({
       type: ACTIONS_DAM_CONTEXT.PARAMS_QUERY,
@@ -36,7 +37,7 @@ export const useFilterDam = () => {
       tokenDam.cancel('Request cancell');
     };
   }
-  return [statusServer, setParams];
+  return setParams;
 };
 
 export const usePreviewDam = () => {

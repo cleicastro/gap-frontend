@@ -17,7 +17,7 @@ import { useFilterNfsa } from '../../../../hooks';
 function Filtros({ handleSair, showFiltro }) {
   const classes = useStyles();
   // eslint-disable-next-line no-unused-vars
-  const [statusServer, setFilter] = useFilterNfsa();
+  const setFilter = useFilterNfsa();
 
   const methods = useForm();
 
@@ -27,7 +27,8 @@ function Filtros({ handleSair, showFiltro }) {
   const handleClearFilter = useCallback(() => {
     setFilter({});
     methods.reset();
-  }, [methods, setFilter]);
+    handleSair();
+  }, [handleSair, methods, setFilter]);
 
   const setParams = (data) => {
     const filter = { ...data };

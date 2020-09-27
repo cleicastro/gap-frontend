@@ -69,7 +69,7 @@ function Filtros({ className, handleSair, showFiltro, ...rest }) {
   const rightChecked = intersection(checked, right);
 
   // eslint-disable-next-line no-unused-vars
-  const [statusServer, setFilter] = useFilterDam();
+  const setFilter = useFilterDam();
   const [receitas] = useStoreReceita();
 
   const methods = useForm();
@@ -123,6 +123,7 @@ function Filtros({ className, handleSair, showFiltro, ...rest }) {
     setRight([]);
     setFilter({});
     methods.reset();
+    handleSair();
   };
   const setParams = (data) => {
     const filter = { ...data, receitaFilter: right.join(',') };

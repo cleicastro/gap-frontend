@@ -7,7 +7,8 @@ import {
   Slider,
   TextField,
   Grid,
-  Checkbox
+  RadioGroup,
+  Radio
 } from '@material-ui/core';
 import { useFormContext } from 'react-hook-form';
 
@@ -21,13 +22,6 @@ function FormFilter() {
   } = useContext(AlvaraFuncionamentoContext);
 
   const classes = useStyles();
-  const [selectedSituacao, setSelectedSituacao] = useState({
-    pago: true,
-    vencer: true,
-    inadimplente: true,
-    cancelado: true,
-    all: true
-  });
 
   const [valueSlide, setValueSlide] = useState([0, 1000]);
 
@@ -38,13 +32,7 @@ function FormFilter() {
     setValue('docContribuinteFilter', paramsQuery.docContribuinteFilter);
     setValue('nameContribuinteFilter', paramsQuery.nameContribuinteFilter);
     setValue('valorTotalFilter', paramsQuery.valorTotalFilter);
-    setSelectedSituacao({
-      pago: paramsQuery.pago || true,
-      vencer: paramsQuery.vencer || true,
-      inadimplente: paramsQuery.inadimplente || true,
-      cancelado: paramsQuery.cancelado || true,
-      all: paramsQuery.all || true
-    });
+    setValue('situacaoFilter', paramsQuery.situacaoFilter);
     setValueSlide(
       paramsQuery.valorTotalFilter
         ? paramsQuery.valorTotalFilter.split(',').map(Number)
@@ -55,20 +43,6 @@ function FormFilter() {
   const handleChangeSlide = (event, newValue) => {
     setValueSlide(newValue);
     setValue('valorTotalFilter', newValue);
-  };
-  const handleChangeCheckboxSituacao = (event) => {
-    const { name, checked } = event.target;
-    setSelectedSituacao(
-      name === 'all'
-        ? {
-          pago: checked,
-          vencer: checked,
-          inadimplente: checked,
-          cancelado: checked,
-          all: checked
-        }
-        : { ...selectedSituacao, all: false, [name]: checked }
-    );
   };
 
   return (
@@ -139,63 +113,44 @@ function FormFilter() {
           control={control}
         />
       </FormGroup>
-      <FormGroup row>
+      <RadioGroup
+        row
+        aria-label="situacao"
+        name="situacaoFilter"
+        defaultValue={
+          paramsQuery.situacaoFilter ? paramsQuery.situacaoFilter : 'todos'
+        }>
         <FormControlLabel
           inputRef={register}
-          control={
-            <Checkbox
-              checked={selectedSituacao.pago}
-              onChange={handleChangeCheckboxSituacao}
-              name="pago"
-            />
-          }
+          value="pago"
+          control={<Radio color="secondary" />}
           label="Pago"
         />
         <FormControlLabel
           inputRef={register}
-          control={
-            <Checkbox
-              checked={selectedSituacao.vencer}
-              onChange={handleChangeCheckboxSituacao}
-              name="vencer"
-            />
-          }
+          value="vencer"
+          control={<Radio color="secondary" />}
           label="À Vencer"
         />
         <FormControlLabel
           inputRef={register}
-          control={
-            <Checkbox
-              checked={selectedSituacao.inadimplente}
-              onChange={handleChangeCheckboxSituacao}
-              name="inadimplente"
-            />
-          }
+          value="inadimplente"
+          control={<Radio color="secondary" />}
           label="Inadimplente"
         />
         <FormControlLabel
           inputRef={register}
-          control={
-            <Checkbox
-              checked={selectedSituacao.cancelado}
-              onChange={handleChangeCheckboxSituacao}
-              name="cancelado"
-            />
-          }
+          value="cancelado"
+          control={<Radio color="secondary" />}
           label="Cancelado"
         />
         <FormControlLabel
           inputRef={register}
-          control={
-            <Checkbox
-              checked={selectedSituacao.all}
-              onChange={handleChangeCheckboxSituacao}
-              name="all"
-            />
-          }
+          value="todos"
+          control={<Radio color="secondary" />}
           label="Todos"
         />
-      </FormGroup>
+      </RadioGroup>
       <FormGroup row style={{ marginTop: 15 }}>
         <Typography id="range-slider" gutterBottom>
           Valor do DAM
