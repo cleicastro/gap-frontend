@@ -71,6 +71,7 @@ export const nfsaContextReducer = (state, action) => {
         if (nfsa.id === payload.id) {
           const newValues = {
             ...payload,
+            items_nfsa: payload.items,
             valor_calculo: payload.baseCalculo,
             valor_nota: payload.valorNF
           };
