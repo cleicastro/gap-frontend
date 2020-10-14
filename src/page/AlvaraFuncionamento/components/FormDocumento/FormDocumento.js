@@ -22,11 +22,13 @@ function FormDocumento() {
   const [stepActivity, setStepActivity] = useStepAlvara();
   const setDocument = useDocument();
 
+  const infoAdAuto = `REFERENTE AO ALVARÁ DE FUNCIONAMENTO DE ${new Date().getFullYear()}`;
+
   const documentInitial = {
     emissao: isEdit ? document.emissao : new Date().toISOString(),
     receita: receitaSeleted.cod,
     docOrigem: '',
-    infoAdicionais: isEdit ? document.infoAdicionais : '',
+    infoAdicionais: isEdit ? document.infoAdicionais : infoAdAuto,
     juros: 0,
     valorMulta: 0,
     taxaExp: 5,

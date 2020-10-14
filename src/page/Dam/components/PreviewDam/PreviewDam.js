@@ -85,6 +85,15 @@ export default function PreviewDam() {
     });
   };
 
+  const handleEditDam = useCallback(() => {
+    dispatch({
+      type: ACTIONS.IS_EDIT,
+      payload: true
+    });
+    setOpenModalMenu(false)
+    setStepActivity(0)
+  }, [dispatch]);
+
   const handleOpenWindow = useCallback(() => {
     dispatch({
       type: ACTIONS.MODAL_NEW_DAM
@@ -202,11 +211,12 @@ export default function PreviewDam() {
           values={{ id_dam: dataDam?.id }}
           handleAlterStatusDAM={handleAlterStatusDAM}
           handleClose={handleOpenWindow}
+          handleEdit={handleEditDam}
           visibleOptions={{
             imprimir: true,
             pagar: !dataDam.pago && dataDam?.status !== 'Cancelado',
             copiar: showModalDetails,
-            editar: showModalDetails,
+            editar: true,
             cancelar: dataDam.status !== 'Cancelado',
             nfsa: false,
             alvara: false,

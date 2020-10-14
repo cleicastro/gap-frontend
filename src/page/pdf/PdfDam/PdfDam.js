@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-
-import { Grid, Typography, CircularProgress } from '@material-ui/core';
+import IconButton from '@material-ui/core/IconButton';
+import PhotoCamera from '@material-ui/icons/Print';
+import { Grid, Typography, CircularProgress, Box } from '@material-ui/core';
 import Axios from 'axios';
 import {
   A4,
@@ -298,6 +299,15 @@ function PdfDam() {
 
   return (
     <div className={classes.root}>
+      <Box displayPrint="none">
+        <IconButton
+          color="primary"
+          aria-label="upload picture"
+          component="span"
+          onClick={() => window.print()}>
+          <PhotoCamera />
+        </IconButton>
+      </Box>
       <A4>
         {dam.status === 'Pago' && (
           <MarcaDAgua>

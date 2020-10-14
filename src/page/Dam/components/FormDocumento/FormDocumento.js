@@ -18,11 +18,55 @@ function FormDocumento() {
   } = useContext(DamContext);
   const setDocument = useDocument();
 
+  let infoAdAuto = null;
+
+  switch (receitaSeleted.cod) {
+    case '1121290000':
+      infoAdAuto = 'REFERENTE AO ALVARÁ DE CONSTRUÇÃO';
+      break;
+    case '1121250200':
+      infoAdAuto = `REFERENTE AO ALVARÁ DE TRÁFEGO DO ANO DE ${new Date().getFullYear()}`;
+      break;
+    case '1121250100':
+      infoAdAuto = `REFERENTE AO ALVARÁ DE TRÁFEGO DO ANO DE ${new Date().getFullYear()}`;
+      break;
+    case '1121250300':
+      infoAdAuto = `REFERENTE AO ALVARÁ DE TRÁFEGO DE ÔNIBUS DO ANO DE ${new Date().getFullYear()}`;
+      break;
+    case '1121250000':
+      infoAdAuto = `REFERENTE AO ALVARÁ DE FUNCIONAMENTO DE ${new Date().getFullYear()}`;
+      break;
+    case '1112043102':
+      infoAdAuto = `REFERENTE AO RECOLHIMENTO DO IRRF `;
+      break;
+    case '1112080000':
+      infoAdAuto = `REFERENTE AO RECOLHIMENTO DE ITBI`;
+      break;
+    case '1122290000':
+      infoAdAuto = `REFERENTE A CERTIDÃO NEGATIVA DE DÉBITO`;
+      break;
+    case '1122900000':
+      infoAdAuto = `REFERENTE A AUTORIZAÇÃO DE EMISSÃO DE BLOCO DE NOTAS`;
+      break;
+    case '1121300000':
+      infoAdAuto = `REFERENTE A AUTORIZAÇÃO DE PLAQUEAMENTO`;
+      break;
+    case '1122280000':
+      infoAdAuto = `REFERENTE A CERTIDÃO DE SEPULTURA`;
+      break;
+    case '1113050102':
+      infoAdAuto = `REFERENTE AO RECOLHIMETO DE ISS DO MÊS DE `;
+      break;
+    default:
+      infoAdAuto = '';
+      break;
+  }
+
   const documentInitial = {
     emissao: isEdit ? document.emissao : new Date().toISOString(),
     receita: receitaSeleted.cod,
     docOrigem: '',
-    infoAdicionais: '',
+    infoAdicionais: infoAdAuto,
     juros: 0,
     valorMulta: 0,
     taxaExp: Number(receitaSeleted.valor_fixo) > 0 ? 0 : 5,

@@ -8,6 +8,7 @@ export const ACTIONS = {
   LIST_INITIAL: 'LIST_INITIAL',
   ADD: 'NFSA_ADD',
   UPDATE_NFSA: 'NFSA_UPDATE',
+  IS_EDIT: 'IS_EDIT_NFSA',
   MODAL_NEW_NFSA: 'MODAL_NEW_NFSA',
   MODAL_DETAILS: 'MODAL_DETAILS',
   MODAL_CONTRIBUINTES: 'MODAL_CONTRIBUINTES_NFSA',
@@ -124,6 +125,11 @@ export const nfsaContextReducer = (state, action) => {
         showModalDetails: action.payload
       };
 
+    case ACTIONS.IS_EDIT:
+      return {
+        ...state,
+        isEdit: action.payload
+      };
     case ACTIONS.MODAL_NEW_NFSA:
       return {
         ...state,

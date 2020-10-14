@@ -1,14 +1,30 @@
-/* eslint-disable import/no-unresolved */
 import React, { useEffect, useState } from 'react';
-import { PDFViewer, Page, Document } from '@react-pdf/renderer';
-import { CircularProgress, Grid, Typography } from '@material-ui/core';
 import Axios from 'axios';
+import IconButton from '@material-ui/core/IconButton';
+import PhotoCamera from '@material-ui/icons/Print';
 
+import { Grid, CircularProgress, Typography, Box } from '@material-ui/core';
 import { AlvaraFuncionamento } from '../../../services';
-import { styles, useStyles } from './styles';
-import { Section } from './components';
 
-const PdfAlvara = () => {
+import {
+  Container,
+  A4,
+  ContainerAlvara,
+  ContainerHeader,
+  ContainerBody,
+  ContainerFooter,
+  Assignature,
+  Title,
+  SubTitle,
+  TextValidate,
+  TextObs,
+  TextContainer,
+  TextALvaraItem,
+  TextFooter,
+  useStyles
+} from './styles';
+
+function PdfAlvara() {
   const classes = useStyles();
   const path = window.location.pathname.split('/');
   const id = Number(path[3]);
@@ -55,7 +71,7 @@ const PdfAlvara = () => {
         className={classes.root}>
         <Grid item>
           <Typography>
-            FALHA AO CARREGAR OS DADOS, TENTE NOVAMENTE MAIS TARDE!
+            FALHA AO CARREGAR OS DADOS, ATUALIZE A PÁGINA!
           </Typography>
         </Grid>
       </Grid>
@@ -63,14 +79,110 @@ const PdfAlvara = () => {
   }
 
   return (
-    <PDFViewer style={styles.container}>
-      <Document>
-        <Page size="A4" style={classes.page}>
-          <Section alvara={alvara} />
-        </Page>
-      </Document>
-    </PDFViewer>
+    <Container>
+      <Box displayPrint="none">
+        <IconButton
+          color="primary"
+          aria-label="upload picture"
+          component="span"
+          onClick={() => window.print()}>
+          <PhotoCamera />
+        </IconButton>
+      </Box>
+      <A4>
+        <ContainerAlvara>
+          <ContainerHeader>
+            <img
+              src="/images/logos/logo.png"
+              width="190"
+              height="120"
+              border="0"
+              align="center"
+              alt="logo"
+            />
+            <Title>ALVARÁ</Title>
+            <SubTitle>Funcionamento</SubTitle>
+          </ContainerHeader>
+          <ContainerBody>
+            <div>
+              <TextContainer>Nome ou Razão Social:</TextContainer>
+              <TextALvaraItem>{alvara.dam.contribuinte.nome}</TextALvaraItem>
+            </div>
+            <div>
+              <TextContainer>Nome Fantasia:</TextContainer>
+              <TextALvaraItem>{alvara.nome_fantasia}</TextALvaraItem>
+            </div>
+            <div>
+              <TextContainer>CPF/CNPJ:</TextContainer>
+              <TextALvaraItem>{alvara.dam.contribuinte.doc}</TextALvaraItem>
+            </div>
+            <div>
+              <TextContainer>Atividade Principal:</TextContainer>
+              <TextALvaraItem>{alvara.atividade_principal}</TextALvaraItem>
+            </div>
+            {alvara.atividade_secundaria_I && (
+              <div>
+                <TextContainer>Atividade Secundária I:</TextContainer>
+                <TextALvaraItem>{alvara.atividade_secundaria_I}</TextALvaraItem>
+              </div>
+            )}
+            {alvara.atividade_secundaria_I && (
+              <div>
+                <TextContainer>Atividade Secundária II:</TextContainer>
+                <TextALvaraItem>
+                  {alvara.atividade_secundaria_II}
+                </TextALvaraItem>
+              </div>
+            )}
+            <div>
+              <TextContainer>Inscrição Municipal:</TextContainer>
+              <TextALvaraItem>{alvara.inscricao_municipal}</TextALvaraItem>
+            </div>
+            <div>
+              <TextContainer>Cadastro Econômico:</TextContainer>
+              <TextALvaraItem>{alvara.dam.contribuinte.id}</TextALvaraItem>
+            </div>
+            <div>
+              <TextContainer>Endereço:</TextContainer>
+              <TextALvaraItem>{alvara.endereco}</TextALvaraItem>
+            </div>
+            <div>
+              <TextContainer>Bairro:</TextContainer>
+              <TextALvaraItem>{alvara.bairro}</TextALvaraItem>
+            </div>
+
+            <TextValidate>
+              {`Validade: 01/01/${new Date().getFullYear()} a 
+              31/12/${new Date().getFullYear()}`}
+            </TextValidate>
+
+            <TextObs>
+              <p>
+                OBS: Funcionar dentro das normas estabelecidas por Lei Municipal
+                Nº 240/00.
+              </p>
+              <b>Recomenda-se</b> aos senhores proprietários de sons
+              automotivos, bares e outras fontes sonoras, atendam aos limites da
+              emissão sonora, de acordo com a lei nº 351/2011, sob pena de
+              incorrer em ato de infração à legislação ambiental.
+            </TextObs>
+          </ContainerBody>
+          <ContainerFooter>
+            <Assignature>
+              <span>____________________________</span>
+              <TextFooter>Carmelina de Nazaré M. da Costa</TextFooter>
+              <TextFooter>Prefeita Municipal de Irituia</TextFooter>
+            </Assignature>
+            <Assignature>
+              <span>____________________________</span>
+              <TextFooter>Cleidiane Carvalho Gomes</TextFooter>
+              <TextFooter>Secretária Municipal de Finanças</TextFooter>
+            </Assignature>
+          </ContainerFooter>
+        </ContainerAlvara>
+      </A4>
+    </Container>
   );
-};
+}
 
 export default PdfAlvara;

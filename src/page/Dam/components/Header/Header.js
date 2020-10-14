@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useRef, useContext, useEffect, useState } from 'react';
+import React, { useRef, useContext, useEffect, useState, useMemo } from 'react';
 import {
   Grid,
   Typography,
@@ -25,8 +25,16 @@ function Header({ handleViewTable, handleViewFilter }) {
   const [params, setParams] = useState('');
   const setFilter = useFilterDam();
   const {
-    state: { paramsQuery }
+    state: { paramsQuery, listDam }
   } = useContext(DamContext);
+
+  const valueTotal = useMemo(
+    () =>
+      listDam.reduce((acc, nfsa) => {
+        return acc + Number(nfsa.valor_total);
+      }, 0),
+    [listDam]
+  );
 
   useEffect(() => {
     if (params.length > 0 && params.length > 4) {
@@ -54,7 +62,7 @@ function Header({ handleViewTable, handleViewFilter }) {
           {new Intl.NumberFormat('pt-BR', {
             style: 'currency',
             currency: 'BRL'
-          }).format(0)}
+          }).format(valueTotal)}
         </Typography>
         <Grid item>
           <div className={classes.search}>

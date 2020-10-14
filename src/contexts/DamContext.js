@@ -8,6 +8,7 @@ export const ACTIONS = {
   LIST_INITIAL: 'LIST_INITIAL_DAM',
   ADD: 'ADD_DAM',
   UPDATE_DAM: 'UPDATE_DAM',
+  IS_EDIT: 'IS_EDIT_DAM',
   MODAL_NEW_DAM: 'MODAL_NEW_DAM',
   MODAL_CONTRIBUINTES: 'MODAL_CONTRIBUINTES_DAM',
   MODAL_DETAILS: 'MODAL_DETAILS_DAM',
@@ -114,7 +115,11 @@ export const damContextReducer = (state, action) => {
         openWindowContribuinte: !state.openWindowContribuinte,
         cadastroContribuinte: action.payload
       };
-
+    case ACTIONS.IS_EDIT:
+      return {
+        ...state,
+        isEdit: action.payload
+      };
     case ACTIONS.MODAL_NEW_DAM:
       return {
         ...state,

@@ -35,13 +35,10 @@ export const A4 = styled.div`
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 
   @media print {
-    margin: 0;
+    padding: 10px 20px;
     border: initial;
     border-radius: initial;
-    width: initial;
-    min-height: initial;
-    box-shadow: initial;
-    background: initial;
+    background: white;
     page-break-after: always;
   }
 `;

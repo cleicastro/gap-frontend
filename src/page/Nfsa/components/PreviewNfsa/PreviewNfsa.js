@@ -127,6 +127,15 @@ function PreviewNfsa() {
     [dataNfsa, dataPagamento, dispatch, setEdit]
   );
 
+  const handleEditDam = useCallback(() => {
+    dispatch({
+      type: ACTIONS_NFSA.IS_EDIT,
+      payload: true
+    });
+    setOpenModalMenu(false)
+    setStepActivity(0)
+  }, [dispatch]);
+
   const handlePrevStep = () => setStepActivity(stepActivity - 1);
 
   return (
@@ -268,11 +277,12 @@ function PreviewNfsa() {
           values={{ id_dam: dataNfsa.dam?.id, id: dataNfsa.id }}
           handleAlterStatusDAM={handleAlterStatusDAM}
           handleClose={handleOpenWindow}
+          handleEdit={handleEditDam}
           visibleOptions={{
             imprimir: true,
             pagar: !dataNfsa?.dam?.pago && dataNfsa?.dam?.status !== 'Cancelado',
             copiar: showModalDetails,
-            editar: showModalDetails,
+            editar: true,
             cancelar: dataNfsa?.dam?.status !== 'Cancelado',
             nfsa: true,
             alvara: false,

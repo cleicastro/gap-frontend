@@ -38,6 +38,7 @@ function FormEndereco() {
           inputRef={register}
           error={!!errors.uf}
           helperText={errors.uf && errors.uf.message}
+          inputProps={{ maxLength: 2 }}
         />
       </Grid>
       <Grid item xs={12} sm={6}>

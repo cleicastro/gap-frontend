@@ -11,16 +11,23 @@ import { ButtonStep, FormCompleteContribuinte } from '../../../../components';
 
 function FormContribuinte() {
   const {
-    state: { taxpayerSeleted },
+    state: { taxpayerSeleted, dataAlvaraFuncionamento },
     dispatch
   } = useContext(AlvaraFuncionamentoContext);
   const [stepActivity, setStepActivity] = useStepAlvara();
   const { handleSubmit } = useForm();
 
+  console.log(dataAlvaraFuncionamento);
   const handleInputContribuinte = (values) => {
     if (values.doc && values.doc !== '') {
       dispatch({ type: ACTIONS.SELECT_TAXPAYER, payload: values });
-      dispatch({ type: ACTIONS.SELECT_ALVARA_FUNCIONAMENTO, payload: {} });
+      dispatch({
+        type: ACTIONS.SELECT_ALVARA_FUNCIONAMENTO,
+        payload: {
+          id_dam: dataAlvaraFuncionamento.id_dam,
+          dam: { ...dataAlvaraFuncionamento.dam, contribuinte: values }
+        }
+      });
     } else {
       dispatch({
         type: ACTIONS.MODAL_CONTRIBUINTES,
