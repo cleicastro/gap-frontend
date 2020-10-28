@@ -24,7 +24,8 @@ function FormDocumento() {
     pisValor,
     inssValor,
     confinsValor,
-    csllValor
+    csllValor,
+    taxaExp
   } = dataNfsa;
 
   const valorPrincipal =
@@ -45,7 +46,7 @@ function FormDocumento() {
     infoAdicionais: '',
     juros: 0,
     valorMulta: 0,
-    taxaExp: 5,
+    taxaExp: taxaExp || 5,
     valorPrincipal
   };
   const loadDocument = setDocument({

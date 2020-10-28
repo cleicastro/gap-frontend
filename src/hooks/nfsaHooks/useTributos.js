@@ -19,7 +19,7 @@ function auxCalcTributs(data, tableIR) {
 
 const useTributos = () => {
   const {
-    state: { dataItemNfsa }
+    state: { dataItemNfsa, dataNfsa }
   } = useContext(NfsaContext);
   const tableIR = useSelector((state) => state.nfsa.tableIR);
 
@@ -33,7 +33,7 @@ const useTributos = () => {
     municipio: 'Irituia',
     converterIRRF: false,
     irRetido: true,
-    taxaExp: 5,
+    taxaExp: dataNfsa.taxaExp ? Number(dataNfsa.taxaExp) : 5,
     baseCalculo,
 
     irPercente: 0,

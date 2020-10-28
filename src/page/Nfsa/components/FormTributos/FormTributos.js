@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Typography,
   Grid,
@@ -39,6 +39,9 @@ function FormTributos() {
 
   const [stepActivity, setStepActivity] = useStepNfsa();
   const [tributos, setTributos] = useTributos();
+  const [selectIsentTaxa, setSelectIsentTaxa] = useState(
+    tributos.taxaExp === 0
+  );
   const {
     control,
     register,
@@ -124,6 +127,18 @@ function FormTributos() {
     }
   };
 
+  const handleIsentarTaxaExpedicao = (event) => {
+    const { checked } = event.target;
+    if (checked) {
+      setValue('valorNF', (Number(getValues('valorNF')) + 5).toFixed(2));
+      setValue('taxaExp', 0);
+    } else {
+      setValue('valorNF', (Number(getValues('valorNF')) - 5).toFixed(2));
+      setValue('taxaExp', 5);
+    }
+    setSelectIsentTaxa(checked);
+  };
+
   const onSubmit = (data) => {
     dispatch({
       type: ACTIONS_NFSA.SELECT_NFSA,
@@ -138,6 +153,7 @@ function FormTributos() {
     });
     setStepActivity(stepActivity + 1);
   };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate autoComplete="off">
       <Grid container direction="column" spacing={4}>
@@ -193,7 +209,7 @@ function FormTributos() {
         <Grid item xs={12} sm={12}>
           <Paper elevation={3} style={{ padding: 20 }}>
             <FormControlLabel
-              disabled={!watch('irRetido')}
+              disabled={!watch('irRetido') || selectIsentTaxa}
               control={
                 <Switch
                   defaultChecked={tributos.converterIRRF || false}
@@ -204,6 +220,19 @@ function FormTributos() {
                 />
               }
               label="Base de cálculo para líquido"
+            />
+            <FormControlLabel
+              style={{ marginLeft: 10 }}
+              disabled={watch('converterIRRF')}
+              control={
+                <Switch
+                  checked={selectIsentTaxa}
+                  onChange={handleIsentarTaxaExpedicao}
+                  name="isentarTaxaExpedicao"
+                  color="primary"
+                />
+              }
+              label="Isentar taxa de expedição"
             />
             <Grid container spacing={3}>
               <Grid item xs={12} sm={4} md={3}>
