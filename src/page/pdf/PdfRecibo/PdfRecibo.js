@@ -105,9 +105,9 @@ function PdfRecibo() {
           }).format(nfsa.valor_calculo)}
         </h4>
         <p style={{ textAlign: 'justify' }}>
-          {`Recebi do(a) Prefeitura Municipal de Irituia a importância de ${Intl.NumberFormat(
-            'pt-BR',
-            {
+          {`Recebi do(a) ${
+            nfsa.tomador.nome
+          } a importância de ${Intl.NumberFormat('pt-BR', {
               style: 'currency',
               currency: 'BRL'
             }
