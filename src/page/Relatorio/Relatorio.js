@@ -6,7 +6,7 @@ import CloudDownload from '@material-ui/icons/CloudDownload';
 import useStyles from './styles';
 
 const linkPlanilha =
-  'https://doc-10-4o-docs.googleusercontent.com/docs/securesc/6oaddgob2nrl1rrmvpjnugr4ms7sftsr/4unu9vsddvop7evtsaaqi8sq0ssge5q4/1607918925000/14149179735440945414/14149179735440945414/1CluGxE_htqmuaO_B6sjFv3KTZ1pR-rYL?e=download&authuser=0&nonce=970uh8doks98m&user=14149179735440945414&hash=v9uklls8hs9vb65se6idrdup8v9hu244';
+  'http://pmi.syspalma.com/MOVIMENTO%20FINANCEIRO%202020.xlsx';
 
 const Relatorio = () => {
   const classes = useStyles();
