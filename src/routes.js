@@ -13,7 +13,8 @@ import {
   PdfRecibo as PDFRECIBO,
   PdfAlvara as PDFALVARA,
   User as UserView,
-  AlvaraFuncionamento as AlvaraFuncionamentoView
+  AlvaraFuncionamento as AlvaraFuncionamentoView,
+  Relatorio as RealatorioView
 } from './page';
 import { Main as MainLayout } from './layouts';
 
@@ -56,6 +57,12 @@ const Routes = () => (
         exact
         layout={MainLayout}
         path="/cadastro/user"
+      />
+      <PrivateRoute
+        component={RealatorioView}
+        exact
+        layout={MainLayout}
+        path="/relatorio"
       />
     </Switch>
   </BrowserRouter>

@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import {
   Dashboard as DashboardIcon,
   Apartment as ApartmentIcon,
-  Settings as SettingsIcon,
+  // Settings as SettingsIcon,
   InsertDriveFile as InsertDriveFileIcon,
   BarChartRounded as RelatorioIcon,
   PostAddOutlined as RegisterIcon,
@@ -61,12 +61,12 @@ export default function Sidebar({
           icon: <RegisterIcon />
         }
       ]
+    },
+    {
+      title: 'Relatórios',
+      href: '/relatorio',
+      icon: <RelatorioIcon />
     }
-    // {
-    //   title: 'Relatórios',
-    //   href: '/relatorio',
-    //   icon: <RelatorioIcon />
-    // }
     // {
     //   title: 'Configurações',
     //   href: '/settings',

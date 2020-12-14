@@ -9,3 +9,4 @@ export { default as PdfRecibo } from './pdf/PdfRecibo';
 export { default as PdfAlvara } from './pdf/PdfAlvara';
 export { default as User } from './User';
 export { default as AlvaraFuncionamento } from './AlvaraFuncionamento';
+export { default as Relatorio } from './Relatorio';
