@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import PropTypes, { element } from 'prop-types';
+import PropTypes from 'prop-types';
 import { Bar } from 'react-chartjs-2';
 import {
   Card,
@@ -98,9 +98,9 @@ const GraficBarAnual = (props) => {
         backgroundColor: palette.primary.main,
         data: arrayMonth.map((month) => {
           if (emitido.length > 0) {
-            const result = emitido.find((value) => value.mes === month);
+            const result = emitido.find((value) => Number(value.mes) === month);
             if (result) {
-              return result.value;
+              return Number(result.value);
             }
             return 0;
           }
@@ -112,9 +112,9 @@ const GraficBarAnual = (props) => {
         backgroundColor: palette.success.main,
         data: arrayMonth.map((month) => {
           if (pago.length > 0) {
-            const result = pago.find((value) => value.mes === month);
+            const result = pago.find((value) => Number(value.mes) === month);
             if (result) {
-              return result.value;
+              return Number(result.value);
             }
             return 0;
           }
