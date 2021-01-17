@@ -43,7 +43,7 @@ const TotalContribuintes = ({
               style: 'percent',
               minimumFractionDigits: 0,
               maximumFractionDigits: 0
-            }).format(statistic / 100)}
+            }).format(statistic / value)}
           </Typography>
           <Typography className={classes.caption} variant="caption">
             {footer}

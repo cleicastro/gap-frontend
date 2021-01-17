@@ -17,11 +17,16 @@ import useStyles from './styles';
 const Dashboard = () => {
   const classes = useStyles();
   const [dataDashboard, setDataDasboard] = useState({
-    collectToday: 100,
-    contributors: 1246,
-    debtors: 233,
-    ufm: 2.8,
-    collectThisYear: [],
+    collectToday: 0,
+    collectYesterday: 0,
+    contributors: 0,
+    contributorsDebtors: 0,
+    valueTotalEmited: 0,
+    valueTotalArrecadado: 0,
+    debtors: 0,
+    ufm: 0,
+    emitido: [],
+    pago: [],
     collectDebtorsToIncome: {
       incomes: [],
       data: {},
@@ -32,7 +37,35 @@ const Dashboard = () => {
   useEffect(() => {
     async function requestDataDashboard() {
       const response = await DashboardService.getDashboardIndex();
-      setDataDasboard(response.data);
+      const {
+        ufm,
+        valorTotalEmitido,
+        valorEmitidoHoje,
+        valorEmitidoOntem,
+        valorInadimplencia,
+        countContribuinte,
+        countContribuinteInadimplente,
+        valueDAMInadimplenteReceita,
+        valueDAMMonth,
+        valueDAMPagoMonth
+      } = response.data;
+
+      setDataDasboard((value) => ({
+        ...value,
+        ufm,
+        collectToday: valorEmitidoHoje,
+        collectYesterday: valorEmitidoOntem,
+        contributors: countContribuinte,
+        valueTotalArrecadado: valorTotalEmitido,
+        valueTotalEmited: valorTotalEmitido,
+        debtors: valorInadimplencia,
+        contributorsDebtors: countContribuinteInadimplente,
+        emitido: valueDAMMonth,
+        pago: valueDAMPagoMonth,
+        collectDebtorsToIncome: {
+          incomes: valueDAMInadimplenteReceita
+        }
+      }));
     }
     requestDataDashboard();
   }, []);
@@ -43,8 +76,8 @@ const Dashboard = () => {
         <Grid item lg={3} sm={6} xl={3} xs={12}>
           <Arrecadado
             title="Arrecadado hoje"
-            value={dataDashboard.collectToday}
-            statistic={12}
+            valueToday={dataDashboard.collectToday}
+            valueYestarday={dataDashboard.collectYesterday}
             footer="Referente ao dia anterior"
           />
         </Grid>
@@ -52,7 +85,7 @@ const Dashboard = () => {
           <TotalContribuintes
             title="Contribuintes"
             value={dataDashboard.contributors}
-            statistic={9}
+            statistic={dataDashboard.contributorsDebtors}
             footer="Inadimplentes"
           />
         </Grid>
@@ -60,13 +93,17 @@ const Dashboard = () => {
           <InadiplentesProgress
             title="Inadimplência"
             value={dataDashboard.debtors}
+            statistic={dataDashboard.valueTotalEmited}
           />
         </Grid>
         <Grid item lg={3} sm={6} xl={3} xs={12}>
           <Ufm title="UFM" value={dataDashboard.ufm} />
         </Grid>
         <Grid item lg={8} md={12} xl={9} xs={12}>
-          <GraficBarAnual />
+          <GraficBarAnual
+            emitido={dataDashboard.emitido}
+            pago={dataDashboard.pago}
+          />
         </Grid>
         <Grid item lg={4} md={6} xl={3} xs={12}>
           <GraficPieInadimplencia

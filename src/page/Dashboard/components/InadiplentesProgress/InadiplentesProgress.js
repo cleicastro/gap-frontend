@@ -5,7 +5,13 @@ import { Card, CardContent, Grid, Typography, Avatar } from '@material-ui/core';
 import InsertChartIcon from '@material-ui/icons/InsertChartOutlined';
 import { useStyles, ColorLinearProgress } from './styles';
 
-const InadiplentesProgress = ({ className, title, value, ...rest }) => {
+const InadiplentesProgress = ({
+  className,
+  title,
+  value,
+  statistic,
+  ...rest
+}) => {
   const classes = useStyles();
 
   return (
@@ -25,7 +31,7 @@ const InadiplentesProgress = ({ className, title, value, ...rest }) => {
                 style: 'percent',
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
-              }).format(value / 100)}
+              }).format(value / statistic || 0)}
             </Typography>
           </Grid>
           <Grid item>
@@ -36,7 +42,7 @@ const InadiplentesProgress = ({ className, title, value, ...rest }) => {
         </Grid>
         <ColorLinearProgress
           className={classes.progress}
-          value={value}
+          value={(value / statistic) * 100 || 0}
           variant="determinate"
           color="primary"
         />

@@ -26,8 +26,15 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     alignItems: 'center'
   },
+  differencePositiveIcon: {
+    color: theme.palette.primary.main
+  },
   differenceIcon: {
     color: theme.palette.error.dark
+  },
+  differenceValuePositive: {
+    color: theme.palette.primary.main,
+    marginRight: theme.spacing(1)
   },
   differenceValue: {
     color: theme.palette.error.dark,

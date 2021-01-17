@@ -6,15 +6,12 @@ import {
   Card,
   CardHeader,
   CardContent,
-  IconButton,
   Divider,
   Typography
 } from '@material-ui/core';
-import RefreshIcon from '@material-ui/icons/Refresh';
 
 import useStyles from './styles';
 import palette from '../../../../theme/palette';
-import { data } from './chart';
 
 const options = {
   legend: {
@@ -40,18 +37,28 @@ const options = {
 
 const GraficPieInadimplencia = (props) => {
   const { values, className, ...rest } = props;
-
   const classes = useStyles();
   const { incomes } = values;
-
+  // const dataTotal = incomes.reduce((acc, item) => acc + Number(item.value), 0);
+  const data = {
+    datasets: [
+      {
+        data: incomes.map((income) => income.value),
+        backgroundColor: incomes.map(
+          () => `#${Math.floor(Math.random() * 256)}`
+        ),
+        borderWidth: 8,
+        borderColor: palette.white,
+        hoverBorderColor: palette.white
+      }
+    ],
+    labels: incomes.map((value) => value.title)
+  };
+  // incomes.map((value) => data.push(value.value));
   return (
     <Card {...rest} className={clsx(classes.root, className)}>
       <CardHeader
-        action={
-          <IconButton size="small">
-            <RefreshIcon />
-          </IconButton>
-        }
+        // action={<IconButton size="small"> <RefreshIcon /> </IconButton>}
         title="Arrecadações Inadimplentes/Receita"
       />
       <Divider />
@@ -60,11 +67,14 @@ const GraficPieInadimplencia = (props) => {
           <Doughnut data={data} options={options} />
         </div>
         <div className={classes.stats}>
-          {incomes.map((device) => (
-            <div className={classes.device} key={device.title}>
-              <Typography variant="body1">{device.title}</Typography>
-              <Typography style={{ color: device.color }} variant="h2">
-                {device.value}%
+          {incomes.map((income) => (
+            <div className={classes.device} key={income.title}>
+              <Typography variant="caption">{income.title}</Typography>
+              <Typography style={{ color: 'green' }} variant="h6">
+                {Intl.NumberFormat('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL'
+                }).format(income.value)}
               </Typography>
             </div>
           ))}
