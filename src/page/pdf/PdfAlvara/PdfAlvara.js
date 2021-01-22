@@ -170,12 +170,12 @@ function PdfAlvara() {
           <ContainerFooter>
             <Assignature>
               <span>____________________________</span>
-              <TextFooter>Carmelina de Nazaré M. da Costa</TextFooter>
-              <TextFooter>Prefeita Municipal de Irituia</TextFooter>
+              <TextFooter>Marcos de Lima Pinto</TextFooter>
+              <TextFooter>Prefeito Municipal de Irituia</TextFooter>
             </Assignature>
             <Assignature>
               <span>____________________________</span>
-              <TextFooter>Cleidiane Carvalho Gomes</TextFooter>
+              <TextFooter>Simonely Leite Pinto</TextFooter>
               <TextFooter>Secretária Municipal de Finanças</TextFooter>
             </Assignature>
           </ContainerFooter>

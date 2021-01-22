@@ -125,10 +125,10 @@ function Teste({ alvara }) {
             <Column>
               <TextTitle>__________________________</TextTitle>
               <TextValues style={{ marginLeft: 8 }}>
-                Carmelina de Nazaré M. da Costa
+                Marcos de Lima Pinto
               </TextValues>
               <TextValues style={{ marginLeft: 20 }}>
-                Prefeita Municipal de Irituia
+                Prefeito Municipal de Irituia
               </TextValues>
             </Column>
           </View>
@@ -136,7 +136,7 @@ function Teste({ alvara }) {
             <Column>
               <TextTitle>__________________________</TextTitle>
               <TextValues style={{ marginLeft: 20 }}>
-                Cleidiane Carvalho Gomes
+                Simonely Leite Pinto
               </TextValues>
               <TextValues style={{ marginLeft: 10 }}>
                 Secretária Municipal de Finanças
