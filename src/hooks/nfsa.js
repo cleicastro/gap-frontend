@@ -218,15 +218,18 @@ async function editStatusDAM(id, params) {
   const response = await Dam.updateDam(id, params);
   return response;
 }
-async function requestTableIR() {
-  const response = await TabelaIR.getTabelaIR();
+async function requestTableDeducao() {
+  const response = await TabelaIR.getTabelaDeducoes();
   return response;
 }
 
-function tableIrAction(table) {
+function tableDeducaoAction(table) {
   return {
-    type: ACTIONS_NFSA.TABLE_IR,
-    payload: table
+    type: ACTIONS_NFSA.TABLE_DEDUCOES,
+    payload: {
+      tableIR: table.tableIR,
+      tableINSS: table.tableINSS
+    }
   };
 }
 function addNfsaAction(nfsa) {
@@ -253,8 +256,8 @@ export const useNfsa = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    requestTableIR().then((response) => {
-      dispatch(tableIrAction(response.data));
+    requestTableDeducao().then((response) => {
+      dispatch(tableDeducaoAction(response.data));
       if (response.status !== 201) {
         setStatusServer(response.status);
       }

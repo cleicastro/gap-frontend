@@ -1,7 +1,7 @@
 import api from './api';
 
 class TabelaIR {
-  getTabelaIR(cancelToken) {
+  getTabelaDeducoes(cancelToken) {
     // const token = sessionStorage.getItem('JWT_Token');
     return api.get(
       'tabela-ir',

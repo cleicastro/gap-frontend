@@ -42,6 +42,7 @@ function FormTributos() {
   const [selectIsentTaxa, setSelectIsentTaxa] = useState(
     tributos.taxaExp === 0
   );
+
   const {
     control,
     register,
@@ -209,7 +210,8 @@ function FormTributos() {
         <Grid item xs={12} sm={12}>
           <Paper elevation={3} style={{ padding: 20 }}>
             <FormControlLabel
-              disabled={!watch('irRetido') || selectIsentTaxa}
+              // disabled={!watch('irRetido') || selectIsentTaxa}
+              disabled
               control={
                 <Switch
                   defaultChecked={tributos.converterIRRF || false}

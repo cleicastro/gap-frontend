@@ -7,7 +7,8 @@ class Tributos {
     taxaExp,
     confinsPercente,
     csllPercente,
-    tableIR
+    tableIR,
+    tableINSS
   ) {
     this.baseCalc = Number(baseCalc);
     this.aliquotaIss = Number(aliquotaIss);
@@ -17,23 +18,40 @@ class Tributos {
     this.confinsPercente = Number(confinsPercente);
     this.csllPercente = Number(csllPercente);
     this.tableIR = tableIR;
+    this.tableINSS = tableINSS;
   }
 
   calcTributsNfsa() {
     const valorISS = (this.baseCalc * this.aliquotaIss) / 100;
     const pisValor = (this.baseCalc * this.pisPercente) / 100;
-    const inssValor = (this.baseCalc * this.inssPercente) / 100;
+    // const inssValor = (this.baseCalc * this.inssPercente) / 100;
     const csllValor = (this.baseCalc * this.csllPercente) / 100;
     const confinsValor = (this.baseCalc * this.confinsPercente) / 100;
 
     const tableIRSelected = this.tableIR.find((faixa) => {
       return this.baseCalc <= Number(faixa.ate);
     });
-    const auxTableIR = tableIRSelected || this.tableIR[this.tableIR.length - 1];
+    const tableINSSSelected = this.tableINSS.find((faixa) => {
+      return this.baseCalc <= Number(faixa.ate);
+    });
 
-    const irValorCalc = this.baseCalc * (Number(auxTableIR.aliquota) / 100);
+    const auxTableINSS =
+      tableINSSSelected || this.tableINSS[this.tableINSS.length - 1];
+    const inssValorCalc = this.baseCalc * (Number(auxTableINSS.aliquota) / 100);
+    let inssValor = 0.0;
+    if (inssValorCalc > 751.98) {
+      inssValor = 751.98;
+    } else {
+      inssValor =
+        this.baseCalc * (Number(auxTableINSS.aliquota) / 100) -
+        Number(auxTableINSS.deducao);
+    }
+
+    const auxTableIR = tableIRSelected || this.tableIR[this.tableIR.length - 1];
+    const irValorCalc =
+      (this.baseCalc - inssValor) * (Number(auxTableIR.aliquota) / 100);
     const irValor =
-      this.baseCalc * (Number(auxTableIR.aliquota) / 100) -
+      (this.baseCalc - inssValor) * (Number(auxTableIR.aliquota) / 100) -
       Number(auxTableIR.deducao);
 
     const valorNF =
@@ -54,6 +72,9 @@ class Tributos {
       irValorView: irValor.toFixed(2),
       valorISS: valorISS.toFixed(2),
       pisValor: pisValor.toFixed(2),
+      inssPercente: auxTableINSS.aliquota,
+      inssValorCalc: inssValorCalc.toFixed(2),
+      inssValorView: inssValor.toFixed(2),
       inssValor: inssValor.toFixed(2),
       confinsValor: confinsValor.toFixed(2),
       csllValor: csllValor.toFixed(2),

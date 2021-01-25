@@ -22,6 +22,7 @@ const useTributos = () => {
     state: { dataItemNfsa, dataNfsa }
   } = useContext(NfsaContext);
   const tableIR = useSelector((state) => state.nfsa.tableIR);
+  const tableINSS = useSelector((state) => state.nfsa.tableINSS);
 
   const baseCalculo = dataItemNfsa.reduce((acc, item) => {
     return acc + Number(item.quantidade) * Number(item.valor);
@@ -61,7 +62,8 @@ const useTributos = () => {
     tributosInitial.taxaExp,
     tributosInitial.confinsPercente,
     tributosInitial.csllPercente,
-    tableIR
+    tableIR,
+    tableINSS
   );
 
   const tributos = calcInicialTributos.calcTributsNfsa();

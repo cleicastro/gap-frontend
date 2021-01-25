@@ -4,22 +4,24 @@ export const ACTIONS = {
   LIST_INITIAL: 'LIST_INITIAL',
   ADD: 'NFSA_ADD',
   UPDATE_NFSA: 'NFSA_UPDATE',
-  TABLE_IR: 'NFSA_TABLE_IR'
+  TABLE_DEDUCOES: 'NFSA_TABLE_DEDUCOES'
 };
 
 const INITIAL_STATE = {
   error: [],
   listNfsa: [],
   pagination: {},
-  tableIR: []
+  tableIR: [],
+  tableINSS: []
 };
 
 export const nfsaReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case ACTIONS.TABLE_IR:
+    case ACTIONS.TABLE_DEDUCOES:
       return {
         ...state,
-        tableIR: action.payload
+        tableIR: action.payload.tableIR,
+        tableINSS: action.payload.tableINSS
       };
     case ACTIONS.LIST_INITIAL:
       return {
