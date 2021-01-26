@@ -78,6 +78,8 @@ function PdfAlvara() {
     );
   }
 
+  const cadastroEconomico = alvara.inscricao_municipal.split('.');
+
   return (
     <Container>
       <Box displayPrint="none">
@@ -140,7 +142,11 @@ function PdfAlvara() {
             </div>
             <div>
               <TextContainer>Cadastro Econômico:</TextContainer>
-              <TextALvaraItem>{alvara.dam.contribuinte.id}</TextALvaraItem>
+              <TextALvaraItem>
+                {cadastroEconomico.length === 4
+                  ? cadastroEconomico[2]
+                  : alvara.dam.contribuinte.id}
+              </TextALvaraItem>
             </div>
             <div>
               <TextContainer>Endereço:</TextContainer>

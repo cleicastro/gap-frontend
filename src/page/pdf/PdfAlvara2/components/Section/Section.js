@@ -26,6 +26,7 @@ function Teste({ alvara }) {
   const {
     contribuinte: { nome, doc, id }
   } = alvara.dam;
+  const cadastroEconomico = inscricaoMunicipal.split('.');
   return (
     <View style={styles.section}>
       <View style={styles.main}>
@@ -79,7 +80,8 @@ function Teste({ alvara }) {
               Inscrição Municipal: {inscricaoMunicipal}
             </TextValues>
             <TextValues style={{ textAlign: 'justify' }}>
-              Cad. Econômico: {id}
+              Cad. Econômico:{' '}
+              {cadastroEconomico.length === 4 ? cadastroEconomico[4] : id}
             </TextValues>
             <TextValues style={{ textAlign: 'justify' }}>
               Endereço: {endereco} Nº: {numero}

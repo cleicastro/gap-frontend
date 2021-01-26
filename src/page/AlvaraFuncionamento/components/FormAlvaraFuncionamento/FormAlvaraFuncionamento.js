@@ -22,13 +22,19 @@ function FormAlvaraFuncionamento() {
   } = useContext(AlvaraFuncionamentoContext);
 
   const { cadAlvara } = taxpayerSeleted;
+  const typeContribuinte = taxpayerSeleted.tipo === 'PF' ? '01' : '02';
+  // const alternativeIM = `${taxpayerSeleted.id}.${typeContribuinte}`;
   const cadastroAlvara = {
     atividadePrincipal: cadAlvara && cadAlvara.atividade_principal,
     atividadeSecundariaI: cadAlvara && cadAlvara.atividade_secundaria_I,
     atividadeSecundariaII: cadAlvara && cadAlvara.atividade_secundaria_II,
     inscricaoMunicipal:
       cadAlvara &&
-      `${cadAlvara.inscricao_municipal}.${new Date().getFullYear()}`
+      `${
+        cadAlvara.inscricao_municipal
+          ? cadAlvara.inscricao_municipal
+          : `${taxpayerSeleted.id}.${typeContribuinte}`
+      }.${new Date().getFullYear()}`
   };
 
   const { register, handleSubmit, control, errors, getValues } = useForm({
